@@ -50,6 +50,15 @@ import org.json.JSONArray;
 
 /**
  * Client-side implementation of IGraphStoreQuery.
+ * <p> e.g.
+ * <pre> // create annotation store client
+ * GraphStoreQuery store = new GraphStoreQuery("https://labbcat.canterbury.ac.nz", "demo", "demo");
+ * // get some basic information
+ * String id = store.getId();
+ * String[] layers = store.getLayerIds();
+ * String[] corpora = store.getCorpusIds();
+ * String[] documents = store.getGraphIdsInCorpus(corpora[0]);
+ * </pre>
  * @author Robert Fromont robert@fromont.net.nz
  */
 
