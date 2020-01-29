@@ -350,8 +350,7 @@ public class GraphStoreQuery
       {
          throw new StoreException("Could not construct request URL.", t);
       }
-   } // end of makeUrl()
-   
+   } // end of makeUrl()   
 
    // IGraphStoreQuery methods:
    
@@ -415,7 +414,7 @@ public class GraphStoreQuery
    } 
    
    /**
-    * Gets a list of layer definitions.
+    * Gets a list of layer definitions - <em>NOT YET IMPLEMENTED</em>.
     * @return A list of layer definitions.
     * @throws StoreException If an error occurs.
     * @throws PermissionException If the operation is not permitted.
@@ -427,7 +426,7 @@ public class GraphStoreQuery
    }
 
    /**
-    * Gets the layer schema.
+    * Gets the layer schema - <em>NOT YET IMPLEMENTED</em>.
     * @return A schema defining the layers and how they relate to each other.
     * @throws StoreException If an error occurs.
     * @throws PermissionException If the operation is not permitted.
@@ -439,7 +438,7 @@ public class GraphStoreQuery
    }
 
    /**
-    * Gets a layer definition.
+    * Gets a layer definition - <em>NOT YET IMPLEMENTED</em>.
     * @param id ID of the layer to get the definition for.
     * @return The definition of the given layer.
     * @throws StoreException If an error occurs.
@@ -452,7 +451,7 @@ public class GraphStoreQuery
    }   
 
    /**
-    * Gets a list of corpus IDs.
+    * Gets a list of corpus IDs - <em>NOT YET IMPLEMENTED</em>.
     * @return A list of corpus IDs.
     * @throws StoreException If an error occurs.
     * @throws PermissionException If the operation is not permitted.
@@ -464,7 +463,7 @@ public class GraphStoreQuery
    } 
    
    /**
-    * Gets a list of participant IDs.
+    * Gets a list of participant IDs - <em>NOT YET IMPLEMENTED</em>.
     * @return A list of participant IDs.
     * @throws StoreException If an error occurs.
     * @throws PermissionException If the operation is not permitted.
@@ -476,7 +475,7 @@ public class GraphStoreQuery
    } 
 
    /**
-    * Gets the participant record specified by the given identifier.
+    * Gets the participant record specified by the given identifier - <em>NOT YET IMPLEMENTED</em>.
     * @param id The ID of the participant, which could be their name or their database annotation
     * ID. 
     * @return An annotation representing the participant, or null if the participant was not found.
@@ -490,7 +489,7 @@ public class GraphStoreQuery
    }
 
    /**
-    * Counts the number of participants that match a particular pattern.
+    * Counts the number of participants that match a particular pattern - <em>NOT YET IMPLEMENTED</em>.
     * @param expression An expression that determines which participants match.
     * <p> The expression language is currently not well defined, but expressions such as the
     * following can be used: 
@@ -516,7 +515,7 @@ public class GraphStoreQuery
    } 
    
    /**
-    * Gets a list of IDs of participants that match a particular pattern.
+    * Gets a list of IDs of participants that match a particular pattern - <em>NOT YET IMPLEMENTED</em>.
     * @param expression An expression that determines which participants match.
     * <p> The expression language is currently not well defined, but expressions such as the
     * following can be used: 
@@ -544,7 +543,7 @@ public class GraphStoreQuery
    } 
 
    /**
-    * Gets a list of graph IDs.
+    * Gets a list of graph IDs - <em>NOT YET IMPLEMENTED</em>.
     * @return A list of graph IDs.
     * @throws StoreException If an error occurs.
     * @throws PermissionException If the operation is not permitted.
@@ -556,7 +555,7 @@ public class GraphStoreQuery
    } 
    
    /**
-    * Gets a list of graph IDs in the given corpus.
+    * Gets a list of graph IDs in the given corpus - <em>NOT YET IMPLEMENTED</em>.
     * @param id A corpus ID.
     * @return A list of graph IDs.
     * @throws StoreException If an error occurs.
@@ -569,7 +568,7 @@ public class GraphStoreQuery
    } 
 
    /**
-    * Gets a list of IDs of graphs that include the given participant.
+    * Gets a list of IDs of graphs that include the given participant - <em>NOT YET IMPLEMENTED</em>.
     * @param id A participant ID.
     * @return A list of graph IDs.
     * @throws StoreException If an error occurs.
@@ -582,9 +581,10 @@ public class GraphStoreQuery
    } 
 
    /**
-    * Counts the number of graphs that match a particular pattern.
+    * Counts the number of graphs that match a particular pattern - <em>NOT YET IMPLEMENTED</em>.
     * @param expression An expression that determines which graphs match.
-    * <p> The expression language is currently not well defined, but expressions such as the following can be used:
+    * <p> The expression language is currently not well defined, but expressions such as
+    * the following can be used: 
     * <ul>
     *  <li><code>id MATCHES 'Ada.+'</code></li>
     *  <li><code>'Robert' IN labels('who')</code></li>
@@ -596,20 +596,12 @@ public class GraphStoreQuery
     *  <li><code>'en' IN labels('transcript_languages')</code></li>
     *  <li><code>'en' IN labels('participant_languages')</code></li>
     *  <li><code>'bell' IN labels('noise')</code></li>
-    *  <li><code>list('transcript_languages').length gt
-   {
-      throw new StoreException("Not implemented");
-   } 1</code></li>
-    *  <li><code>list('participant_languages').length gt
-   {
-      throw new StoreException("Not implemented");
-   } 1</code></li>
-    *  <li><code>list('transcript').length gt
-   {
-      throw new StoreException("Not implemented");
-   } 100</code></li>
+    *  <li><code>list('transcript_languages').length &gt; 1</code></li>
+    *  <li><code>list('participant_languages').length &gt; 1</code></li>
+    *  <li><code>list('transcript').length &gt; 100</code></li>
     *  <li><code>'Robert' IN annotators('transcript_rating')</code></li>
-    *  <li><code>id NOT MATCHES 'Ada.+' AND my('corpus').label = 'CC' AND 'Robert' IN labels('who')</code></li>
+    *  <li><code>id NOT MATCHES 'Ada.+' AND my('corpus').label = 'CC' AND 'Robert' IN
+    * labels('who')</code></li> 
     * </ul>
     * @return The number of matching graphs.
     * @throws StoreException If an error occurs.
@@ -622,7 +614,7 @@ public class GraphStoreQuery
    }    
 
    /**
-    * <p>Gets a list of IDs of graphs that match a particular pattern.</p>
+    * <p>Gets a list of IDs of graphs that match a particular pattern - <em>NOT YET IMPLEMENTED</em>.
     * <p>The results can be exhaustive, by omitting pageLength and pageNumber, or they
     * can be a subset (a 'page') of results, by given pageLength and pageNumber values.</p>
     * <p>The order of the list can be specified.  If ommitted, the graphs are listed in ID
@@ -640,20 +632,12 @@ public class GraphStoreQuery
     *  <li><code>'en' IN labels('transcript_languages')</code></li>
     *  <li><code>'en' IN labels('participant_languages')</code></li>
     *  <li><code>'bell' IN labels('noise')</code></li>
-    *  <li><code>list('transcript_languages').length gt
-   {
-      throw new StoreException("Not implemented");
-   } 1</code></li>
-    *  <li><code>list('participant_languages').length gt
-   {
-      throw new StoreException("Not implemented");
-   } 1</code></li>
-    *  <li><code>list('transcript').length gt
-   {
-      throw new StoreException("Not implemented");
-   } 100</code></li>
+    *  <li><code>list('transcript_languages').length &gt; 1</code></li>
+    *  <li><code>list('participant_languages').length &gt; 1</code></li>
+    *  <li><code>list('transcript').length &gt; 100</code></li>
     *  <li><code>'Robert' IN annotators('transcript_rating')</code></li>
-    *  <li><code>id NOT MATCHES 'Ada.+' AND my('corpus').label = 'CC' AND 'Robert' IN labels('who')</code></li>
+    *  <li><code>id NOT MATCHES 'Ada.+' AND my('corpus').label = 'CC' AND 'Robert' IN
+    * labels('who')</code></li> 
     * </ul>
     * @param pageLength The maximum number of IDs to return, or null to return all.
     * @param pageNumber The zero-based page number to return, or null to return the first page.
@@ -670,9 +654,10 @@ public class GraphStoreQuery
    } 
 
    /**
-    * Counts the number of annotations that match a particular pattern.
+    * Counts the number of annotations that match a particular pattern - <em>NOT YET IMPLEMENTED</em>.
     * @param expression An expression that determines which participants match.
-    * <p> The expression language is currently not well defined, but expressions such as the following can be used:
+    * <p> The expression language is currently not well defined, but expressions such as
+    * the following can be used:
     * <ul>
     *  <li><code>id = 'ew_0_456'</code></li>
     *  <li><code>label NOT MATCHES 'th[aeiou].*'</code></li>
@@ -693,7 +678,7 @@ public class GraphStoreQuery
    } 
 
    /**
-    * Gets a list of annotations that match a particular pattern.
+    * Gets a list of annotations that match a particular pattern - <em>NOT YET IMPLEMENTED</em>.
     * @param expression An expression that determines which graphs match.
     * <p> The expression language is currently not well defined, but expressions such as the
     * following can be used: 
@@ -719,7 +704,7 @@ public class GraphStoreQuery
    } 
 
    /**
-    * Gets the number of annotations on the given layer of the given graph.
+    * Gets the number of annotations on the given layer of the given graph - <em>NOT YET IMPLEMENTED</em>.
     * @param id The ID of the graph.
     * @param layerId The ID of the layer.
     * @return A (possibly empty) array of annotations.
@@ -734,7 +719,7 @@ public class GraphStoreQuery
    }
 
    /**
-    * Gets the annotations on the given layer of the given graph.
+    * Gets the annotations on the given layer of the given graph - <em>NOT YET IMPLEMENTED</em>.
     * @param id The ID of the graph.
     * @param layerId The ID of the layer.
     * @return A (possibly empty) array of annotations.
@@ -749,7 +734,7 @@ public class GraphStoreQuery
    }
 
    /**
-    * Gets the annotations on the given layer of the given graph.
+    * Gets the annotations on the given layer of the given graph - <em>NOT YET IMPLEMENTED</em>.
     * @param id The ID of the graph.
     * @param layerId The ID of the layer.
     * @param pageLength The maximum number of IDs to return, or null to return all.
@@ -766,28 +751,19 @@ public class GraphStoreQuery
    }
    
    /**
-    * Gets the annotations on given layers for a set of match IDs.
+    * Gets the annotations on given layers for a set of match IDs - <em>NOT YET IMPLEMENTED</em>.
     * @param matchIds An iterator that supplies match IDs - these may be the contents of
     * the MatchId column in exported search results, token URLs, or annotation IDs. 
     * @param layerIds The layer IDs of the layers to get.
-    * @param targetOffset Which token to get the annotations of
-   {
-      throw new StoreException("Not implemented");
-   } 0 means the match target
+    * @param targetOffset Which token to get the annotations of;  0 means the match target
     * itself, 1 means the token after the target, -1 means the token before the target, etc. 
-    * @param annotationsPerLayer The number of annotations per layer to get
-   {
-      throw new StoreException("Not implemented");
-   } if there's a
+    * @param annotationsPerLayer The number of annotations per layer to get; if there's a
     * smaller number of annotations available, the unfilled array elements will be null.
     * @param consumer A consumer for handling the resulting
     * annotations. Consumer.accept() will be invoked once for each element returned by the
     * <var>matchIds</var> iterator, with an array of {@link Annotation} objects. The size
     * of this array will be <var>layerIds.length</var> * <var>annotationsPerLayer</var>,
-    * and will be filled in with the available annotations for each layer
-   {
-      throw new StoreException("Not implemented");
-   } when
+    * and will be filled in with the available annotations for each layer; when
     * annotations are not available, null is supplied.
     * @throws StoreException If an error occurs.
     * @throws PermissionException If the operation is not permitted.
@@ -799,7 +775,7 @@ public class GraphStoreQuery
    }
    
    /**
-    * Gets the given anchors in the given graph.
+    * Gets the given anchors in the given graph - <em>NOT YET IMPLEMENTED</em>.
     * @param id The ID of the graph.
     * @param anchorIds A list of anchor IDs.
     * @return A (possibly empty) array of anchors.
@@ -814,7 +790,7 @@ public class GraphStoreQuery
    }
 
    /**
-    * Gets a graph given its ID.
+    * Gets a graph given its ID - <em>NOT YET IMPLEMENTED</em>.
     * @param id The given graph ID.
     * @return The identified graph.
     * @throws StoreException If an error occurs.
@@ -828,7 +804,7 @@ public class GraphStoreQuery
    }
 
    /**
-    * Gets a graph given its ID, containing only the given layers.
+    * Gets a graph given its ID, containing only the given layers - <em>NOT YET IMPLEMENTED</em>.
     * @param id The given graph ID.
     * @param layerIds The IDs of the layers to load, or null if only graph data is required.
     * @return The identified graph.
@@ -843,7 +819,7 @@ public class GraphStoreQuery
    }
 
    /**
-    * Gets a fragment of a graph, given its ID and the ID of an annotation in it that defines the 
+    * Gets a fragment of a graph, given its ID and the ID of an annotation in it that defines the - <em>NOT YET IMPLEMENTED</em> 
     * desired fragment.
     * @param graphId The ID of the graph.
     * @param annotationId The ID of an annotation that defines the bounds of the fragment.
@@ -859,7 +835,7 @@ public class GraphStoreQuery
    }
 
    /**
-    * Gets a fragment of a graph, given its ID and the ID of an annotation in it that defines the 
+    * Gets a fragment of a graph, given its ID and the ID of an annotation in it that defines the - <em>NOT YET IMPLEMENTED</em> 
     * desired fragment, and containing only the given layers.
     * @param graphId The ID of the graph.
     * @param annotationId The ID of an annotation that defines the bounds of the fragment.
@@ -876,7 +852,7 @@ public class GraphStoreQuery
    }
    
    /**
-    * Gets a fragment of a graph, given its ID and the start/end offsets that define the 
+    * Gets a fragment of a graph, given its ID and the start/end offsets that define the - <em>NOT YET IMPLEMENTED</em> 
     * desired fragment, and containing only the given layers.
     * @param graphId The ID of the graph.
     * @param start The start offset of the fragment.
@@ -894,7 +870,7 @@ public class GraphStoreQuery
    }
    
    /**
-    * Gets a series of fragments, given the series' ID, and only the given layers.
+    * Gets a series of fragments, given the series' ID, and only the given layers - <em>NOT YET IMPLEMENTED</em>.
     * @param seriesId The ID of the series.
     * @param layerIds The IDs of the layers to load, or null if only graph data is required.
     * @return An enumeratable series of fragments.
@@ -909,7 +885,7 @@ public class GraphStoreQuery
    }
    
    /**
-    * List the predefined media tracks available for transcripts.
+    * List the predefined media tracks available for transcripts - <em>NOT YET IMPLEMENTED</em>.
     * @return An ordered list of media track definitions.
     * @throws StoreException If an error occurs.
     * @throws PermissionException If the operation is not permitted. 
@@ -921,7 +897,7 @@ public class GraphStoreQuery
    }
    
    /**
-    * List the media available for the given graph.
+    * List the media available for the given graph - <em>NOT YET IMPLEMENTED</em>.
     * @param id The graph ID.
     * @return List of media files available for the given graph.
     * @throws StoreException If an error occurs.
@@ -935,14 +911,11 @@ public class GraphStoreQuery
    }
 
    /**
-    * Gets a given media track for a given graph.
+    * Gets a given media track for a given graph - <em>NOT YET IMPLEMENTED</em>.
     * @param id The graph ID.
     * @param trackSuffix The track suffix of the media - see {@link MediaTrackDefinition#suffix}.
     * @param mimeType The MIME type of the media, which may include parameters for type
-    * conversion, e.g. "text/wav
-   {
-      throw new StoreException("Not implemented");
-   } samplerate=16000".
+    * conversion, e.g. "text/wav; samplerate=16000".
     * @return A URL to the given media for the given graph, or null if the given media doesn't
     * exist. 
     * @throws StoreException If an error occurs.
@@ -956,14 +929,11 @@ public class GraphStoreQuery
    }
 
    /**
-    * Gets a given media track for a given graph.
+    * Gets a given media track for a given graph - <em>NOT YET IMPLEMENTED</em>.
     * @param id The graph ID.
     * @param trackSuffix The track suffix of the media - see {@link MediaTrackDefinition#suffix}.
     * @param mimeType The MIME type of the media, which may include parameters for type
-    * conversion, e.g. "text/wav
-   {
-      throw new StoreException("Not implemented");
-   } samplerate=16000"
+    * conversion, e.g. "text/wav; samplerate=16000"
     * @param startOffset The start offset of the media sample, or null for the start of the whole
     * recording. 
     * @param endOffset The end offset of the media sample, or null for the end of the whole
@@ -981,7 +951,7 @@ public class GraphStoreQuery
    }
 
    /**
-    * Get a list of documents associated with the episode of the given graph.
+    * Get a list of documents associated with the episode of the given graph - <em>NOT YET IMPLEMENTED</em>.
     * @param id The graph ID.
     * @return List of URLs to documents.
     * @throws StoreException If an error prevents the media from being saved.
