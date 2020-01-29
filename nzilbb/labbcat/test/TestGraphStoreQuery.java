@@ -34,9 +34,22 @@ import nzilbb.labbcat.*;
 public class TestGraphStoreQuery 
 {
    // YOU MUST ENSURE THE FOLLOWING SETTINGS ARE VALID FOR YOU TEST LABBCAT SERVER:
-   String labbcatUrl = "http://localhost:8080/labbcat/";
-   String username = "labbcat";
-   String password = "labbcat";
+   static String labbcatUrl = "http://localhost:8080/labbcat/";
+   static String username = "labbcat";
+   static String password = "labbcat";
+   static GraphStoreQuery store;
+
+   @BeforeClass public static void createStore()
+   {
+      try
+      {
+         store = new GraphStoreQuery(labbcatUrl, username, password).setBatchMode(true);
+      }
+      catch(MalformedURLException exception)
+      {
+         fail("Could not create GraphStoreQuery object");
+      }
+   }
    
    @Test(expected = StoreException.class) public void invalidCredentials()
       throws Exception
@@ -70,11 +83,17 @@ public class TestGraphStoreQuery
       store.getId();
    }
 
+   @Test public void getId()
+      throws Exception
+   {
+      String id = store.getId();
+      assertEquals("ID matches the url",
+                   labbcatUrl, id);
+   }
+
    @Test public void getLayerIds()
       throws Exception
    {
-      GraphStoreQuery store = new GraphStoreQuery(labbcatUrl, username, password)
-         .setBatchMode(true);
       String[] ids = store.getLayerIds();
       //for (String id : ids) System.out.println("layer " + id);
       assertTrue("Some IDs are returned",
@@ -93,8 +112,6 @@ public class TestGraphStoreQuery
    @Test public void getCorpusIds()
       throws Exception
    {
-      GraphStoreQuery store = new GraphStoreQuery(labbcatUrl, username, password)
-         .setBatchMode(true);
       String[] ids = store.getCorpusIds();
       // for (String id : ids) System.out.println("corpus " + id);
       assertTrue("Some IDs are returned",
@@ -104,8 +121,6 @@ public class TestGraphStoreQuery
    @Test public void getParticipantIds()
       throws Exception
    {
-      GraphStoreQuery store = new GraphStoreQuery(labbcatUrl, username, password)
-         .setBatchMode(true);
       String[] ids = store.getParticipantIds();
       // for (String id : ids) System.out.println("participant " + id);
       assertTrue("Some IDs are returned",
@@ -115,13 +130,139 @@ public class TestGraphStoreQuery
    @Test public void getGraphIds()
       throws Exception
    {
-      GraphStoreQuery store = new GraphStoreQuery(labbcatUrl, username, password)
-         .setBatchMode(true);
       String[] ids = store.getGraphIds();
       // for (String id : ids) System.out.println("graph " + id);
       assertTrue("Some IDs are returned",
                  ids.length > 0);
    }
+
+   @Test public void countMatchingParticipantIds()
+      throws Exception
+   {
+      int count = store.countMatchingParticipantIds("id MATCHES '.+'");
+      assertTrue("There are some matches",
+                 count > 0);
+   }
+
+   @Test public void getMatchingParticipantIds()
+      throws Exception
+   {
+      String[] ids = store.getMatchingParticipantIds("id MATCHES '.+'");
+      assertTrue("Some IDs are returned",
+                 ids.length > 0);
+      if (ids.length < 2)
+      {
+         System.out.println("Too few participants to test pagination");
+      }
+      else
+      {
+         ids = store.getMatchingParticipantIds("id MATCHES '.+'", 2, 0);
+         assertEquals("Two IDs are returned",
+                      2, ids.length);
+      }         
+   }
+
+   @Test public void getGraphIdsInCorpus()
+      throws Exception
+   {
+      String[] ids = store.getCorpusIds();
+      assertTrue("There's at least one corpus",
+                 ids.length > 0);
+      String corpus = ids[0];
+      ids = store.getGraphIdsInCorpus(corpus);
+      assertTrue("Some IDs are returned for corpus " + corpus,
+                 ids.length > 0);
+   }
+
+   @Test public void getGraphIdsWithParticipant()
+      throws Exception
+   {
+      String[] ids = store.getParticipantIds();
+      assertTrue("There's at least one participant",
+                 ids.length > 0);
+      String participant = ids[0];
+      ids = store.getGraphIdsWithParticipant(participant);
+      assertTrue("Some IDs are returned for participant " + participant,
+                 ids.length > 0);
+   }
+
+   @Test public void countMatchingGraphIds()
+      throws Exception
+   {
+      int count = store.countMatchingGraphIds("id MATCHES '.+'");
+      assertTrue("There are some matches",
+                 count > 0);
+   }
+
+   @Test public void getMatchingGraphIds()
+      throws Exception
+   {
+      String[] ids = store.getMatchingGraphIds("id MATCHES '.+'");
+      assertTrue("Some IDs are returned",
+                 ids.length > 0);
+      if (ids.length < 2)
+      {
+         System.out.println("Too few graphs to test pagination");
+      }
+      else
+      {
+         ids = store.getMatchingGraphIds("id MATCHES '.+'", 2, 0, "id DESC");
+         assertEquals("Two IDs are returned",
+                      2, ids.length);
+      }         
+   }
+
+   @Test public void countAnnotations()
+      throws Exception
+   {
+      String[] ids = store.getMatchingGraphIds("id MATCHES '.+'", 1, 0);
+      assertTrue("Some graph IDs are returned",
+                 ids.length > 0);
+      String graphId = ids[0];
+      long count = store.countAnnotations(graphId, "orthography");
+      assertTrue("There are some matches",
+                 count > 0);
+   }
+
+   // @Test public void getMedia()
+   //    throws Exception
+   // {
+   //    store.setVerbose(true);
+   //    String[] ids = store.getMatchingGraphIds("id MATCHES '.+'", 1, 0);
+   //    assertTrue("Some graph IDs are returned",
+   //               ids.length > 0);
+   //    String graphId = ids[0];
+   //    String url = store.getMedia(graphId, "", "audio/wav");
+   //    assertNotNull("There is some media",
+   //                  url);
+   // }
+
+   // @Test public void countMatchingAnnotations()
+   //    throws Exception
+   // {
+   //    store.setVerbose(true);
+   //    int count = store.countMatchingAnnotations("layer.id = 'orthography' AND label MATCHES 'and'");
+   //    assertTrue("There are some matches",
+   //               count > 0);
+   // }
+
+   // @Test public void getMatchingAnnotations()
+   //    throws Exception
+   // {
+   //    String[] ids = store.countMatchingAnnotations("id MATCHES '.+'");
+   //    assertTrue("Some IDs are returned",
+   //               ids.length > 0);
+   //    if (ids.length < 2)
+   //    {
+   //       System.out.println("Too few graphs to test pagination");
+   //    }
+   //    else
+   //    {
+   //       ids = store.countMatchingAnnotations("id MATCHES '.+'", 2, 0);
+   //       assertEquals("Two IDs are returned",
+   //                    2, ids.length);
+   //    }         
+   // }
 
    public static void main(String args[]) 
    {

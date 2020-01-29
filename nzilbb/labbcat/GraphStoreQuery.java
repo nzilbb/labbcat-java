@@ -367,8 +367,8 @@ public class GraphStoreQuery
       {
          URL url = url("getId");
          if (verbose) System.out.println("getId -> " + url);
-         HttpRequestGet request = new HttpRequestGet(url, getRequiredHttpAuthorization());
-         request.setHeader("Accept", "application/json");
+         HttpRequestGet request = new HttpRequestGet(url, getRequiredHttpAuthorization())
+            .setHeader("Accept", "application/json");
          Response response = new Response(request.get(), verbose);
          response.checkForErrors(); // throws a StoreException on error
          return (String)response.getModel();
@@ -392,8 +392,8 @@ public class GraphStoreQuery
       {
          URL url = url("getLayerIds");
          if (verbose) System.out.println("getLayerIds -> " + url);
-         HttpRequestGet request = new HttpRequestGet(url, getRequiredHttpAuthorization());
-         request.setHeader("Accept", "application/json");
+         HttpRequestGet request = new HttpRequestGet(url, getRequiredHttpAuthorization())
+            .setHeader("Accept", "application/json");
          Response response = new Response(request.get(), verbose);
          response.checkForErrors(); // throws a StoreException on error
          JSONArray array = (JSONArray)response.getModel();
@@ -463,8 +463,8 @@ public class GraphStoreQuery
       {
          URL url = url("getCorpusIds");
          if (verbose) System.out.println("getCorpusIds -> " + url);
-         HttpRequestGet request = new HttpRequestGet(url, getRequiredHttpAuthorization());
-         request.setHeader("Accept", "application/json");
+         HttpRequestGet request = new HttpRequestGet(url, getRequiredHttpAuthorization())
+            .setHeader("Accept", "application/json");
          Response response = new Response(request.get(), verbose);
          response.checkForErrors(); // throws a StoreException on error
          JSONArray array = (JSONArray)response.getModel();
@@ -497,8 +497,8 @@ public class GraphStoreQuery
       {
          URL url = url("getParticipantIds");
          if (verbose) System.out.println("getParticipantIds -> " + url);
-         HttpRequestGet request = new HttpRequestGet(url, getRequiredHttpAuthorization());
-         request.setHeader("Accept", "application/json");
+         HttpRequestGet request = new HttpRequestGet(url, getRequiredHttpAuthorization())
+            .setHeader("Accept", "application/json");
          Response response = new Response(request.get(), verbose);
          response.checkForErrors(); // throws a StoreException on error
          JSONArray array = (JSONArray)response.getModel();
@@ -533,7 +533,7 @@ public class GraphStoreQuery
    }
 
    /**
-    * Counts the number of participants that match a particular pattern - <em>NOT YET IMPLEMENTED</em>.
+    * Counts the number of participants that match a particular pattern.
     * @param expression An expression that determines which participants match.
     * <p> The expression language is currently not well defined, but expressions such as the
     * following can be used: 
@@ -555,11 +555,25 @@ public class GraphStoreQuery
    public int countMatchingParticipantIds(String expression)
       throws StoreException, PermissionException
    {
-      throw new StoreException("Not implemented");
+      try
+      {
+         URL url = url("countMatchingParticipantIds");
+         if (verbose) System.out.println("countMatchingParticipantIds -> " + url);
+         HttpRequestGet request = new HttpRequestGet(url, getRequiredHttpAuthorization())
+            .setParameter("expression", expression)
+            .setHeader("Accept", "application/json");
+         Response response = new Response(request.get(), verbose);
+         response.checkForErrors(); // throws a StoreException on error
+         return (Integer)response.getModel();
+      }
+      catch(IOException x)
+      {
+         throw new StoreException("Could not get response.", x);
+      }
    } 
    
    /**
-    * Gets a list of IDs of participants that match a particular pattern - <em>NOT YET IMPLEMENTED</em>.
+    * Gets a list of IDs of participants that match a particular pattern.
     * @param expression An expression that determines which participants match.
     * <p> The expression language is currently not well defined, but expressions such as the
     * following can be used: 
@@ -583,7 +597,32 @@ public class GraphStoreQuery
    public String[] getMatchingParticipantIds(String expression, Integer pageLength, Integer pageNumber)
       throws StoreException, PermissionException
    {
-      throw new StoreException("Not implemented");
+      try
+      {
+         URL url = url("getMatchingParticipantIds");
+         if (verbose) System.out.println("getMatchingParticipantIds -> " + url);
+         HttpRequestGet request = new HttpRequestGet(url, getRequiredHttpAuthorization())
+            .setHeader("Accept", "application/json")
+            .setParameter("expression", expression);
+         if (pageLength != null) request.setParameter("pageLength", pageLength);
+         if (pageNumber != null) request.setParameter("pageNumber", pageNumber);
+         Response response = new Response(request.get(), verbose);
+         response.checkForErrors(); // throws a StoreException on error
+         JSONArray array = (JSONArray)response.getModel();
+         Vector<String> ids = new Vector<String>();
+         if (array != null)
+         {
+            for (int i = 0; i < array.length(); i++)
+            {
+               ids.add(array.getString(i));
+            }
+         }
+         return ids.toArray(new String[0]);
+      }
+      catch(IOException x)
+      {
+         throw new StoreException("Could not get response.", x);
+      }
    } 
 
    /**
@@ -599,8 +638,8 @@ public class GraphStoreQuery
       {
          URL url = url("getGraphIds");
          if (verbose) System.out.println("getGraphIds -> " + url);
-         HttpRequestGet request = new HttpRequestGet(url, getRequiredHttpAuthorization());
-         request.setHeader("Accept", "application/json");
+         HttpRequestGet request = new HttpRequestGet(url, getRequiredHttpAuthorization())
+            .setHeader("Accept", "application/json");
          Response response = new Response(request.get(), verbose);
          response.checkForErrors(); // throws a StoreException on error
          JSONArray array = (JSONArray)response.getModel();
@@ -621,7 +660,7 @@ public class GraphStoreQuery
    } 
    
    /**
-    * Gets a list of graph IDs in the given corpus - <em>NOT YET IMPLEMENTED</em>.
+    * Gets a list of graph IDs in the given corpus.
     * @param id A corpus ID.
     * @return A list of graph IDs.
     * @throws StoreException If an error occurs.
@@ -630,7 +669,30 @@ public class GraphStoreQuery
    public String[] getGraphIdsInCorpus(String id)
       throws StoreException, PermissionException
    {
-      throw new StoreException("Not implemented");
+      try
+      {
+         URL url = url("getGraphIdsInCorpus");
+         if (verbose) System.out.println("getGraphIdsInCorpus -> " + url);
+         HttpRequestGet request = new HttpRequestGet(url, getRequiredHttpAuthorization())
+            .setParameter("id", id)
+            .setHeader("Accept", "application/json");
+         Response response = new Response(request.get(), verbose);
+         response.checkForErrors(); // throws a StoreException on error
+         JSONArray array = (JSONArray)response.getModel();
+         Vector<String> ids = new Vector<String>();
+         if (array != null)
+         {
+            for (int i = 0; i < array.length(); i++)
+            {
+               ids.add(array.getString(i));
+            }
+         }
+         return ids.toArray(new String[0]);
+      }
+      catch(IOException x)
+      {
+         throw new StoreException("Could not get response.", x);
+      }
    } 
 
    /**
@@ -643,11 +705,34 @@ public class GraphStoreQuery
    public String[] getGraphIdsWithParticipant(String id)
       throws StoreException, PermissionException
    {
-      throw new StoreException("Not implemented");
+      try
+      {
+         URL url = url("getGraphIdsWithParticipant");
+         if (verbose) System.out.println("getGraphIdsWithParticipant -> " + url);
+         HttpRequestGet request = new HttpRequestGet(url, getRequiredHttpAuthorization())
+            .setParameter("id", id)
+            .setHeader("Accept", "application/json");
+         Response response = new Response(request.get(), verbose);
+         response.checkForErrors(); // throws a StoreException on error
+         JSONArray array = (JSONArray)response.getModel();
+         Vector<String> ids = new Vector<String>();
+         if (array != null)
+         {
+            for (int i = 0; i < array.length(); i++)
+            {
+               ids.add(array.getString(i));
+            }
+         }
+         return ids.toArray(new String[0]);
+      }
+      catch(IOException x)
+      {
+         throw new StoreException("Could not get response.", x);
+      }
    } 
 
    /**
-    * Counts the number of graphs that match a particular pattern - <em>NOT YET IMPLEMENTED</em>.
+    * Counts the number of graphs that match a particular pattern.
     * @param expression An expression that determines which graphs match.
     * <p> The expression language is currently not well defined, but expressions such as
     * the following can be used: 
@@ -676,11 +761,25 @@ public class GraphStoreQuery
    public int countMatchingGraphIds(String expression)
       throws StoreException, PermissionException
    {
-      throw new StoreException("Not implemented");
+      try
+      {
+         URL url = url("countMatchingGraphIds");
+         if (verbose) System.out.println("countMatchingGraphIds -> " + url);
+         HttpRequestGet request = new HttpRequestGet(url, getRequiredHttpAuthorization())
+            .setParameter("expression", expression)
+            .setHeader("Accept", "application/json");
+         Response response = new Response(request.get(), verbose);
+         response.checkForErrors(); // throws a StoreException on error
+         return (Integer)response.getModel();
+      }
+      catch(IOException x)
+      {
+         throw new StoreException("Could not get response.", x);
+      }
    }    
 
    /**
-    * <p>Gets a list of IDs of graphs that match a particular pattern - <em>NOT YET IMPLEMENTED</em>.
+    * <p>Gets a list of IDs of graphs that match a particular pattern.
     * <p>The results can be exhaustive, by omitting pageLength and pageNumber, or they
     * can be a subset (a 'page') of results, by given pageLength and pageNumber values.</p>
     * <p>The order of the list can be specified.  If ommitted, the graphs are listed in ID
@@ -716,11 +815,36 @@ public class GraphStoreQuery
    public String[] getMatchingGraphIds(String expression, Integer pageLength, Integer pageNumber, String order)
       throws StoreException, PermissionException
    {
-      throw new StoreException("Not implemented");
+      try
+      {
+         URL url = url("getMatchingGraphIds");
+         if (verbose) System.out.println("getMatchingGraphIds -> " + url);
+         HttpRequestGet request = new HttpRequestGet(url, getRequiredHttpAuthorization()) 
+            .setHeader("Accept", "application/json")
+            .setParameter("expression", expression);
+         if (pageLength != null) request.setParameter("pageLength", pageLength);
+         if (pageNumber != null) request.setParameter("pageNumber", pageNumber);
+         Response response = new Response(request.get(), verbose);
+         response.checkForErrors(); // throws a StoreException on error
+         JSONArray array = (JSONArray)response.getModel();
+         Vector<String> ids = new Vector<String>();
+         if (array != null)
+         {
+            for (int i = 0; i < array.length(); i++)
+            {
+               ids.add(array.getString(i));
+            }
+         }
+         return ids.toArray(new String[0]);
+      }
+      catch(IOException x)
+      {
+         throw new StoreException("Could not get response.", x);
+      }
    } 
 
    /**
-    * Counts the number of annotations that match a particular pattern - <em>NOT YET IMPLEMENTED</em>.
+    * Counts the number of annotations that match a particular pattern.
     * @param expression An expression that determines which participants match.
     * <p> The expression language is currently not well defined, but expressions such as
     * the following can be used:
@@ -740,7 +864,21 @@ public class GraphStoreQuery
    public int countMatchingAnnotations(String expression)
       throws StoreException, PermissionException
    {
-      throw new StoreException("Not implemented");
+      try
+      {
+         URL url = url("countMatchingAnnotations");
+         if (verbose) System.out.println("countMatchingAnnotations -> " + url);
+         HttpRequestGet request = new HttpRequestGet(url, getRequiredHttpAuthorization())
+            .setParameter("expression", expression)
+            .setHeader("Accept", "application/json");
+         Response response = new Response(request.get(), verbose);
+         response.checkForErrors(); // throws a StoreException on error
+         return (Integer)response.getModel();
+      }
+      catch(IOException x)
+      {
+         throw new StoreException("Could not get response.", x);
+      }
    } 
 
    /**
@@ -781,22 +919,22 @@ public class GraphStoreQuery
    public long countAnnotations(String id, String layerId)
       throws StoreException, PermissionException, GraphNotFoundException
    {
-      throw new StoreException("Not implemented");
-   }
-
-   /**
-    * Gets the annotations on the given layer of the given graph - <em>NOT YET IMPLEMENTED</em>.
-    * @param id The ID of the graph.
-    * @param layerId The ID of the layer.
-    * @return A (possibly empty) array of annotations.
-    * @throws StoreException If an error occurs.
-    * @throws PermissionException If the operation is not permitted.
-    * @throws GraphNotFoundException If the graph was not found in the store.
-    */
-   public Annotation[] getAnnotations(String id, String layerId)
-      throws StoreException, PermissionException, GraphNotFoundException
-   {
-      throw new StoreException("Not implemented");
+      try
+      {
+         URL url = url("countAnnotations");
+         if (verbose) System.out.println("countAnnotations -> " + url);
+         HttpRequestGet request = new HttpRequestGet(url, getRequiredHttpAuthorization())
+            .setParameter("id", id)
+            .setParameter("layerId", layerId)
+            .setHeader("Accept", "application/json");
+         Response response = new Response(request.get(), verbose);
+         response.checkForErrors(); // throws a StoreException on error
+         return (Integer)response.getModel();
+      }
+      catch(IOException x)
+      {
+         throw new StoreException("Could not get response.", x);
+      }
    }
 
    /**
@@ -977,7 +1115,7 @@ public class GraphStoreQuery
    }
 
    /**
-    * Gets a given media track for a given graph - <em>NOT YET IMPLEMENTED</em>.
+    * Gets a given media track for a given graph.
     * @param id The graph ID.
     * @param trackSuffix The track suffix of the media - see {@link MediaTrackDefinition#suffix}.
     * @param mimeType The MIME type of the media, which may include parameters for type
@@ -991,7 +1129,23 @@ public class GraphStoreQuery
    public String getMedia(String id, String trackSuffix, String mimeType) 
       throws StoreException, PermissionException, GraphNotFoundException
    {
-      throw new StoreException("Not implemented");
+      try
+      {
+         URL url = url("getMedia");
+         if (verbose) System.out.println("getMedia -> " + url);
+         HttpRequestGet request = new HttpRequestGet(url, getRequiredHttpAuthorization())
+            .setHeader("Accept", "application/json")
+            .setParameter("id", id)
+            .setParameter("trackSuffix", trackSuffix)
+            .setParameter("mimeType", mimeType);
+         Response response = new Response(request.get(), verbose);
+         response.checkForErrors(); // throws a StoreException on error
+         return (String)response.getModel();
+      }
+      catch(IOException x)
+      {
+         throw new StoreException("Could not get response.", x);
+      }
    }
 
    /**
