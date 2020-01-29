@@ -26,6 +26,8 @@ import org.junit.*;
 import static org.junit.Assert.*;
 
 import java.net.MalformedURLException;
+import java.util.Arrays;
+import java.util.HashSet;
 import nzilbb.ag.StoreException;
 import nzilbb.labbcat.*;
 
@@ -74,9 +76,18 @@ public class TestGraphStoreQuery
       GraphStoreQuery store = new GraphStoreQuery(labbcatUrl, username, password)
          .setBatchMode(true);
       String[] ids = store.getLayerIds();
-      
+      //for (String id : ids) System.out.println(id);
       assertTrue("Some IDs are returned",
                  ids.length > 0);
+      HashSet<String> idSet = new HashSet<String>(Arrays.asList(ids));
+      assertTrue("Has transcript layer",
+                 idSet.contains("transcript"));
+      assertTrue("Has turns layer",
+                 idSet.contains("turns"));
+      assertTrue("Has utterances layer",
+                 idSet.contains("utterances"));
+      assertTrue("Has transcript_type layer",
+                 idSet.contains("transcript_type"));
    }
 
    public static void main(String args[]) 
