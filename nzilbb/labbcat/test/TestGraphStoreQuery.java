@@ -76,7 +76,7 @@ public class TestGraphStoreQuery
       GraphStoreQuery store = new GraphStoreQuery(labbcatUrl, username, password)
          .setBatchMode(true);
       String[] ids = store.getLayerIds();
-      //for (String id : ids) System.out.println(id);
+      //for (String id : ids) System.out.println("layer " + id);
       assertTrue("Some IDs are returned",
                  ids.length > 0);
       HashSet<String> idSet = new HashSet<String>(Arrays.asList(ids));
@@ -88,6 +88,39 @@ public class TestGraphStoreQuery
                  idSet.contains("utterances"));
       assertTrue("Has transcript_type layer",
                  idSet.contains("transcript_type"));
+   }
+
+   @Test public void getCorpusIds()
+      throws Exception
+   {
+      GraphStoreQuery store = new GraphStoreQuery(labbcatUrl, username, password)
+         .setBatchMode(true);
+      String[] ids = store.getCorpusIds();
+      // for (String id : ids) System.out.println("corpus " + id);
+      assertTrue("Some IDs are returned",
+                 ids.length > 0);
+   }
+
+   @Test public void getParticipantIds()
+      throws Exception
+   {
+      GraphStoreQuery store = new GraphStoreQuery(labbcatUrl, username, password)
+         .setBatchMode(true);
+      String[] ids = store.getParticipantIds();
+      // for (String id : ids) System.out.println("participant " + id);
+      assertTrue("Some IDs are returned",
+                 ids.length > 0);
+   }
+
+   @Test public void getGraphIds()
+      throws Exception
+   {
+      GraphStoreQuery store = new GraphStoreQuery(labbcatUrl, username, password)
+         .setBatchMode(true);
+      String[] ids = store.getGraphIds();
+      // for (String id : ids) System.out.println("graph " + id);
+      assertTrue("Some IDs are returned",
+                 ids.length > 0);
    }
 
    public static void main(String args[]) 

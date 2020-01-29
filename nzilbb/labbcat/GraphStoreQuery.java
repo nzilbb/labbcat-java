@@ -451,7 +451,7 @@ public class GraphStoreQuery
    }   
 
    /**
-    * Gets a list of corpus IDs - <em>NOT YET IMPLEMENTED</em>.
+    * Gets a list of corpus IDs.
     * @return A list of corpus IDs.
     * @throws StoreException If an error occurs.
     * @throws PermissionException If the operation is not permitted.
@@ -459,11 +459,33 @@ public class GraphStoreQuery
    public String[] getCorpusIds()
       throws StoreException, PermissionException
    {
-      throw new StoreException("Not implemented");
+      try
+      {
+         URL url = url("getCorpusIds");
+         if (verbose) System.out.println("getCorpusIds -> " + url);
+         HttpRequestGet request = new HttpRequestGet(url, getRequiredHttpAuthorization());
+         request.setHeader("Accept", "application/json");
+         Response response = new Response(request.get(), verbose);
+         response.checkForErrors(); // throws a StoreException on error
+         JSONArray array = (JSONArray)response.getModel();
+         Vector<String> ids = new Vector<String>();
+         if (array != null)
+         {
+            for (int i = 0; i < array.length(); i++)
+            {
+               ids.add(array.getString(i));
+            }
+         }
+         return ids.toArray(new String[0]);
+      }
+      catch(IOException x)
+      {
+         throw new StoreException("Could not get response.", x);
+      }
    } 
    
    /**
-    * Gets a list of participant IDs - <em>NOT YET IMPLEMENTED</em>.
+    * Gets a list of participant IDs.
     * @return A list of participant IDs.
     * @throws StoreException If an error occurs.
     * @throws PermissionException If the operation is not permitted.
@@ -471,7 +493,29 @@ public class GraphStoreQuery
    public String[] getParticipantIds()
       throws StoreException, PermissionException
    {
-      throw new StoreException("Not implemented");
+      try
+      {
+         URL url = url("getParticipantIds");
+         if (verbose) System.out.println("getParticipantIds -> " + url);
+         HttpRequestGet request = new HttpRequestGet(url, getRequiredHttpAuthorization());
+         request.setHeader("Accept", "application/json");
+         Response response = new Response(request.get(), verbose);
+         response.checkForErrors(); // throws a StoreException on error
+         JSONArray array = (JSONArray)response.getModel();
+         Vector<String> ids = new Vector<String>();
+         if (array != null)
+         {
+            for (int i = 0; i < array.length(); i++)
+            {
+               ids.add(array.getString(i));
+            }
+         }
+         return ids.toArray(new String[0]);
+      }
+      catch(IOException x)
+      {
+         throw new StoreException("Could not get response.", x);
+      }
    } 
 
    /**
@@ -543,7 +587,7 @@ public class GraphStoreQuery
    } 
 
    /**
-    * Gets a list of graph IDs - <em>NOT YET IMPLEMENTED</em>.
+    * Gets a list of graph IDs.
     * @return A list of graph IDs.
     * @throws StoreException If an error occurs.
     * @throws PermissionException If the operation is not permitted.
@@ -551,7 +595,29 @@ public class GraphStoreQuery
    public String[] getGraphIds()
       throws StoreException, PermissionException
    {
-      throw new StoreException("Not implemented");
+      try
+      {
+         URL url = url("getGraphIds");
+         if (verbose) System.out.println("getGraphIds -> " + url);
+         HttpRequestGet request = new HttpRequestGet(url, getRequiredHttpAuthorization());
+         request.setHeader("Accept", "application/json");
+         Response response = new Response(request.get(), verbose);
+         response.checkForErrors(); // throws a StoreException on error
+         JSONArray array = (JSONArray)response.getModel();
+         Vector<String> ids = new Vector<String>();
+         if (array != null)
+         {
+            for (int i = 0; i < array.length(); i++)
+            {
+               ids.add(array.getString(i));
+            }
+         }
+         return ids.toArray(new String[0]);
+      }
+      catch(IOException x)
+      {
+         throw new StoreException("Could not get response.", x);
+      }
    } 
    
    /**
