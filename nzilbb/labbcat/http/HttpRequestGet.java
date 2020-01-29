@@ -155,9 +155,10 @@ public class HttpRequestGet
     * @param sParameter
     * @param oValue
     */
-   public void setParameter(String sParameter, Object oValue)
+   public HttpRequestGet setParameter(String sParameter, Object oValue)
    {
       mParameters.put(sParameter, oValue);
+      return this;
    } // end of setParameter()
    
    /**
@@ -165,9 +166,10 @@ public class HttpRequestGet
     * @param sKey
     * @param sValue
     */
-   public void setHeader(String sKey, String sValue)
+   public HttpRequestGet setHeader(String sKey, String sValue)
    {
       mHeaders.put(sKey, sValue);
+      return this;
    } // end of setParameter()   
    
    /**
