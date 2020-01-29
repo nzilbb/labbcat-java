@@ -224,18 +224,17 @@ public class TestGraphStoreQuery
                  count > 0);
    }
 
-   // @Test public void getMedia()
-   //    throws Exception
-   // {
-   //    store.setVerbose(true);
-   //    String[] ids = store.getMatchingGraphIds("id MATCHES '.+'", 1, 0);
-   //    assertTrue("Some graph IDs are returned",
-   //               ids.length > 0);
-   //    String graphId = ids[0];
-   //    String url = store.getMedia(graphId, "", "audio/wav");
-   //    assertNotNull("There is some media",
-   //                  url);
-   // }
+   @Test public void getMedia()
+      throws Exception
+   {
+      String[] ids = store.getMatchingGraphIds("id MATCHES 'Agnes.+\\.trs'", 1, 0);
+      assertTrue("Some graph IDs are returned",
+                 ids.length > 0);
+      String graphId = ids[0];
+      String url = store.getMedia(graphId, "", "audio/wav");
+      assertNotNull("There is some media",
+                    url);
+   }
 
    // @Test public void countMatchingAnnotations()
    //    throws Exception
