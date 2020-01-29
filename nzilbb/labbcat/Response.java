@@ -280,5 +280,16 @@ public class Response
       }
       return this;
    } // end of checkForErrors()
+
+   
+   /**
+    * Determines whether the model is null.
+    * @return true if the model returned is null, false otherwise.
+    */
+   public boolean isModelNull()
+   {
+      return model == null || model.equals(null);
+   } // end of isModelNull()
+
    
 } // end of class Response

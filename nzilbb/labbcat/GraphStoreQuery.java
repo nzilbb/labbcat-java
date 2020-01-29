@@ -380,6 +380,7 @@ public class GraphStoreQuery
             .setHeader("Accept", "application/json");
          Response response = new Response(request.get(), verbose);
          response.checkForErrors(); // throws a StoreException on error
+         if (response.isModelNull()) return null;
          return (String)response.getModel();
       }
       catch(IOException x)
@@ -405,6 +406,7 @@ public class GraphStoreQuery
             .setHeader("Accept", "application/json");
          Response response = new Response(request.get(), verbose);
          response.checkForErrors(); // throws a StoreException on error
+         if (response.isModelNull()) return null;
          JSONArray array = (JSONArray)response.getModel();
          Vector<String> ids = new Vector<String>();
          if (array != null)
@@ -476,6 +478,7 @@ public class GraphStoreQuery
             .setHeader("Accept", "application/json");
          Response response = new Response(request.get(), verbose);
          response.checkForErrors(); // throws a StoreException on error
+         if (response.isModelNull()) return null;
          JSONArray array = (JSONArray)response.getModel();
          Vector<String> ids = new Vector<String>();
          if (array != null)
@@ -510,6 +513,7 @@ public class GraphStoreQuery
             .setHeader("Accept", "application/json");
          Response response = new Response(request.get(), verbose);
          response.checkForErrors(); // throws a StoreException on error
+         if (response.isModelNull()) return null;
          JSONArray array = (JSONArray)response.getModel();
          Vector<String> ids = new Vector<String>();
          if (array != null)
@@ -617,6 +621,7 @@ public class GraphStoreQuery
          if (pageNumber != null) request.setParameter("pageNumber", pageNumber);
          Response response = new Response(request.get(), verbose);
          response.checkForErrors(); // throws a StoreException on error
+         if (response.isModelNull()) return null;
          JSONArray array = (JSONArray)response.getModel();
          Vector<String> ids = new Vector<String>();
          if (array != null)
@@ -651,6 +656,7 @@ public class GraphStoreQuery
             .setHeader("Accept", "application/json");
          Response response = new Response(request.get(), verbose);
          response.checkForErrors(); // throws a StoreException on error
+         if (response.isModelNull()) return null;
          JSONArray array = (JSONArray)response.getModel();
          Vector<String> ids = new Vector<String>();
          if (array != null)
@@ -687,6 +693,7 @@ public class GraphStoreQuery
             .setHeader("Accept", "application/json");
          Response response = new Response(request.get(), verbose);
          response.checkForErrors(); // throws a StoreException on error
+         if (response.isModelNull()) return null;
          JSONArray array = (JSONArray)response.getModel();
          Vector<String> ids = new Vector<String>();
          if (array != null)
@@ -723,6 +730,7 @@ public class GraphStoreQuery
             .setHeader("Accept", "application/json");
          Response response = new Response(request.get(), verbose);
          response.checkForErrors(); // throws a StoreException on error
+         if (response.isModelNull()) return null;
          JSONArray array = (JSONArray)response.getModel();
          Vector<String> ids = new Vector<String>();
          if (array != null)
@@ -835,6 +843,7 @@ public class GraphStoreQuery
          if (pageNumber != null) request.setParameter("pageNumber", pageNumber);
          Response response = new Response(request.get(), verbose);
          response.checkForErrors(); // throws a StoreException on error
+         if (response.isModelNull()) return null;
          JSONArray array = (JSONArray)response.getModel();
          Vector<String> ids = new Vector<String>();
          if (array != null)
@@ -938,7 +947,8 @@ public class GraphStoreQuery
             .setHeader("Accept", "application/json");
          Response response = new Response(request.get(), verbose);
          response.checkForErrors(); // throws a StoreException on error
-         return (Integer)response.getModel();
+         if (response.getModel() instanceof Integer) return (Integer)response.getModel();
+         return (Long)response.getModel();
       }
       catch(IOException x)
       {
@@ -1147,8 +1157,10 @@ public class GraphStoreQuery
             .setParameter("id", id)
             .setParameter("trackSuffix", trackSuffix)
             .setParameter("mimeType", mimeType);
+         if (verbose) System.out.println("parameters: " + request.getParameters());
          Response response = new Response(request.get(), verbose);
          response.checkForErrors(); // throws a StoreException on error
+         if (response.isModelNull()) return null;
          return (String)response.getModel();
       }
       catch(IOException x)
