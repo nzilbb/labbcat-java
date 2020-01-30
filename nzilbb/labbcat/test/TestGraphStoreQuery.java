@@ -64,7 +64,12 @@ public class TestGraphStoreQuery
          fail("Could not create GraphStoreQuery object");
       }
    }
-   
+
+   @After public void notVerbose()
+   {
+      store.setVerbose(false);
+   }
+
    @Test(expected = StoreException.class) public void invalidCredentials()
       throws Exception
    {
