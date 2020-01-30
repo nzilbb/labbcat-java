@@ -55,10 +55,11 @@ public class HttpRequestPost
     * @param sKey
     * @param sValue
     */
-   public void setHeader(String sKey, String sValue)
+   public HttpRequestPost setHeader(String sKey, String sValue)
    {
       connection.setRequestProperty(sKey, sValue);
-   } // end of setParameter()
+      return this;
+   } // end of setHeader()
    
    protected void connect() throws IOException 
    {
@@ -163,9 +164,10 @@ public class HttpRequestPost
     * @param value cookie value
     * @throws IOException
     */
-   public void setCookie(String name, String value) throws IOException 
+   public HttpRequestPost setCookie(String name, String value) throws IOException 
    {
       cookies.put(name, value);
+      return this;
    }
    
    /**
@@ -173,10 +175,11 @@ public class HttpRequestPost
     * @param cookies the cookie "name-to-value" map
     * @throws IOException
     */
-   public void setCookies(Map<String,String> cookies) throws IOException 
+   public HttpRequestPost setCookies(Map<String,String> cookies) throws IOException 
    {
       if (cookies == null) return;
       this.cookies.putAll(cookies);
+      return this;
    }
    
    /**
@@ -185,13 +188,14 @@ public class HttpRequestPost
     * + 1] is a value) 
     * @throws IOException
     */
-   public void setCookies(String[] cookies) throws IOException 
+   public HttpRequestPost setCookies(String[] cookies) throws IOException 
    {
       if (cookies == null) return;
       for (int i = 0; i < cookies.length - 1; i+=2) 
       {
          setCookie(cookies[i], cookies[i+1]);
       }
+      return this;
    }
    
    /**
@@ -200,13 +204,14 @@ public class HttpRequestPost
     * @param value parameter value
     * @throws IOException
     */
-   public void setParameter(String name, String value) throws IOException 
+   public HttpRequestPost setParameter(String name, String value) throws IOException 
    {
       if (value == null) return; //20100520 robert.fromont@canterbury.ac.nz 
       if (!bNoParametersYet) write("&");
       write(URLEncoder.encode(name, "UTF8") 
             + "=" + URLEncoder.encode(value, "UTF8"));
       bNoParametersYet = false;
+      return this;
    }
    
    /**
@@ -216,7 +221,7 @@ public class HttpRequestPost
     * @param object parameter value, or a collection of values
     * @throws IOException
     */
-   public void setParameter(String name, Object object) throws IOException 
+   public HttpRequestPost setParameter(String name, Object object) throws IOException 
    {
       if (object == null) return;
       if (object instanceof Iterable) 
@@ -234,6 +239,7 @@ public class HttpRequestPost
       {
          setParameter(name, object.toString());
       }
+      return this;
    }
    
    /**
@@ -243,7 +249,7 @@ public class HttpRequestPost
     * @throws IOException
     */
    @SuppressWarnings("rawtypes")
-   public void setParameters(Map<String,String> parameters) throws IOException 
+   public HttpRequestPost setParameters(Map<String,String> parameters) throws IOException 
    {
       if (parameters == null) return;
       for (Iterator i = parameters.entrySet().iterator(); i.hasNext();) 
@@ -251,6 +257,7 @@ public class HttpRequestPost
          Map.Entry entry = (Map.Entry)i.next();
          setParameter(entry.getKey().toString(), entry.getValue());
       }
+      return this;
    }
    
    /**
@@ -260,13 +267,14 @@ public class HttpRequestPost
     * otherwise it is stringified and sent in the request 
     * @throws IOException
     */
-   public void setParameters(Object[] parameters) throws IOException 
+   public HttpRequestPost setParameters(Object[] parameters) throws IOException 
    {
       if (parameters == null) return;
       for (int i = 0; i < parameters.length - 1; i+=2) 
       {
          setParameter(parameters[i].toString(), parameters[i+1]);
       }
+      return this;
    }
    
    /**
