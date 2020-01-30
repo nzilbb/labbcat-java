@@ -23,6 +23,7 @@ package nzilbb.labbcat;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.HttpURLConnection;
 import java.util.Vector;
 import nzilbb.ag.StoreException;
 import nzilbb.util.IO;
@@ -40,6 +41,18 @@ public class Response
    // Attributes:
    
    /**
+    * The HTTP status code, or -1 if not known.
+    * @see #getHttpStatus()
+    * @see #setHttpStatus(int)
+    */
+   protected int httpStatus = -1;
+   /**
+    * Getter for {@link #httpStatus}: The HTTP status code, or -1 if not known.
+    * @return The HTTP status code, or -1 if not known.
+    */
+   public int getHttpStatus() { return httpStatus; }
+
+   /**
     * Server title.
     * @see #getTitle()
     * @see #setTitle(String)
@@ -50,11 +63,6 @@ public class Response
     * @return Server title.
     */
    public String getTitle() { return title; }
-   /**
-    * Setter for {@link #title}: Server title.
-    * @param newTitle Server title.
-    */
-   public Response setTitle(String newTitle) { title = newTitle; return this; }
 
    /**
     * The request code.
@@ -67,11 +75,6 @@ public class Response
     * @return The request code.
     */
    public int getCode() { return code; }
-   /**
-    * Setter for {@link #code}: The request code.
-    * @param newCode The request code.
-    */
-   public Response setCode(int newCode) { code = newCode; return this; }
 
    /**
     * Errors returned.
@@ -84,11 +87,6 @@ public class Response
     * @return Errors returned.
     */
    public Vector<String> getErrors() { return errors; }
-   /**
-    * Setter for {@link #errors}: Errors returned.
-    * @param newErrors Errors returned.
-    */
-   public Response setErrors(Vector<String> newErrors) { errors = newErrors; return this; }
 
    /**
     * Messages returned.
@@ -101,11 +99,6 @@ public class Response
     * @return Messages returned.
     */
    public Vector<String> getMessages() { return messages; }
-   /**
-    * Setter for {@link #messages}: Messages returned.
-    * @param newMessages Messages returned.
-    */
-   public Response setMessages(Vector<String> newMessages) { messages = newMessages; return this; }
 
    /**
     * The model or result returned.
@@ -147,11 +140,6 @@ public class Response
     * @return Whether to print verbose output or not.
     */
    public boolean getVerbose() { return verbose; }
-   /**
-    * Setter for {@link #verbose}: Whether to print verbose output or not.
-    * @param newVerbose Whether to print verbose output or not.
-    */
-   public Response setVerbose(boolean newVerbose) { verbose = newVerbose; return this; }
    
    // Methods:
    
@@ -187,7 +175,7 @@ public class Response
    public Response(InputStream input, boolean verbose)
       throws StoreException
    {
-      setVerbose(verbose);
+      this.verbose = verbose;
       try
       {
          load(input);
@@ -195,6 +183,58 @@ public class Response
       catch(Exception exception)
       {
          throw new StoreException(exception);
+      }
+   } // end of constructor
+   
+   /**
+    * Constructor from HttpURLConnection.
+    * @param input The stream to read from.
+    * @param verbose The verbosity setting to use.
+    */
+   public Response(HttpURLConnection connection, boolean verbose)
+      throws StoreException
+   {
+      this.verbose = verbose;
+      try
+      {
+         httpStatus = connection.getResponseCode();
+      }
+      catch(IOException exception)
+      {
+         throw new StoreException(exception);
+      }
+      if (httpStatus == HttpURLConnection.HTTP_OK)
+      {
+         try
+         {
+            load(connection.getInputStream());
+         }
+         catch(Exception exception)
+         {
+            throw new StoreException(exception);
+         }
+      }
+      else
+      {
+         if (verbose)
+         {
+            try
+            {
+               System.out.println("HTTP error: " + httpStatus + ": " + connection.getResponseMessage());
+            }
+            catch(IOException exception)
+            {
+               System.out.println("HTTP error: " + httpStatus);
+            }
+         }
+         try
+         {
+            load(connection.getErrorStream());
+         }
+         catch(Exception exception)
+         {
+            throw new StoreException(exception);
+         }
       }
    } // end of constructor
    
@@ -262,21 +302,13 @@ public class Response
     * @throws StoreException
     */
    public Response checkForErrors()
-      throws StoreException
+      throws ResponseException
    {
-      if (errors != null && errors.size() > 0)
+      if ((errors != null && errors.size() > 0)
+          || code > 0
+          || (httpStatus > 0 && httpStatus != HttpURLConnection.HTTP_OK))
       {
-         StringBuilder allErrors = new StringBuilder();
-         for (String error : errors)
-         {
-            if (allErrors.length() > 0) allErrors.append("\n");
-            allErrors.append(error);
-         }
-         throw new StoreException(allErrors.toString());
-      }
-      if (code != 0)
-      {
-         throw new StoreException("Response code " + code);
+         throw new ResponseException(this);
       }
       return this;
    } // end of checkForErrors()
