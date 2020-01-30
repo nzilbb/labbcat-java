@@ -36,7 +36,6 @@ public class ResponseException
    /**
     * The response.
     * @see #getResponse()
-    * @see #setResponse(Response)
     */
    protected Response response;
    /**

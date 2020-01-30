@@ -34,7 +34,7 @@
     <!-- Compile the java code from ${src} into ${build} -->
     <javac srcdir="${src}" destdir="${build}"
 	   includes="${srcfiles}"
-	   excludes="${testsrcfiles}"
+	   excludes="${testsrcfiles} **/package-info.java"
 	   classpath="${lib}/nzilbb.ag.jar"
 	   listfiles="yes"
 	   target="${config.classversion}"
@@ -109,7 +109,7 @@
   <target name="clean"
           description="Clean up" >
     <delete>
-      <fileset dir="${build}" includes="**/*.class"/>
+      <fileset dir="${javadoc}"/>
     </delete>
   </target>
 </project>

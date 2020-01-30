@@ -43,7 +43,6 @@ public class Response
    /**
     * The HTTP status code, or -1 if not known.
     * @see #getHttpStatus()
-    * @see #setHttpStatus(int)
     */
    protected int httpStatus = -1;
    /**
@@ -55,7 +54,6 @@ public class Response
    /**
     * Server title.
     * @see #getTitle()
-    * @see #setTitle(String)
     */
    protected String title;
    /**
@@ -67,7 +65,6 @@ public class Response
    /**
     * The request code.
     * @see #getCode()
-    * @see #setCode(int)
     */
    protected int code = -1;
    /**
@@ -79,7 +76,6 @@ public class Response
    /**
     * Errors returned.
     * @see #getErrors()
-    * @see #setErrors(Vector)
     */
    protected Vector<String> errors;
    /**
@@ -91,7 +87,6 @@ public class Response
    /**
     * Messages returned.
     * @see #getMessages()
-    * @see #setMessages(Vector<String>)
     */
    protected Vector<String> messages;
    /**
@@ -103,7 +98,6 @@ public class Response
    /**
     * The model or result returned.
     * @see #getModel()
-    * @see #setModel(Object)
     */
    protected Object model;
    /**
@@ -120,7 +114,6 @@ public class Response
    /**
     * Raw response text.
     * @see #getRaw()
-    * @see #setRaw(String)
     */
    protected String raw;
    /**
@@ -132,7 +125,6 @@ public class Response
    /**
     * Whether to print verbose output or not.
     * @see #getVerbose()
-    * @see #setVerbose(boolean)
     */
    protected boolean verbose;
    /**
@@ -188,7 +180,7 @@ public class Response
    
    /**
     * Constructor from HttpURLConnection.
-    * @param input The stream to read from.
+    * @param connection The connection to read from.
     * @param verbose The verbosity setting to use.
     */
    public Response(HttpURLConnection connection, boolean verbose)
