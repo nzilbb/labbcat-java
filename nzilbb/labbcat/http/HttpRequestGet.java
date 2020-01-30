@@ -27,7 +27,8 @@ import java.io.*;
 import java.util.*;
 
 /**
- * GET HTTP request, using ordinary default request encoding, and encoding all arguments in the URL string
+ * GET HTTP request, using ordinary default request encoding, and encoding all arguments
+ * in the URL string
  * @author Robert Fromont robert@fromont.net.nz
  */
 
@@ -189,6 +190,10 @@ public class HttpRequestGet
       for (String sParameter : mParameters.keySet())
       {
          Object o = mParameters.get(sParameter);
+         if (o.getClass().isArray())
+         {
+            o = Arrays.asList((Object[])o);
+         }
          if (o instanceof Iterable)
          {
             @SuppressWarnings("rawtypes")
