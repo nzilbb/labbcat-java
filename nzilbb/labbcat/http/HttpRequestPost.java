@@ -48,7 +48,9 @@ public class HttpRequestPost
    
    /** Parameters so far flag */
    protected boolean bNoParametersYet = true;
-   
+
+   private String url = "?"; 
+   private StringBuilder body = new StringBuilder(); 
    
    /**
     * Sets a request parameter value
@@ -77,12 +79,14 @@ public class HttpRequestPost
    
    protected void write(String s) throws IOException 
    {
+      body.append(s);
       connect();
       os.write(s.getBytes());
    }
    
    protected void newline() throws IOException 
    {
+      body.append("\n");
       connect();
       write("\r\n");
    }
@@ -124,6 +128,7 @@ public class HttpRequestPost
    public HttpRequestPost(URL url, String sAuthorization) throws IOException 
    {
       this((HttpURLConnection)url.openConnection(), sAuthorization);
+      this.url = url.toString();
    }
    
    /**
@@ -135,6 +140,7 @@ public class HttpRequestPost
    public HttpRequestPost(String urlString, String sAuthorization) throws IOException 
    {
       this(new URL(urlString), sAuthorization);
+      url = urlString;
    }
       
    @SuppressWarnings("rawtypes")
@@ -177,7 +183,7 @@ public class HttpRequestPost
     */
    public HttpRequestPost setCookies(Map<String,String> cookies) throws IOException 
    {
-      if (cookies == null) return;
+      if (cookies == null) return this;
       this.cookies.putAll(cookies);
       return this;
    }
@@ -190,7 +196,7 @@ public class HttpRequestPost
     */
    public HttpRequestPost setCookies(String[] cookies) throws IOException 
    {
-      if (cookies == null) return;
+      if (cookies == null) return this;
       for (int i = 0; i < cookies.length - 1; i+=2) 
       {
          setCookie(cookies[i], cookies[i+1]);
@@ -206,7 +212,7 @@ public class HttpRequestPost
     */
    public HttpRequestPost setParameter(String name, String value) throws IOException 
    {
-      if (value == null) return; //20100520 robert.fromont@canterbury.ac.nz 
+      if (value == null) return this; //20100520 robert.fromont@canterbury.ac.nz 
       if (!bNoParametersYet) write("&");
       write(URLEncoder.encode(name, "UTF8") 
             + "=" + URLEncoder.encode(value, "UTF8"));
@@ -223,7 +229,7 @@ public class HttpRequestPost
     */
    public HttpRequestPost setParameter(String name, Object object) throws IOException 
    {
-      if (object == null) return;
+      if (object == null) return this;
       if (object instanceof Iterable) 
       {
          @SuppressWarnings("rawtypes")
@@ -251,7 +257,7 @@ public class HttpRequestPost
    @SuppressWarnings("rawtypes")
    public HttpRequestPost setParameters(Map<String,String> parameters) throws IOException 
    {
-      if (parameters == null) return;
+      if (parameters == null) return this;
       for (Iterator i = parameters.entrySet().iterator(); i.hasNext();) 
       {
          Map.Entry entry = (Map.Entry)i.next();
@@ -269,7 +275,7 @@ public class HttpRequestPost
     */
    public HttpRequestPost setParameters(Object[] parameters) throws IOException 
    {
-      if (parameters == null) return;
+      if (parameters == null) return this;
       for (int i = 0; i < parameters.length - 1; i+=2) 
       {
          setParameter(parameters[i].toString(), parameters[i+1]);
@@ -535,4 +541,13 @@ public class HttpRequestPost
    {
       return new HttpRequestPost(url, sAuthorization).post(name1, value1, name2, value2, name3, value3, name4, value4);
    }
+
+   /**
+    * String representation of the request, for logging.
+    * @return A String representation of the request, for logging.
+    */
+   public String toString()
+   {
+      return "POST " + url + " : " + body;
+   } // end of toString()
 }
