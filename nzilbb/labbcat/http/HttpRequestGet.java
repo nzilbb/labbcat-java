@@ -183,8 +183,31 @@ public class HttpRequestGet
       throws IOException, MalformedURLException
    {
       String sBase = getBaseUrl().toString();
-      // construct query string
-      String sQueryString = "";
+      String sQueryString = getQueryString();
+      
+      URLConnection connection = new URL(sBase + sQueryString).openConnection();
+      connection.setUseCaches(false);
+      for (String sKey: mHeaders.keySet())
+      {
+         connection.setRequestProperty(sKey, mHeaders.get(sKey));
+      } // next header
+      if (sAuthorization != null)
+      {
+         connection.setRequestProperty("Authorization", sAuthorization);
+      }
+      return (HttpURLConnection)connection;
+   } // end of getConnection()
+
+   
+   /**
+    * Generates the query string.
+    * @return The query string.
+    */
+   public String getQueryString()
+      throws UnsupportedEncodingException
+   {
+      String sBase = getBaseUrl().toString();
+      StringBuilder sQueryString = new StringBuilder();
       String sParameterPrefix = "?";
       if (sBase.indexOf('?') >= 0) sParameterPrefix = "&";
       for (String sParameter : mParameters.keySet())
@@ -200,33 +223,25 @@ public class HttpRequestGet
 	       Iterator i = ((Iterable)o).iterator();
             while (i.hasNext())
             {
-               sQueryString += sParameterPrefix 
-                  + URLEncoder.encode(sParameter, "UTF8") 
-                  + "=" + URLEncoder.encode(i.next().toString(), "UTF8");
+               sQueryString.append(sParameterPrefix)
+                  .append(URLEncoder.encode(sParameter, "UTF8"))
+                  .append("=")
+                  .append(URLEncoder.encode(i.next().toString(), "UTF8"));
                sParameterPrefix = "&";
             }
          }
          else
          {
-            sQueryString += sParameterPrefix 
-               + URLEncoder.encode(sParameter, "UTF8") 
-               + "=" + URLEncoder.encode(o.toString(), "UTF8");
+            sQueryString.append(sParameterPrefix)
+               .append(URLEncoder.encode(sParameter, "UTF8"))
+               .append("=")
+               .append(URLEncoder.encode(o.toString(), "UTF8"));
          }
          
          sParameterPrefix = "&";
       } // next parameter
-      URLConnection connection = new URL(sBase + sQueryString).openConnection();
-      connection.setUseCaches(false);
-      for (String sKey: mHeaders.keySet())
-      {
-         connection.setRequestProperty(sKey, mHeaders.get(sKey));
-      } // next header
-      if (sAuthorization != null)
-      {
-         connection.setRequestProperty("Authorization", sAuthorization);
-      }
-      return (HttpURLConnection)connection;
-   } // end of getConnection()
+      return sQueryString.toString();
+   } // end of getQueryString()
    
    /**
     * Fetches the request response
@@ -234,10 +249,27 @@ public class HttpRequestGet
     * @throws IOException
     * @throws MalformedURLException
     */
-   public InputStream get()
+   public HttpURLConnection get()
       throws IOException, MalformedURLException
    {
-      return getConnection().getInputStream();
+      return getConnection();
    } // end of get()
+   
+   /**
+    * String representation of the request, for logging.
+    * @return A String representation of the request, for logging.
+    */
+   public String toString()
+   {
+      try
+      {
+         return "GET " + getBaseUrl() + getQueryString();
+      }
+      catch(UnsupportedEncodingException exception)
+      {
+         return "GET " + getBaseUrl() + " " + mParameters;
+      }
+   } // end of toString()
+
 
 } // end of class HttpRequestGet
