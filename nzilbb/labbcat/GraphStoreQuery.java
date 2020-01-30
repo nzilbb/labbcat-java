@@ -47,6 +47,7 @@ import nzilbb.ag.StoreException;
 import nzilbb.labbcat.http.*;
 import nzilbb.util.MonitorableSeries;
 import org.json.JSONArray;
+import org.json.JSONObject;
 
 /**
  * Client-side implementation of IGraphStoreQuery.
@@ -121,7 +122,6 @@ public class GraphStoreQuery
     */
    public GraphStoreQuery setPassword(String newPassword) { password = newPassword; return this; }
 
-
    /**
     * Whether to run in batch mode or not. If false, the user may be asked to enter
     * username/password if required. Default is false.
@@ -143,7 +143,6 @@ public class GraphStoreQuery
     * asked to enter username/password if required. 
     */
    public GraphStoreQuery setBatchMode(boolean newBatchMode) { batchMode = newBatchMode; return this; }
-   
 
    /**
     * Whether to print verbose output or not.
@@ -223,7 +222,8 @@ public class GraphStoreQuery
 
    private String authorization = null;
    /**
-    * Determines whether an authorization string is required for HTTP requests (i.e. whether a username/password is required)
+    * Determines whether an authorization string is required for HTTP requests
+    * (i.e. whether a username/password is required)
     * @return The authorization string that's required, if any
     * @throws Exception if the user cancels while begin prompted for credentials
     */
@@ -425,7 +425,7 @@ public class GraphStoreQuery
    } 
    
    /**
-    * Gets a list of layer definitions - <em>NOT YET IMPLEMENTED</em>.
+    * Gets a list of layer definitions.
     * @return A list of layer definitions.
     * @throws StoreException If an error occurs.
     * @throws PermissionException If the operation is not permitted.
@@ -433,7 +433,30 @@ public class GraphStoreQuery
    public Layer[] getLayers()
       throws StoreException, PermissionException
    {
-      throw new StoreException("Not implemented");
+      try
+      {
+         URL url = url("getLayers");
+         if (verbose) System.out.println("getLayers -> " + url);
+         HttpRequestGet request = new HttpRequestGet(url, getRequiredHttpAuthorization()) 
+            .setHeader("Accept", "application/json");
+         Response response = new Response(request.get(), verbose);
+         response.checkForErrors(); // throws a StoreException on error
+         if (response.isModelNull()) return null;
+         JSONArray array = (JSONArray)response.getModel();
+         Vector<Layer> layers = new Vector<Layer>();
+         if (array != null)
+         {
+            for (int i = 0; i < array.length(); i++)
+            {
+               layers.add(new Layer(array.getJSONObject(i)));
+            }
+         }
+         return layers.toArray(new Layer[0]);
+      }
+      catch(IOException x)
+      {
+         throw new StoreException("Could not get response.", x);
+      }
    }
 
    /**
@@ -449,7 +472,7 @@ public class GraphStoreQuery
    }
 
    /**
-    * Gets a layer definition - <em>NOT YET IMPLEMENTED</em>.
+    * Gets a layer definition.
     * @param id ID of the layer to get the definition for.
     * @return The definition of the given layer.
     * @throws StoreException If an error occurs.
@@ -458,7 +481,22 @@ public class GraphStoreQuery
    public Layer getLayer(String id)
       throws StoreException, PermissionException
    {
-      throw new StoreException("Not implemented");
+      try
+      {
+         URL url = url("getLayer");
+         if (verbose) System.out.println("getLayer -> " + url);
+         HttpRequestGet request = new HttpRequestGet(url, getRequiredHttpAuthorization()) 
+            .setHeader("Accept", "application/json")
+            .setParameter("id", id);
+         Response response = new Response(request.get(), verbose);
+         response.checkForErrors(); // throws a StoreException on error
+         if (response.isModelNull()) return null;
+         return new Layer((JSONObject)response.getModel());
+      }
+      catch(IOException x)
+      {
+         throw new StoreException("Could not get response.", x);
+      }
    }   
 
    /**
@@ -532,7 +570,7 @@ public class GraphStoreQuery
    } 
 
    /**
-    * Gets the participant record specified by the given identifier - <em>NOT YET IMPLEMENTED</em>.
+    * Gets the participant record specified by the given identifier.
     * @param id The ID of the participant, which could be their name or their database annotation
     * ID. 
     * @return An annotation representing the participant, or null if the participant was not found.
@@ -542,7 +580,22 @@ public class GraphStoreQuery
    public Annotation getParticipant(String id)
       throws StoreException, PermissionException
    {
-      throw new StoreException("Not implemented");
+      try
+      {
+         URL url = url("getParticipant");
+         if (verbose) System.out.println("getParticipant -> " + url);
+         HttpRequestGet request = new HttpRequestGet(url, getRequiredHttpAuthorization()) 
+            .setHeader("Accept", "application/json")
+            .setParameter("id", id);
+         Response response = new Response(request.get(), verbose);
+         response.checkForErrors(); // throws a StoreException on error
+         if (response.isModelNull()) return null;
+         return new Annotation((JSONObject)response.getModel());
+      }
+      catch(IOException x)
+      {
+         throw new StoreException("Could not get response.", x);
+      }
    }
 
    /**
@@ -712,7 +765,7 @@ public class GraphStoreQuery
    } 
 
    /**
-    * Gets a list of IDs of graphs that include the given participant - <em>NOT YET IMPLEMENTED</em>.
+    * Gets a list of IDs of graphs that include the given participant.
     * @param id A participant ID.
     * @return A list of graph IDs.
     * @throws StoreException If an error occurs.
@@ -802,7 +855,8 @@ public class GraphStoreQuery
     * <p>The order of the list can be specified.  If ommitted, the graphs are listed in ID
     * order.</p> 
     * @param expression An expression that determines which graphs match.
-    * <p> The expression language is currently not well defined, but expressions such as the following can be used:
+    * <p> The expression language is currently not well defined, but expressions such as
+    * the following can be used:
     * <ul>
     *  <li><code>id MATCHES 'Ada.+'</code></li>
     *  <li><code>'Robert' IN labels('who')</code></li>
@@ -900,7 +954,7 @@ public class GraphStoreQuery
    } 
 
    /**
-    * Gets a list of annotations that match a particular pattern - <em>NOT YET IMPLEMENTED</em>.
+    * Gets a list of annotations that match a particular pattern.
     * @param expression An expression that determines which graphs match.
     * <p> The expression language is currently not well defined, but expressions such as the
     * following can be used: 
@@ -922,11 +976,37 @@ public class GraphStoreQuery
    public Annotation[] getMatchingAnnotations(String expression, Integer pageLength, Integer pageNumber)
       throws StoreException, PermissionException
    {
-      throw new StoreException("Not implemented");
+      try
+      {
+         URL url = url("getMatchingAnnotations");
+         if (verbose) System.out.println("getMatchingGraphIds -> " + url);
+         HttpRequestGet request = new HttpRequestGet(url, getRequiredHttpAuthorization()) 
+            .setHeader("Accept", "application/json")
+            .setParameter("expression", expression);
+         if (pageLength != null) request.setParameter("pageLength", pageLength);
+         if (pageNumber != null) request.setParameter("pageNumber", pageNumber);
+         Response response = new Response(request.get(), verbose);
+         response.checkForErrors(); // throws a StoreException on error
+         if (response.isModelNull()) return null;
+         JSONArray array = (JSONArray)response.getModel();
+         Vector<Annotation> annotations = new Vector<Annotation>();
+         if (array != null)
+         {
+            for (int i = 0; i < array.length(); i++)
+            {
+               annotations.add(new Annotation(array.getJSONObject(i)));
+            }
+         }
+         return annotations.toArray(new Annotation[0]);
+      }
+      catch(IOException x)
+      {
+         throw new StoreException("Could not get response.", x);
+      }
    } 
 
    /**
-    * Gets the number of annotations on the given layer of the given graph - <em>NOT YET IMPLEMENTED</em>.
+    * Gets the number of annotations on the given layer of the given graph.
     * @param id The ID of the graph.
     * @param layerId The ID of the layer.
     * @return A (possibly empty) array of annotations.
@@ -957,7 +1037,7 @@ public class GraphStoreQuery
    }
 
    /**
-    * Gets the annotations on the given layer of the given graph - <em>NOT YET IMPLEMENTED</em>.
+    * Gets the annotations on the given layer of the given graph.
     * @param id The ID of the graph.
     * @param layerId The ID of the layer.
     * @param pageLength The maximum number of IDs to return, or null to return all.
@@ -970,7 +1050,34 @@ public class GraphStoreQuery
    public Annotation[] getAnnotations(String id, String layerId, Integer pageLength, Integer pageNumber)
       throws StoreException, PermissionException, GraphNotFoundException
    {
-      throw new StoreException("Not implemented");
+      try
+      {
+         URL url = url("getAnnotations");
+         if (verbose) System.out.println("getAnnotations -> " + url);
+         HttpRequestGet request = new HttpRequestGet(url, getRequiredHttpAuthorization()) 
+            .setHeader("Accept", "application/json")
+            .setParameter("id", id)
+            .setParameter("layerId", layerId);
+         if (pageLength != null) request.setParameter("pageLength", pageLength);
+         if (pageNumber != null) request.setParameter("pageNumber", pageNumber);
+         Response response = new Response(request.get(), verbose);
+         response.checkForErrors(); // throws a StoreException on error
+         if (response.isModelNull()) return null;
+         JSONArray array = (JSONArray)response.getModel();
+         Vector<Annotation> annotations = new Vector<Annotation>();
+         if (array != null)
+         {
+            for (int i = 0; i < array.length(); i++)
+            {
+               annotations.add(new Annotation(array.getJSONObject(i)));
+            }
+         }
+         return annotations.toArray(new Annotation[0]);
+      }
+      catch(IOException x)
+      {
+         throw new StoreException("Could not get response.", x);
+      }
    }
    
    /**
@@ -998,7 +1105,7 @@ public class GraphStoreQuery
    }
    
    /**
-    * Gets the given anchors in the given graph - <em>NOT YET IMPLEMENTED</em>.
+    * Gets the given anchors in the given graph.
     * @param id The ID of the graph.
     * @param anchorIds A list of anchor IDs.
     * @return A (possibly empty) array of anchors.
@@ -1009,7 +1116,32 @@ public class GraphStoreQuery
    public Anchor[] getAnchors(String id, String[] anchorIds)
       throws StoreException, PermissionException, GraphNotFoundException
    {
-      throw new StoreException("Not implemented");
+      try
+      {
+         URL url = url("getAnchors");
+         if (verbose) System.out.println("getAnchors -> " + url);
+         HttpRequestGet request = new HttpRequestGet(url, getRequiredHttpAuthorization()) 
+            .setHeader("Accept", "application/json")
+            .setParameter("id", id)
+            .setParameter("anchorIds", anchorIds);
+         Response response = new Response(request.get(), verbose);
+         response.checkForErrors(); // throws a StoreException on error
+         if (response.isModelNull()) return null;
+         JSONArray array = (JSONArray)response.getModel();
+         Vector<Anchor> anchors = new Vector<Anchor>();
+         if (array != null)
+         {
+            for (int i = 0; i < array.length(); i++)
+            {
+               anchors.add(new Anchor(array.getJSONObject(i)));
+            }
+         }
+         return anchors.toArray(new Anchor[0]);
+      }
+      catch(IOException x)
+      {
+         throw new StoreException("Could not get response.", x);
+      }
    }
 
    /**
@@ -1108,7 +1240,7 @@ public class GraphStoreQuery
    }
    
    /**
-    * List the predefined media tracks available for transcripts - <em>NOT YET IMPLEMENTED</em>.
+    * List the predefined media tracks available for transcripts.
     * @return An ordered list of media track definitions.
     * @throws StoreException If an error occurs.
     * @throws PermissionException If the operation is not permitted. 
@@ -1116,11 +1248,34 @@ public class GraphStoreQuery
    public MediaTrackDefinition[] getMediaTracks() 
       throws StoreException, PermissionException
    {
-      throw new StoreException("Not implemented");
+      try
+      {
+         URL url = url("getMediaTracks");
+         if (verbose) System.out.println("getMediaTracks -> " + url);
+         HttpRequestGet request = new HttpRequestGet(url, getRequiredHttpAuthorization()) 
+            .setHeader("Accept", "application/json");
+         Response response = new Response(request.get(), verbose);
+         response.checkForErrors(); // throws a StoreException on error
+         if (response.isModelNull()) return null;
+         JSONArray array = (JSONArray)response.getModel();
+         Vector<MediaTrackDefinition> tracks = new Vector<MediaTrackDefinition>();
+         if (array != null)
+         {
+            for (int i = 0; i < array.length(); i++)
+            {
+               tracks.add(new MediaTrackDefinition(array.getJSONObject(i)));
+            }
+         }
+         return tracks.toArray(new MediaTrackDefinition[0]);
+      }
+      catch(IOException x)
+      {
+         throw new StoreException("Could not get response.", x);
+      }
    }
    
    /**
-    * List the media available for the given graph - <em>NOT YET IMPLEMENTED</em>.
+    * List the media available for the given graph.
     * @param id The graph ID.
     * @return List of media files available for the given graph.
     * @throws StoreException If an error occurs.
@@ -1130,7 +1285,31 @@ public class GraphStoreQuery
    public MediaFile[] getAvailableMedia(String id) 
       throws StoreException, PermissionException, GraphNotFoundException
    {
-      throw new StoreException("Not implemented");
+      try
+      {
+         URL url = url("getAvailableMedia");
+         if (verbose) System.out.println("getAvailableMedia -> " + url);
+         HttpRequestGet request = new HttpRequestGet(url, getRequiredHttpAuthorization()) 
+            .setHeader("Accept", "application/json")
+            .setParameter("id", id);
+         Response response = new Response(request.get(), verbose);
+         response.checkForErrors(); // throws a StoreException on error
+         if (response.isModelNull()) return null;
+         JSONArray array = (JSONArray)response.getModel();
+         Vector<MediaFile> files = new Vector<MediaFile>();
+         if (array != null)
+         {
+            for (int i = 0; i < array.length(); i++)
+            {
+               files.add(new MediaFile(array.getJSONObject(i)));
+            }
+         }
+         return files.toArray(new MediaFile[0]);
+      }
+      catch(IOException x)
+      {
+         throw new StoreException("Could not get response.", x);
+      }
    }
 
    /**
@@ -1170,7 +1349,7 @@ public class GraphStoreQuery
    }
 
    /**
-    * Gets a given media track for a given graph - <em>NOT YET IMPLEMENTED</em>.
+    * Gets a given media track for a given graph.
     * @param id The graph ID.
     * @param trackSuffix The track suffix of the media - see {@link MediaTrackDefinition#suffix}.
     * @param mimeType The MIME type of the media, which may include parameters for type
@@ -1188,11 +1367,31 @@ public class GraphStoreQuery
    public String getMedia(String id, String trackSuffix, String mimeType, Double startOffset, Double endOffset) 
       throws StoreException, PermissionException, GraphNotFoundException
    {
-      throw new StoreException("Not implemented");
+      try
+      {
+         URL url = url("getMedia");
+         if (verbose) System.out.println("getMedia -> " + url);
+         HttpRequestGet request = new HttpRequestGet(url, getRequiredHttpAuthorization())
+            .setHeader("Accept", "application/json")
+            .setParameter("id", id)
+            .setParameter("trackSuffix", trackSuffix)
+            .setParameter("mimeType", mimeType)
+            .setParameter("startOffset", startOffset)
+            .setParameter("endOffset", endOffset);
+         if (verbose) System.out.println("parameters: " + request.getParameters());
+         Response response = new Response(request.get(), verbose);
+         response.checkForErrors(); // throws a StoreException on error
+         if (response.isModelNull()) return null;
+         return (String)response.getModel();
+      }
+      catch(IOException x)
+      {
+         throw new StoreException("Could not get response.", x);
+      }
    }
 
    /**
-    * Get a list of documents associated with the episode of the given graph - <em>NOT YET IMPLEMENTED</em>.
+    * Get a list of documents associated with the episode of the given graph.
     * @param id The graph ID.
     * @return List of URLs to documents.
     * @throws StoreException If an error prevents the media from being saved.
@@ -1202,7 +1401,31 @@ public class GraphStoreQuery
    public MediaFile[] getEpisodeDocuments(String id)
       throws StoreException, PermissionException, GraphNotFoundException
    {
-      throw new StoreException("Not implemented");
+      try
+      {
+         URL url = url("getEpisodeDocuments");
+         if (verbose) System.out.println("getEpisodeDocuments -> " + url);
+         HttpRequestGet request = new HttpRequestGet(url, getRequiredHttpAuthorization()) 
+            .setHeader("Accept", "application/json")
+            .setParameter("id", id);
+         Response response = new Response(request.get(), verbose);
+         response.checkForErrors(); // throws a StoreException on error
+         if (response.isModelNull()) return null;
+         JSONArray array = (JSONArray)response.getModel();
+         Vector<MediaFile> files = new Vector<MediaFile>();
+         if (array != null)
+         {
+            for (int i = 0; i < array.length(); i++)
+            {
+               files.add(new MediaFile(array.getJSONObject(i)));
+            }
+         }
+         return files.toArray(new MediaFile[0]);
+      }
+      catch(IOException x)
+      {
+         throw new StoreException("Could not get response.", x);
+      }
    }
 
 } // end of class GraphStoreQuery
