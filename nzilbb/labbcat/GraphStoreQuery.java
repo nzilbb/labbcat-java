@@ -244,7 +244,7 @@ public class GraphStoreQuery
          if (verbose)
          {
             System.out.println(
-               "First connection test status ("+(batchMode?" batch":"interacive")+" mode): "
+               "First connection test status ("+(batchMode?"batch":"interacive")+" mode): "
                + testConnection.getResponseCode());
          }            
 	 if (testConnection.getResponseCode() == HttpURLConnection.HTTP_UNAUTHORIZED)
@@ -375,9 +375,9 @@ public class GraphStoreQuery
       try
       {
          URL url = url("getId");
-         if (verbose) System.out.println("getId -> " + url);
          HttpRequestGet request = new HttpRequestGet(url, getRequiredHttpAuthorization())
             .setHeader("Accept", "application/json");
+         if (verbose) System.out.println("getId -> " + request);
          Response response = new Response(request.get(), verbose);
          response.checkForErrors(); // throws a StoreException on error
          if (response.isModelNull()) return null;
@@ -401,9 +401,9 @@ public class GraphStoreQuery
       try
       {
          URL url = url("getLayerIds");
-         if (verbose) System.out.println("getLayerIds -> " + url);
          HttpRequestGet request = new HttpRequestGet(url, getRequiredHttpAuthorization())
             .setHeader("Accept", "application/json");
+         if (verbose) System.out.println("getLayerIds -> " + request);
          Response response = new Response(request.get(), verbose);
          response.checkForErrors(); // throws a StoreException on error
          if (response.isModelNull()) return null;
@@ -436,9 +436,9 @@ public class GraphStoreQuery
       try
       {
          URL url = url("getLayers");
-         if (verbose) System.out.println("getLayers -> " + url);
          HttpRequestGet request = new HttpRequestGet(url, getRequiredHttpAuthorization()) 
             .setHeader("Accept", "application/json");
+         if (verbose) System.out.println("getLayers -> " + request);
          Response response = new Response(request.get(), verbose);
          response.checkForErrors(); // throws a StoreException on error
          if (response.isModelNull()) return null;
@@ -484,10 +484,10 @@ public class GraphStoreQuery
       try
       {
          URL url = url("getLayer");
-         if (verbose) System.out.println("getLayer -> " + url);
          HttpRequestGet request = new HttpRequestGet(url, getRequiredHttpAuthorization()) 
             .setHeader("Accept", "application/json")
             .setParameter("id", id);
+         if (verbose) System.out.println("getLayer -> " + request);
          Response response = new Response(request.get(), verbose);
          response.checkForErrors(); // throws a StoreException on error
          if (response.isModelNull()) return null;
@@ -511,9 +511,9 @@ public class GraphStoreQuery
       try
       {
          URL url = url("getCorpusIds");
-         if (verbose) System.out.println("getCorpusIds -> " + url);
          HttpRequestGet request = new HttpRequestGet(url, getRequiredHttpAuthorization())
             .setHeader("Accept", "application/json");
+         if (verbose) System.out.println("getCorpusIds -> " + request);
          Response response = new Response(request.get(), verbose);
          response.checkForErrors(); // throws a StoreException on error
          if (response.isModelNull()) return null;
@@ -546,9 +546,9 @@ public class GraphStoreQuery
       try
       {
          URL url = url("getParticipantIds");
-         if (verbose) System.out.println("getParticipantIds -> " + url);
          HttpRequestGet request = new HttpRequestGet(url, getRequiredHttpAuthorization())
             .setHeader("Accept", "application/json");
+         if (verbose) System.out.println("getParticipantIds -> " + request);
          Response response = new Response(request.get(), verbose);
          response.checkForErrors(); // throws a StoreException on error
          if (response.isModelNull()) return null;
@@ -583,10 +583,10 @@ public class GraphStoreQuery
       try
       {
          URL url = url("getParticipant");
-         if (verbose) System.out.println("getParticipant -> " + url);
          HttpRequestGet request = new HttpRequestGet(url, getRequiredHttpAuthorization()) 
             .setHeader("Accept", "application/json")
             .setParameter("id", id);
+         if (verbose) System.out.println("getParticipant -> " + request);
          Response response = new Response(request.get(), verbose);
          response.checkForErrors(); // throws a StoreException on error
          if (response.isModelNull()) return null;
@@ -666,10 +666,10 @@ public class GraphStoreQuery
       try
       {
          URL url = url("getMatchingParticipantIds");
-         if (verbose) System.out.println("getMatchingParticipantIds -> " + url);
          HttpRequestGet request = new HttpRequestGet(url, getRequiredHttpAuthorization())
             .setHeader("Accept", "application/json")
             .setParameter("expression", expression);
+         if (verbose) System.out.println("getMatchingParticipantIds -> " + request);
          if (pageLength != null) request.setParameter("pageLength", pageLength);
          if (pageNumber != null) request.setParameter("pageNumber", pageNumber);
          Response response = new Response(request.get(), verbose);
@@ -704,9 +704,9 @@ public class GraphStoreQuery
       try
       {
          URL url = url("getGraphIds");
-         if (verbose) System.out.println("getGraphIds -> " + url);
          HttpRequestGet request = new HttpRequestGet(url, getRequiredHttpAuthorization())
             .setHeader("Accept", "application/json");
+         if (verbose) System.out.println("getGraphIds -> " + request);
          Response response = new Response(request.get(), verbose);
          response.checkForErrors(); // throws a StoreException on error
          if (response.isModelNull()) return null;
@@ -740,10 +740,10 @@ public class GraphStoreQuery
       try
       {
          URL url = url("getGraphIdsInCorpus");
-         if (verbose) System.out.println("getGraphIdsInCorpus -> " + url);
          HttpRequestGet request = new HttpRequestGet(url, getRequiredHttpAuthorization())
             .setParameter("id", id)
             .setHeader("Accept", "application/json");
+         if (verbose) System.out.println("getGraphIdsInCorpus -> " + request);
          Response response = new Response(request.get(), verbose);
          response.checkForErrors(); // throws a StoreException on error
          if (response.isModelNull()) return null;
@@ -777,10 +777,10 @@ public class GraphStoreQuery
       try
       {
          URL url = url("getGraphIdsWithParticipant");
-         if (verbose) System.out.println("getGraphIdsWithParticipant -> " + url);
          HttpRequestGet request = new HttpRequestGet(url, getRequiredHttpAuthorization())
             .setParameter("id", id)
             .setHeader("Accept", "application/json");
+         if (verbose) System.out.println("getGraphIdsWithParticipant -> " + request);
          Response response = new Response(request.get(), verbose);
          response.checkForErrors(); // throws a StoreException on error
          if (response.isModelNull()) return null;
@@ -889,12 +889,12 @@ public class GraphStoreQuery
       try
       {
          URL url = url("getMatchingGraphIds");
-         if (verbose) System.out.println("getMatchingGraphIds -> " + url);
          HttpRequestGet request = new HttpRequestGet(url, getRequiredHttpAuthorization()) 
             .setHeader("Accept", "application/json")
             .setParameter("expression", expression);
          if (pageLength != null) request.setParameter("pageLength", pageLength);
          if (pageNumber != null) request.setParameter("pageNumber", pageNumber);
+         if (verbose) System.out.println("getMatchingGraphIds -> " + request);
          Response response = new Response(request.get(), verbose);
          response.checkForErrors(); // throws a StoreException on error
          if (response.isModelNull()) return null;
@@ -979,12 +979,12 @@ public class GraphStoreQuery
       try
       {
          URL url = url("getMatchingAnnotations");
-         if (verbose) System.out.println("getMatchingGraphIds -> " + url);
          HttpRequestGet request = new HttpRequestGet(url, getRequiredHttpAuthorization()) 
             .setHeader("Accept", "application/json")
             .setParameter("expression", expression);
          if (pageLength != null) request.setParameter("pageLength", pageLength);
          if (pageNumber != null) request.setParameter("pageNumber", pageNumber);
+         if (verbose) System.out.println("getMatchingGraphIds -> " + request);
          Response response = new Response(request.get(), verbose);
          response.checkForErrors(); // throws a StoreException on error
          if (response.isModelNull()) return null;
@@ -1053,13 +1053,13 @@ public class GraphStoreQuery
       try
       {
          URL url = url("getAnnotations");
-         if (verbose) System.out.println("getAnnotations -> " + url);
          HttpRequestGet request = new HttpRequestGet(url, getRequiredHttpAuthorization()) 
             .setHeader("Accept", "application/json")
             .setParameter("id", id)
             .setParameter("layerId", layerId);
          if (pageLength != null) request.setParameter("pageLength", pageLength);
          if (pageNumber != null) request.setParameter("pageNumber", pageNumber);
+         if (verbose) System.out.println("getAnnotations -> " + request);
          Response response = new Response(request.get(), verbose);
          response.checkForErrors(); // throws a StoreException on error
          if (response.isModelNull()) return null;
@@ -1119,11 +1119,11 @@ public class GraphStoreQuery
       try
       {
          URL url = url("getAnchors");
-         if (verbose) System.out.println("getAnchors -> " + url);
          HttpRequestGet request = new HttpRequestGet(url, getRequiredHttpAuthorization()) 
             .setHeader("Accept", "application/json")
             .setParameter("id", id)
             .setParameter("anchorIds", anchorIds);
+         if (verbose) System.out.println("getAnchors -> " + request);
          Response response = new Response(request.get(), verbose);
          response.checkForErrors(); // throws a StoreException on error
          if (response.isModelNull()) return null;
@@ -1251,9 +1251,9 @@ public class GraphStoreQuery
       try
       {
          URL url = url("getMediaTracks");
-         if (verbose) System.out.println("getMediaTracks -> " + url);
          HttpRequestGet request = new HttpRequestGet(url, getRequiredHttpAuthorization()) 
             .setHeader("Accept", "application/json");
+         if (verbose) System.out.println("getMediaTracks -> " + request);
          Response response = new Response(request.get(), verbose);
          response.checkForErrors(); // throws a StoreException on error
          if (response.isModelNull()) return null;
@@ -1288,10 +1288,10 @@ public class GraphStoreQuery
       try
       {
          URL url = url("getAvailableMedia");
-         if (verbose) System.out.println("getAvailableMedia -> " + url);
          HttpRequestGet request = new HttpRequestGet(url, getRequiredHttpAuthorization()) 
             .setHeader("Accept", "application/json")
             .setParameter("id", id);
+         if (verbose) System.out.println("getAvailableMedia -> " + request);
          Response response = new Response(request.get(), verbose);
          response.checkForErrors(); // throws a StoreException on error
          if (response.isModelNull()) return null;
@@ -1330,13 +1330,12 @@ public class GraphStoreQuery
       try
       {
          URL url = url("getMedia");
-         if (verbose) System.out.println("getMedia -> " + url);
          HttpRequestGet request = new HttpRequestGet(url, getRequiredHttpAuthorization())
             .setHeader("Accept", "application/json")
             .setParameter("id", id)
             .setParameter("trackSuffix", trackSuffix)
             .setParameter("mimeType", mimeType);
-         if (verbose) System.out.println("parameters: " + request.getParameters());
+         if (verbose) System.out.println("getMedia -> " + request);
          Response response = new Response(request.get(), verbose);
          response.checkForErrors(); // throws a StoreException on error
          if (response.isModelNull()) return null;
@@ -1370,7 +1369,6 @@ public class GraphStoreQuery
       try
       {
          URL url = url("getMedia");
-         if (verbose) System.out.println("getMedia -> " + url);
          HttpRequestGet request = new HttpRequestGet(url, getRequiredHttpAuthorization())
             .setHeader("Accept", "application/json")
             .setParameter("id", id)
@@ -1378,7 +1376,7 @@ public class GraphStoreQuery
             .setParameter("mimeType", mimeType)
             .setParameter("startOffset", startOffset)
             .setParameter("endOffset", endOffset);
-         if (verbose) System.out.println("parameters: " + request.getParameters());
+         if (verbose) System.out.println("getMedia -> " + request);
          Response response = new Response(request.get(), verbose);
          response.checkForErrors(); // throws a StoreException on error
          if (response.isModelNull()) return null;
@@ -1404,10 +1402,10 @@ public class GraphStoreQuery
       try
       {
          URL url = url("getEpisodeDocuments");
-         if (verbose) System.out.println("getEpisodeDocuments -> " + url);
          HttpRequestGet request = new HttpRequestGet(url, getRequiredHttpAuthorization()) 
             .setHeader("Accept", "application/json")
             .setParameter("id", id);
+         if (verbose) System.out.println("getEpisodeDocuments -> " + request);
          Response response = new Response(request.get(), verbose);
          response.checkForErrors(); // throws a StoreException on error
          if (response.isModelNull()) return null;
