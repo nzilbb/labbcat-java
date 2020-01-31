@@ -47,6 +47,9 @@ public class Labbcat
    extends GraphStoreAdministration
 {
    // Attributes:
+   
+   /** Current request, if any */
+   HttpRequestPostMultipart postRequest;   
   
    // Methods:
    
@@ -169,6 +172,19 @@ public class Labbcat
    } // end of taskStatus()
    
    /**
+    * Wait for the given task to finish.
+    * @param taskId
+    * @return The taskId.
+    * @throws IOException
+    * @throws ResponseException
+    */
+   public String waitForTask(String taskId)
+    throws IOException, ResponseException
+   {
+      throw new IOException("not implemented");
+   } // end of waitForTask()
+   
+   /**
     * Release a finished task, to free up server resources.
     * @param taskId The ID of the task.
     * @throws IOException
@@ -190,8 +206,38 @@ public class Labbcat
    {
       throw new IOException("not implemented");
    } // end of getTasks()
+   
+   /**
+    * Cancel the current request, if possible.
+    */
+   public void cancel()
+   {
+      if (postRequest != null)
+      {
+	 postRequest.cancel();
+      }
+   } // end of cancel()
 
-   // TODO String getMatches(pattern, participantId=NULL, main.participant=TRUE, words.context=0)
+   /**
+    * Determines whether or not the request is being cancelled.
+    * @return true, if the last request has been asked to cancel, false otherwise
+    */
+   public boolean isCancelling()
+   {
+      if (postRequest == null)
+      {
+	 return false;
+      }
+      else
+      {
+	 return postRequest.isCancelling();
+      }
+   } // end of isCancelling()
+   
+   // TODO String getMatches(JSONObject pattern, participantId=NULL, main.participant=TRUE, words.context=0)
    // TODO getMatchLabels(matchIds, layerIds, targetOffset=0, annotationsPerLayer=1)
    // TODO String getSoundFragments(id, start, end, sampleRate = NULL)
+   // TODO getFragments(id, start, end, layerIds, mimeType = "text/praat-textgrid")
+
+   // TODO clearLayer(id)
 } // end of class Labbcat
