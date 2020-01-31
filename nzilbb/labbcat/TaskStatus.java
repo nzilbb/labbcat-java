@@ -65,6 +65,23 @@ public class TaskStatus
    public TaskStatus setThreadName(String newThreadName) { threadName = newThreadName; return this; }
 
    /**
+    * Whether the task is currently running (true) or complete (false).
+    * @see #getRunning()
+    * @see #setRunning(boolean)
+    */
+   protected boolean running;
+   /**
+    * Getter for {@link #running}: Whether the task is currently running (true) or complete (false).
+    * @return Whether the task is currently running (true) or complete (false).
+    */
+   public boolean getRunning() { return running; }
+   /**
+    * Setter for {@link #running}: Whether the task is currently running (true) or complete (false).
+    * @param newRunning Whether the task is currently running (true) or complete (false).
+    */
+   public TaskStatus setRunning(boolean newRunning) { running = newRunning; return this; }
+
+   /**
     * Duration in seconds.
     * @see #getDuration()
     * @see #setDuration(int)
@@ -132,6 +149,24 @@ public class TaskStatus
     */
    public TaskStatus setRefreshSeconds(int newRefreshSeconds) { refreshSeconds = newRefreshSeconds; return this; }
    
+
+   /**
+    * URL for task results, if any.
+    * @see #getResultUrl()
+    * @see #setResultUrl(String)
+    */
+   protected String resultUrl;
+   /**
+    * Getter for {@link #resultUrl}: URL for task results, if any.
+    * @return URL for task results, if any.
+    */
+   public String getResultUrl() { return resultUrl; }
+   /**
+    * Setter for {@link #resultUrl}: URL for task results, if any.
+    * @param newResultUrl URL for task results, if any.
+    */
+   public TaskStatus setResultUrl(String newResultUrl) { resultUrl = newResultUrl; return this; }
+
    // Methods:
    
    /**
