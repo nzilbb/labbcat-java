@@ -63,6 +63,23 @@ public class Response
    public String getTitle() { return title; }
 
    /**
+    * Server version.
+    * @see #getVersion()
+    * @see #setVersion(String)
+    */
+   protected String version;
+   /**
+    * Getter for {@link #version}: Server version.
+    * @return Server version.
+    */
+   public String getVersion() { return version; }
+   /**
+    * Setter for {@link #version}: Server version.
+    * @param newVersion Server version.
+    */
+   public Response setVersion(String newVersion) { version = newVersion; return this; }
+
+   /**
     * The request code.
     * @see #getCode()
     */
@@ -190,6 +207,7 @@ public class Response
       try
       {
          httpStatus = connection.getResponseCode();
+         if (verbose) System.out.println("HTTP status: " + connection.getResponseCode());
       }
       catch(IOException exception)
       {
@@ -257,6 +275,8 @@ public class Response
       
       title = json.getString("title");
       if (verbose) System.out.println("title: " + title);
+      version = json.optString("version");
+      if (verbose) System.out.println("version: " + version);
       code = json.getInt("code");
       if (verbose) System.out.println("code: " + code);
       model = json.get("model");      

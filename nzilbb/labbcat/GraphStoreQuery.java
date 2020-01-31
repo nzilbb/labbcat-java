@@ -161,6 +161,18 @@ public class GraphStoreQuery
     */
    public GraphStoreQuery setVerbose(boolean newVerbose) { verbose = newVerbose; return this; }
 
+   /**
+    * Minimum server version required for this API to work properly.
+    * @see #getMinLabbcatVersion()
+    * @see #setMinLabbcatVersion(String)
+    */
+   protected String minLabbcatVersion = "20200129.1901";
+   /**
+    * Getter for {@link #minLabbcatVersion}: Minimum server version required for this API to work properly.
+    * @return Minimum server version required for this API to work properly.
+    */
+   public String getMinLabbcatVersion() { return minLabbcatVersion; }
+
    // Methods:
    
    /**
@@ -228,16 +240,17 @@ public class GraphStoreQuery
     * @throws Exception if the user cancels while begin prompted for credentials
     */
    public String getRequiredHttpAuthorization()
-      throws IOException 
+      throws IOException, StoreException
    {
       if (authorization != null) return authorization;
       
-      URL testUrl = getLabbcatUrl();
+      URL testUrl = url(""); // store URL with no path
       HttpURLConnection testConnection = (HttpURLConnection)testUrl.openConnection();
+      Response response = null;
       try
       {
 	 InputStream is = testConnection.getInputStream();
-	 is.close();
+	 response = new Response(is, verbose);
       }
       catch (IOException x)
       {
@@ -262,7 +275,7 @@ public class GraphStoreQuery
                   try 
                   { 
                      InputStream is = testConnection.getInputStream(); 
-                     is.close();
+                     response = new Response(is, verbose);
                   }
                   catch (IOException xx)
                   {
@@ -317,13 +330,16 @@ public class GraphStoreQuery
                   try 
                   { 
                      InputStream is = testConnection.getInputStream(); 
-                     is.close();
+                     response = new Response(is, verbose);
                   }
                   catch (Exception xx)
                   {
-                     System.out.println(
-                        "Next connection test status in interactive mode: "
-                        + testConnection.getResponseCode());
+                     if (verbose)
+                     {
+                        System.out.println(
+                           "Next connection test status in interactive mode: "
+                           + testConnection.getResponseCode());
+                     }
                      if (testConnection.getResponseCode() == HttpURLConnection.HTTP_UNAUTHORIZED)
                      {
                         authorization = null;
@@ -339,6 +355,19 @@ public class GraphStoreQuery
             throw x;
          }
       } // exception getting content
+
+      if (response != null)
+      { // got a response
+         // check server version
+         if (response.getVersion() == null
+             || response.getVersion().compareTo(minLabbcatVersion) < 0)
+         {
+            throw new StoreException(
+               "Server is version " + response.getVersion()
+               + " but the minimum required version is " + minLabbcatVersion);
+         }
+      }
+      
       return authorization;
    } // end of getRequiredHttpAuthorization()
    
