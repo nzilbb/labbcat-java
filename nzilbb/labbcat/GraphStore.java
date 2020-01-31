@@ -132,18 +132,18 @@ public class GraphStore
     * @return A URL for the given resource.
     * @throws StoreException If the URL is malformed.
     */
-   public URL url(String resource)
+   public URL editUrl(String resource)
       throws StoreException
    {
       try
       {
-         return new URL(new URL(labbcatUrl, "edit/api/store/"), resource);
+         return new URL(new URL(labbcatUrl, "edit/store/"), resource);
       }
       catch(Throwable t)
       {
          throw new StoreException("Could not construct request URL.", t);
       }
-   } // end of makeUrl()   
+   } // end of editUrl()   
 
    // IGraphStore methods:
    
@@ -192,7 +192,7 @@ public class GraphStore
    {
       try
       {
-         URL url = url("createAnnotation");
+         URL url = editUrl("createAnnotation");
          HttpRequestPost request = new HttpRequestPost(url, getRequiredHttpAuthorization())
             .setHeader("Accept", "application/json")
             .setParameter("id", id)
@@ -224,7 +224,7 @@ public class GraphStore
    {
       try
       {
-         URL url = url("destroyAnnotation");
+         URL url = editUrl("destroyAnnotation");
          HttpRequestPost request = new HttpRequestPost(url, getRequiredHttpAuthorization())
             .setHeader("Accept", "application/json")
             .setParameter("id", id)
@@ -308,7 +308,7 @@ public class GraphStore
    {
       try
       {
-         URL url = url("deleteGraph");
+         URL url = editUrl("deleteGraph");
          HttpRequestPost request = new HttpRequestPost(url, getRequiredHttpAuthorization())
             .setHeader("Accept", "application/json")
             .setParameter("id", id);
