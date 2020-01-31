@@ -41,19 +41,23 @@ import java.util.Iterator;
  */
 public class HttpRequestPostMultipart 
 {
-      protected HttpURLConnection connection;
-      protected OutputStream os = null;
-      protected Map<String,String> cookies = new HashMap<String,String>();
-
+   protected HttpURLConnection connection;
+   protected OutputStream os = null;
+   protected Map<String,String> cookies = new HashMap<String,String>();
+   
+   private String url = "?"; 
+   private StringBuilder body = new StringBuilder(); 
+   
    /**
     * Sets a request parameter value
     * @param sKey
     * @param sValue
     */
-   public void setHeader(String sKey, String sValue)
+   public HttpRequestPostMultipart setHeader(String sKey, String sValue)
    {
       connection.setRequestProperty(sKey, sValue);
-   } // end of setParameter()
+      return this;
+   } // end of setHeader()
    
    /** Cancel flag */
    protected boolean bCancelling = false;
@@ -246,13 +250,16 @@ public class HttpRequestPostMultipart
     * @param value parameter value
     * @throws IOException
     */
-   public void setParameter(String name, String value) throws IOException 
+   public HttpRequestPostMultipart setParameter(String name, String value) throws IOException 
    {
-      if (value == null) return; //20100520 robert.fromont@canterbury.ac.nz 
+      if (value == null) return this; //20100520 robert.fromont@canterbury.ac.nz 
       boundary();
       writeName(name);
       newline(); newline();
       writeln(value);
+      // for toString
+      body.append(name).append(" = ").append(value).append(" ");
+      return this;
    }
    
    private void pipe(InputStream in, OutputStream out) throws IOException 
@@ -284,7 +291,7 @@ public class HttpRequestPostMultipart
     * @param is input stream to read the contents of the file from
     * @throws IOException
     */
-   public void setParameter(String name, String filename, InputStream is) throws IOException 
+   public HttpRequestPostMultipart setParameter(String name, String filename, InputStream is) throws IOException 
    {
       try
       {
@@ -301,11 +308,14 @@ public class HttpRequestPostMultipart
          newline();
          pipe(is, os);
          newline();
+         // for toString:
+         body.append(name).append(" = file (").append(filename).append(") ");
       }
       finally
       {
          is.close();  //20100521 robert.fromont@canterbury.ac.nz
       }
+      return this;
    }
    
    /**
@@ -314,10 +324,11 @@ public class HttpRequestPostMultipart
     * @param file the file to upload
     * @throws IOException
     */
-   public void setParameter(String name, File file) throws IOException 
+   public HttpRequestPostMultipart setParameter(String name, File file) throws IOException 
    {
-      if (file == null) return; //20100520 robert.fromont@canterbury.ac.nz 
+      if (file == null) return this; //20100520 robert.fromont@canterbury.ac.nz 
       setParameter(name, file.getPath(), new FileInputStream(file));
+      return this;
    }
    
    /**
@@ -327,9 +338,9 @@ public class HttpRequestPostMultipart
     * @param object parameter value, a File or anything else that can be stringified
     * @throws IOException
     */
-   public void setParameter(String name, Object object) throws IOException 
+   public HttpRequestPostMultipart setParameter(String name, Object object) throws IOException 
    {
-      if (object == null) return; //20100520 robert.fromont@canterbury.ac.nz 
+      if (object == null) return this; //20100520 robert.fromont@canterbury.ac.nz 
       if (object instanceof File) 
       {
          setParameter(name, (File) object);
@@ -347,6 +358,7 @@ public class HttpRequestPostMultipart
       {
          setParameter(name, object.toString());
       }
+      return this;
    }
    
    /**
@@ -356,14 +368,15 @@ public class HttpRequestPostMultipart
     * @throws IOException
     */
    @SuppressWarnings("rawtypes")
-   public void setParameters(Map<String,String> parameters) throws IOException 
+   public HttpRequestPostMultipart setParameters(Map<String,String> parameters) throws IOException 
    {
-      if (parameters == null) return;
+      if (parameters == null) return this;
       for (Iterator i = parameters.entrySet().iterator(); i.hasNext();) 
       {
          Map.Entry entry = (Map.Entry)i.next();
          setParameter(entry.getKey().toString(), entry.getValue());
       }
+      return this;
    }
    
    /**
@@ -373,13 +386,14 @@ public class HttpRequestPostMultipart
     * otherwise it is stringified and sent in the request 
     * @throws IOException
     */
-   public void setParameters(Object[] parameters) throws IOException 
+   public HttpRequestPostMultipart setParameters(Object[] parameters) throws IOException 
    {
-      if (parameters == null) return;
+      if (parameters == null) return this;
       for (int i = 0; i < parameters.length - 1; i+=2) 
       {
          setParameter(parameters[i].toString(), parameters[i+1]);
       }
+      return this;
    }
    
    /**
@@ -642,4 +656,13 @@ public class HttpRequestPostMultipart
    {
       return new HttpRequestPostMultipart(url, sAuthorization).post(name1, value1, name2, value2, name3, value3, name4, value4);
    }
+   
+   /**
+    * String representation of the request, for logging.
+    * @return A String representation of the request, for logging.
+    */
+   public String toString()
+   {
+      return "POST " + url + " : " + body;
+   } // end of toString()
 }
