@@ -31,7 +31,8 @@ import nzilbb.ag.serialize.ISerializer;
 import nzilbb.ag.serialize.SerializationDescriptor;
 
 /**
- * Client-side implementation of IGraphStoreAdministration.
+ * Client-side implementation of 
+ * <a href="https://nzilbb.github.io/ag/javadoc/nzilbb/ag/IGraphStoreAdministration.html">nzilbb.ag.IGraphStoreAdminitration</a>.
  * <p> e.g.
  * <pre> // create annotation store client
  * GraphStoreAdministration store = new GraphStoreAdministration("https://labbcat.canterbury.ac.nz", "demo", "demo");
@@ -129,7 +130,7 @@ public class GraphStoreAdministration
    // IGraphStoreAdministration methods:
    
    /**
-    * Registers a graph deserializer.
+    * <em>NOT YET IMPLEMENTED</em> - Registers a graph deserializer.
     * @param deserializer The deserializer to register.
     * @throws StoreException If an error prevents the operation.
     * @throws PermissionException If the operation is not permitted.
@@ -140,7 +141,7 @@ public class GraphStoreAdministration
    }
 
    /**
-    * De-registers a graph deserializer.
+    * <em>NOT YET IMPLEMENTED</em> - De-registers a graph deserializer.
     * @param deserializer The deserializer to de-register.
     * @throws StoreException If an error prevents the operation.
     * @throws PermissionException If the operation is not permitted.
@@ -151,7 +152,7 @@ public class GraphStoreAdministration
    }
 
    /**
-    * Lists the descriptors of all registered deserializers.
+    * <em>NOT YET IMPLEMENTED</em> - Lists the descriptors of all registered deserializers.
     * @return A list of the descriptors of all registered deserializers.
     * @throws StoreException If an error prevents the operation.
     * @throws PermissionException If the operation is not permitted.
@@ -162,7 +163,7 @@ public class GraphStoreAdministration
    }
    
    /**
-    * Gets the deserializer for the given MIME type.
+    * <em>NOT YET IMPLEMENTED</em> - Gets the deserializer for the given MIME type.
     * @param mimeType The MIME type.
     * @return The deserializer for the given MIME type, or null if none is registered.
     * @throws StoreException If an error prevents the operation.
@@ -174,7 +175,7 @@ public class GraphStoreAdministration
    }
 
    /**
-    * Gets the deserializer for the given file suffix (extension).
+    * <em>NOT YET IMPLEMENTED</em> - Gets the deserializer for the given file suffix (extension).
     * @param suffix The file extension.
     * @return The deserializer for the given suffix, or null if none is registered.
     * @throws StoreException If an error prevents the operation.
@@ -186,7 +187,7 @@ public class GraphStoreAdministration
    }
 
    /**
-    * Registers a graph serializer.
+    * <em>NOT YET IMPLEMENTED</em> - Registers a graph serializer.
     * @param serializer The serializer to register.
     * @throws StoreException If an error prevents the operation.
     * @throws PermissionException If the operation is not permitted.
@@ -197,7 +198,7 @@ public class GraphStoreAdministration
    }
 
    /**
-    * De-registers a graph serializer.
+    * <em>NOT YET IMPLEMENTED</em> - De-registers a graph serializer.
     * @param serializer The serializer to de-register.
     * @throws StoreException If an error prevents the operation.
     * @throws PermissionException If the operation is not permitted.
@@ -208,7 +209,7 @@ public class GraphStoreAdministration
    }
 
    /**
-    * Lists the descriptors of all registered serializers.
+    * <em>NOT YET IMPLEMENTED</em> - Lists the descriptors of all registered serializers.
     * @return A list of the descriptors of all registered serializers.
     * @throws StoreException If an error prevents the operation.
     * @throws PermissionException If the operation is not permitted.
@@ -219,7 +220,7 @@ public class GraphStoreAdministration
    }
    
    /**
-    * Gets the serializer for the given MIME type.
+    * <em>NOT YET IMPLEMENTED</em> - Gets the serializer for the given MIME type.
     * @param mimeType The MIME type.
     * @return The serializer for the given MIME type, or null if none is registered.
     * @throws StoreException If an error prevents the operation.
@@ -231,7 +232,7 @@ public class GraphStoreAdministration
    }
 
    /**
-    * Gets the serializer for the given file suffix (extension).
+    * <em>NOT YET IMPLEMENTED</em> - Gets the serializer for the given file suffix (extension).
     * @param suffix The file extension.
     * @return The serializer for the given suffix, or null if none is registered.
     * @throws StoreException If an error prevents the operation.

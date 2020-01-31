@@ -50,7 +50,8 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 /**
- * Client-side implementation of IGraphStoreQuery.
+ * Client-side implementation of 
+ * <a href="https://nzilbb.github.io/ag/javadoc/nzilbb/ag/IGraphStoreQuery.html">nzilbb.ag.IGraphStoreQuery</a>.
  * <p> e.g.
  * <pre> // create annotation store client
  * GraphStoreQuery store = new GraphStoreQuery("https://labbcat.canterbury.ac.nz", "demo", "demo");
@@ -489,7 +490,7 @@ public class GraphStoreQuery
    }
 
    /**
-    * Gets the layer schema - <em>NOT YET IMPLEMENTED</em>.
+    * <em>NOT YET IMPLEMENTED</em> - Gets the layer schema.
     * @return A schema defining the layers and how they relate to each other.
     * @throws StoreException If an error occurs.
     * @throws PermissionException If the operation is not permitted.
@@ -1110,7 +1111,7 @@ public class GraphStoreQuery
    }
    
    /**
-    * Gets the annotations on given layers for a set of match IDs - <em>NOT YET IMPLEMENTED</em>.
+    * <em>NOT YET IMPLEMENTED</em> - Gets the annotations on given layers for a set of match IDs.
     * @param matchIds An iterator that supplies match IDs - these may be the contents of
     * the MatchId column in exported search results, token URLs, or annotation IDs. 
     * @param layerIds The layer IDs of the layers to get.
@@ -1174,7 +1175,7 @@ public class GraphStoreQuery
    }
 
    /**
-    * Gets a graph given its ID - <em>NOT YET IMPLEMENTED</em>.
+    * <em>NOT YET IMPLEMENTED</em> - Gets a graph given its ID.
     * @param id The given graph ID.
     * @return The identified graph.
     * @throws StoreException If an error occurs.
@@ -1188,7 +1189,7 @@ public class GraphStoreQuery
    }
 
    /**
-    * Gets a graph given its ID, containing only the given layers - <em>NOT YET IMPLEMENTED</em>.
+    * <em>NOT YET IMPLEMENTED</em> - Gets a graph given its ID, containing only the given layers.
     * @param id The given graph ID.
     * @param layerIds The IDs of the layers to load, or null if only graph data is required.
     * @return The identified graph.
@@ -1203,7 +1204,7 @@ public class GraphStoreQuery
    }
 
    /**
-    * Gets a fragment of a graph, given its ID and the ID of an annotation in it that defines the - <em>NOT YET IMPLEMENTED</em> 
+    * <em>NOT YET IMPLEMENTED</em> - Gets a fragment of a graph, given its ID and the ID of an annotation in it that defines the
     * desired fragment.
     * @param graphId The ID of the graph.
     * @param annotationId The ID of an annotation that defines the bounds of the fragment.
@@ -1219,7 +1220,7 @@ public class GraphStoreQuery
    }
 
    /**
-    * Gets a fragment of a graph, given its ID and the ID of an annotation in it that defines the - <em>NOT YET IMPLEMENTED</em> 
+    * <em>NOT YET IMPLEMENTED</em> - Gets a fragment of a graph, given its ID and the ID of an annotation in it that defines the 
     * desired fragment, and containing only the given layers.
     * @param graphId The ID of the graph.
     * @param annotationId The ID of an annotation that defines the bounds of the fragment.
@@ -1236,7 +1237,7 @@ public class GraphStoreQuery
    }
    
    /**
-    * Gets a fragment of a graph, given its ID and the start/end offsets that define the - <em>NOT YET IMPLEMENTED</em> 
+    * <em>NOT YET IMPLEMENTED</em> - Gets a fragment of a graph, given its ID and the start/end offsets that define the
     * desired fragment, and containing only the given layers.
     * @param graphId The ID of the graph.
     * @param start The start offset of the fragment.
@@ -1254,7 +1255,7 @@ public class GraphStoreQuery
    }
    
    /**
-    * Gets a series of fragments, given the series' ID, and only the given layers - <em>NOT YET IMPLEMENTED</em>.
+    * <em>NOT YET IMPLEMENTED</em> - Gets a series of fragments, given the series' ID, and only the given layers.
     * @param seriesId The ID of the series.
     * @param layerIds The IDs of the layers to load, or null if only graph data is required.
     * @return An enumeratable series of fragments.

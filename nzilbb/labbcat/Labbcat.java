@@ -36,13 +36,26 @@ import org.json.JSONObject;
 /**
  * Labbcat client, for accessing LaBB-CAT server functions programmatically.
  * <p> e.g.
- * <pre> // create annotation store client
- * Labbcat labbcat = new Labbcat("https://labbcat.canterbury.ac.nz", "demo", "demo");
- * // get some basic information
- * String id = labbcat.getId();
- * String[] layers = labbcat.getLayerIds();
- * String[] corpora = labbcat.getCorpusIds();
- * String[] documents = labbcat.getGraphIdsInCorpus(corpora[0]);
+ * <pre> // create LaBB-CAT client
+ * Labbcat labbcat = new {@link #Labbcat(String,String,String) Labbcat("https://labbcat.canterbury.ac.nz", "demo", "demo")};
+ * 
+ * // get a corpus ID
+ * String[] corpora = labbcat.{@link GraphStoreQuery#getCorpusIds() getCorpusIds()};
+ * String corpus = ids[0];
+ *
+ * // get a transcript type
+ * Layer typeLayer = labbcat.{@link GraphStoreQuery#getLayer(String) getLayer("transcript_type")};
+ * String transcriptType = typeLayer.getValidLabels().keySet().iterator().next();
+ *
+ * // upload a transcript
+ * File transcript = new File("/some/transcript.txt");
+ * String taskId = labbcat.{@link #newTranscript(File,File[],String,String,String,String) newTranscript(transcript, null, null, transcriptType, corpus, "test")};
+ *
+ * // wait until all automatic annotations have been generated
+ * TaskStatus layerGenerationTask = labbcat.{@link #waitForTask(String,int) waitForTask(taskId, 30)};
+ *
+ * // get all the POS annotations
+ * Annotation[] pos = store.{@link GraphStoreQuery#getAnnotations(String,String,Integer,Integer) getAnnotations(transcript.getName(), "pos")};
  * </pre>
  * @author Robert Fromont robert@fromont.net.nz
  */

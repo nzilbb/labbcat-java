@@ -33,7 +33,8 @@ import nzilbb.ag.StoreException;
 import nzilbb.labbcat.http.*;
 
 /**
- * Client-side implementation of IGraphStore.
+ * Client-side implementation of 
+ * <a href="https://nzilbb.github.io/ag/javadoc/nzilbb/ag/IGraphStore.html">nzilbb.ag.IGraphStore</a>.
  * <p> e.g.
  * <pre> // create annotation store client
  * GraphStoreQuery store = new GraphStore("https://labbcat.canterbury.ac.nz", "demo", "demo");
@@ -131,16 +132,8 @@ public class GraphStore
    // IGraphStore methods:
    
    /**
-    * Saves the given graph. The graph can be partial e.g. include only some of the layers
+    * <em>NOT YET IMPLEMENTED</em> - Saves the given graph. The graph can be partial e.g. include only some of the layers
     * that the stored version of the graph contains.
-    * <p>The graph deltas are assumed to be set correctly, so if this is a new graph, then
-    * {@link Graph#getChange()} should return Change.Operation.Create, if it's an update,
-    * Change.Operation.Update, and to delete, Change.Operation.Delete.  Correspondingly,
-    * all {@link Anchor}s and {@link Annotation}s should have their changes set also.  If
-    * {@link Graph#getChanges()} returns no changes, no action will be taken, and this
-    * method returns false.
-    * <p>After this method has executed, {@link Graph#commit()} is <em>not</em> called -
-    * this must be done by the caller, if they want changes to be committed.
     * @param graph The graph to save.
     * @return true if changes were saved, false if there were no changes to save.
     * @throws StoreException If an error prevents the graph from being saved.
@@ -223,7 +216,7 @@ public class GraphStore
    }
    
    /**
-    * Saves a participant, and all its tags, to the database.  The participant is
+    * <em>NOT YET IMPLEMENTED</em> - Saves a participant, and all its tags, to the database.  The participant is
     * represented by an Annotation that isn't assumed to be part of a graph.
     * @param participant
     * @return true if changes were saved, false if there were no changes to save.
@@ -237,9 +230,10 @@ public class GraphStore
    }
 
    /**
-    * Saves the given media for the given graph
+    * <em>NOT YET IMPLEMENTED</em> - Saves the given media for the given graph
     * @param id The graph ID
-    * @param trackSuffix The track suffix of the media - see {@link MediaTrackDefinition#suffix}.
+    * @param trackSuffix The track suffix of the media
+    *  - see <a href="https://nzilbb.github.io/ag/javadoc/nzilbb/ag/MediaTrackDefinition.html#suffix">MediaTrackDefinition.suffix</a>}.
     * @param mediaUrl A URL to the media content.
     * @throws StoreException If an error prevents the media from being saved.
     * @throws PermissionException If saving the media is not permitted.
@@ -252,7 +246,7 @@ public class GraphStore
    }
 
    /**
-    * Saves the given source file (transcript) for the given graph.
+    * <em>NOT YET IMPLEMENTED</em> - Saves the given source file (transcript) for the given graph.
     * @param id The graph ID
     * @param url A URL to the transcript.
     * @throws StoreException If an error prevents the media from being saved.
@@ -266,7 +260,7 @@ public class GraphStore
    }
 
    /**
-    * Saves the given document for the episode of the given graph.
+    * <em>NOT YET IMPLEMENTED</em> - Saves the given document for the episode of the given graph.
     * @param id The graph ID
     * @param url A URL to the document.
     * @throws StoreException If an error prevents the media from being saved.
