@@ -21,13 +21,17 @@
 //
 package nzilbb.labbcat;
 
+import java.io.File;
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Collection;
-import java.io.File;
-import java.io.IOException;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 import nzilbb.ag.StoreException;
 import nzilbb.labbcat.http.*;
+import org.json.JSONObject;
 
 /**
  * Labbcat client, for accessing LaBB-CAT server functions programmatically.
@@ -140,9 +144,34 @@ public class Labbcat
     * @throws ResponseException
     */
    public String newTranscript(File transcript, File[] media, String mediaSuffix, String transcriptType, String corpus, String episode)
-      throws IOException, ResponseException
+      throws IOException, StoreException
    {
-      throw new IOException("not implemented");
+      cancelling = false;
+      URL url = makeUrl("edit/transcript/new");
+      HttpRequestPostMultipart request = new HttpRequestPostMultipart(url, getRequiredHttpAuthorization())
+         .setHeader("Accept", "application/json")
+         .setParameter("todo", "new")
+         .setParameter("auto", true)
+         .setParameter("transcriptType", transcriptType)
+         .setParameter("corpus", corpus)
+         .setParameter("episode", episode)
+         .setParameter("uploadfile1_0", transcript);
+      if (media != null && media.length > 0)
+      {
+         if (mediaSuffix == null) mediaSuffix = "";
+         for (int f = 0; f < media.length; f++)
+         {
+            request.setParameter("uploadmedia"+mediaSuffix+"1", media[f]);
+         } // next file
+      }
+      if (verbose) System.out.println("taskStatus -> " + request);
+      Response response = new Response(request.post(), verbose);
+      response.checkForErrors(); // throws a ResponseException on error
+
+      // extract the threadId from model.result.id
+      JSONObject model = (JSONObject)response.getModel();
+      JSONObject result = model.getJSONObject("result");
+      return result.getString(transcript.getName());
    } // end of newTranscript()
 
    /**
@@ -153,47 +182,101 @@ public class Labbcat
     * @throws ResponseException
     */
    public String updateTranscript(File transcript)
-      throws IOException, ResponseException
+      throws IOException, StoreException
    {
-      throw new IOException("not implemented");
+      cancelling = false;
+      URL url = makeUrl("edit/transcript/new");
+      HttpRequestPostMultipart request = new HttpRequestPostMultipart(url, getRequiredHttpAuthorization())
+         .setHeader("Accept", "application/json")
+         .setParameter("todo", "update")
+         .setParameter("auto", true)
+         .setParameter("uploadfile1_0", transcript);
+      if (verbose) System.out.println("taskStatus -> " + request);
+      Response response = new Response(request.post(), verbose);
+      response.checkForErrors(); // throws a ResponseException on error
+      
+      // extract the threadId from model.result.id
+      JSONObject model = (JSONObject)response.getModel();
+      JSONObject result = model.getJSONObject("result");
+      return result.getString(transcript.getName());
    } // end of updateTranscript()
    
    /**
     * Gets the current state of the given task.
-    * @param taskId The ID of the task.
+    * @param threadId The ID of the task.
     * @return The status of the task
     * @throws IOException
     * @throws ResponseException
     */
-   public TaskStatus taskStatus(String taskId)
-      throws IOException, ResponseException
+   public TaskStatus taskStatus(String threadId)
+      throws IOException, StoreException
    {
-      throw new IOException("not implemented");
+      cancelling = false;
+      URL url = makeUrl("thread");
+      HttpRequestGet request = new HttpRequestGet(url, getRequiredHttpAuthorization())
+         .setHeader("Accept", "application/json")
+         .setParameter("threadId", threadId);
+      if (verbose) System.out.println("taskStatus -> " + request);
+      Response response = new Response(request.get(), verbose);
+      response.checkForErrors(); // throws a ResponseException on error
+      if (response.isModelNull()) return null;
+      return new TaskStatus((JSONObject)response.getModel());
    } // end of taskStatus()
    
    /**
     * Wait for the given task to finish.
-    * @param taskId
-    * @return The taskId.
+    * @param threadId
+    * @param maxSeconds The maximum time to wait for the task, or 0 for forever.
+    * @return The final task status.
     * @throws IOException
     * @throws ResponseException
     */
-   public String waitForTask(String taskId)
-    throws IOException, ResponseException
+   public TaskStatus waitForTask(String threadId, int maxSeconds)
+    throws IOException, StoreException
    {
-      throw new IOException("not implemented");
+      cancelling = false;
+      TaskStatus status = taskStatus(threadId);
+      
+      long endTime = 0;
+      if (maxSeconds > 0) endTime = new Date().getTime() + (maxSeconds * 1000);
+      
+      while (status.getRunning() && !cancelling)
+      {
+         long ms = status.getRefreshSeconds() * 1000;
+         if (ms <= 0) ms = 2000;
+         try { Thread.sleep(ms); } catch(Exception exception) {}
+         
+         if (endTime > 0 && new Date().getTime() > endTime)
+         { // is time up?
+            cancelling = true;
+         }
+         
+         if (!cancelling)
+         { // are we stopping now?
+            status = taskStatus(threadId);
+         }
+      } // loop
+      return status;
    } // end of waitForTask()
    
    /**
     * Release a finished task, to free up server resources.
-    * @param taskId The ID of the task.
+    * @param threadId The ID of the task.
     * @throws IOException
     * @throws ResponseException
     */
-   public void releaseTask(String taskId)
-    throws IOException, ResponseException
+   public void releaseTask(String threadId)
+    throws IOException, StoreException
    {
-      throw new IOException("not implemented");
+      cancelling = false;
+      URL url = makeUrl("threads");
+      HttpRequestGet request = new HttpRequestGet(url, getRequiredHttpAuthorization())
+         .setHeader("Accept", "application/json")
+         .setParameter("threadId", threadId)
+         .setParameter("command", "release");
+      if (verbose) System.out.println("taskStatus -> " + request);
+      Response response = new Response(request.get(), verbose);
+      response.checkForErrors(); // throws a ResponseException on error
    } // end of releaseTask()
 
    /**
@@ -201,17 +284,34 @@ public class Labbcat
     * @return A list of all task statuses.
     * @throws IOException, ResponseException
     */
-   public TaskStatus[] getTasks()
-    throws IOException, ResponseException
+   public Map<String,TaskStatus> getTasks()
+      throws IOException, StoreException
    {
-      throw new IOException("not implemented");
+      cancelling = false;
+      URL url = makeUrl("threads");
+      HttpRequestGet request = new HttpRequestGet(url, getRequiredHttpAuthorization())
+         .setHeader("Accept", "application/json");
+      if (verbose) System.out.println("getTasks -> " + request);
+      Response response = new Response(request.get(), verbose);
+      response.checkForErrors(); // throws a ResponseException on error
+      if (response.isModelNull()) return null;
+      JSONObject model = (JSONObject)response.getModel();
+      HashMap<String,TaskStatus> result = new HashMap<String,TaskStatus>();
+      for (String threadId : model.keySet())
+      {
+         result.put(threadId,
+                    new TaskStatus(model.getJSONObject(threadId)));
+      } // next task
+      return result;
    } // end of getTasks()
-   
+
+   boolean cancelling = false;
    /**
     * Cancel the current request, if possible.
     */
    public void cancel()
    {
+      cancelling = true;
       if (postRequest != null)
       {
 	 postRequest.cancel();
@@ -226,7 +326,7 @@ public class Labbcat
    {
       if (postRequest == null)
       {
-	 return false;
+	 return cancelling;
       }
       else
       {
@@ -240,4 +340,5 @@ public class Labbcat
    // TODO getFragments(id, start, end, layerIds, mimeType = "text/praat-textgrid")
 
    // TODO clearLayer(id)
+   
 } // end of class Labbcat
