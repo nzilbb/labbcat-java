@@ -353,7 +353,7 @@ public class GraphStoreQuery
    {
       try
       {
-         return new URL(new URL(labbcatUrl, "api/store/"), resource);
+         return new URL(new URL(labbcatUrl, "store/"), resource);
       }
       catch(Throwable t)
       {
