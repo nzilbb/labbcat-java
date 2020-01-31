@@ -21,6 +21,8 @@
 //
 package nzilbb.labbcat;
 
+import org.json.JSONObject;
+
 /**
  * The status of a server-side task.
  * @author Robert Fromont robert@fromont.net.nz
@@ -149,7 +151,6 @@ public class TaskStatus
     */
    public TaskStatus setRefreshSeconds(int newRefreshSeconds) { refreshSeconds = newRefreshSeconds; return this; }
    
-
    /**
     * URL for task results, if any.
     * @see #getResultUrl()
@@ -167,6 +168,23 @@ public class TaskStatus
     */
    public TaskStatus setResultUrl(String newResultUrl) { resultUrl = newResultUrl; return this; }
 
+   /**
+    * The label for the results.
+    * @see #getResultText()
+    * @see #setResultText(String)
+    */
+   protected String resultText;
+   /**
+    * Getter for {@link #resultText}: The label for the results.
+    * @return The label for the results.
+    */
+   public String getResultText() { return resultText; }
+   /**
+    * Setter for {@link #resultText}: The label for the results.
+    * @param newResultText The label for the results.
+    */
+   public TaskStatus setResultText(String newResultText) { resultText = newResultText; return this; }
+
    // Methods:
    
    /**
@@ -175,4 +193,33 @@ public class TaskStatus
    public TaskStatus()
    {
    } // end of constructor
+   
+   /**
+    * Constructor from JSON.
+    */
+   public TaskStatus(JSONObject json)
+   {
+      threadId = json.optString("threadId");
+      threadName = json.optString("threadName");
+      running = json.optBoolean("running");
+      duration = json.optInt("duration");
+      percentComplete = json.optInt("percentComplete");
+      refreshSeconds = json.optInt("refreshSeconds");
+      resultUrl = json.optString("resultUrl");
+      resultText = json.optString("resultText");
+      status = json.optString("status");
+   } // end of constructor
+   
+   /**
+    * Represents the object as a String, for logging.
+    * @return A string representation of the object.
+    */
+   public String toString()
+   {
+      return "threadId: " + threadId + " ("+threadName+") status: " + status
+         + " (" + percentComplete + "% "
+         + (running?"running...)":"finished.)")
+         + (resultUrl==null?"":" "+resultUrl);
+   } // end of toString()
+
 } // end of class TaskStatus
