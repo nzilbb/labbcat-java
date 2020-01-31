@@ -21,42 +21,20 @@
 //
 package nzilbb.labbcat;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.nio.charset.StandardCharsets;
-import java.util.Base64;
-import java.util.Iterator;
-import java.util.Vector;
-import java.util.function.Consumer;
-import javax.swing.JOptionPane;
-import javax.swing.JPasswordField;
-import nzilbb.ag.Anchor;
-import nzilbb.ag.Annotation;
-import nzilbb.ag.Graph;
-import nzilbb.ag.GraphNotFoundException;
 import nzilbb.ag.IGraphStoreAdministration;
-import nzilbb.ag.Layer;
-import nzilbb.ag.MediaFile;
-import nzilbb.ag.MediaTrackDefinition;
 import nzilbb.ag.PermissionException;
-import nzilbb.ag.Schema;
 import nzilbb.ag.StoreException;
 import nzilbb.ag.serialize.IDeserializer;
 import nzilbb.ag.serialize.ISerializer;
 import nzilbb.ag.serialize.SerializationDescriptor;
-import nzilbb.labbcat.http.*;
-import nzilbb.util.MonitorableSeries;
-import org.json.JSONArray;
-import org.json.JSONObject;
 
 /**
  * Client-side implementation of IGraphStoreAdministration.
  * <p> e.g.
  * <pre> // create annotation store client
- * GraphStoreAdministrationQuery store = new GraphStoreAdministration("https://labbcat.canterbury.ac.nz", "demo", "demo");
+ * GraphStoreAdministration store = new GraphStoreAdministration("https://labbcat.canterbury.ac.nz", "demo", "demo");
  * // get some basic information
  * String id = store.getId();
  * String[] layers = store.getLayerIds();
