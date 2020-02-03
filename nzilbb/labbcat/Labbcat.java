@@ -29,8 +29,10 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Vector;
 import nzilbb.ag.StoreException;
 import nzilbb.labbcat.http.*;
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 /**
@@ -242,7 +244,7 @@ public class Labbcat
     * @param maxSeconds The maximum time to wait for the task, or 0 for forever.
     * @return The final task status.
     * @throws IOException
-    * @throws ResponseException
+    * @throws StoreException
     */
    public TaskStatus waitForTask(String threadId, int maxSeconds)
     throws IOException, StoreException
@@ -273,10 +275,30 @@ public class Labbcat
    } // end of waitForTask()
    
    /**
+    * Cancels a running task.
+    * @param threadId The ID of the task.
+    * @throws IOException
+    * @throws StoreException
+    */
+   public void cancelTask(String threadId)
+    throws IOException, StoreException
+   {
+      cancelling = false;
+      URL url = makeUrl("threads");
+      HttpRequestGet request = new HttpRequestGet(url, getRequiredHttpAuthorization())
+         .setHeader("Accept", "application/json")
+         .setParameter("threadId", threadId)
+         .setParameter("command", "cancel");
+      if (verbose) System.out.println("taskStatus -> " + request);
+      Response response = new Response(request.get(), verbose);
+      response.checkForErrors(); // throws a ResponseException on error
+   } // end of releaseTask()
+
+   /**
     * Release a finished task, to free up server resources.
     * @param threadId The ID of the task.
     * @throws IOException
-    * @throws ResponseException
+    * @throws StoreException
     */
    public void releaseTask(String threadId)
     throws IOException, StoreException
@@ -295,7 +317,8 @@ public class Labbcat
    /**
     * Gets a list of all tasks on the server.
     * @return A list of all task statuses.
-    * @throws IOException, ResponseException
+    * @throws IOException
+    * @throws StoreException
     */
    public Map<String,TaskStatus> getTasks()
       throws IOException, StoreException
@@ -348,6 +371,137 @@ public class Labbcat
    } // end of isCancelling()
    
    // TODO String getMatches(JSONObject pattern, participantId=NULL, main.participant=TRUE, words.context=0)
+   
+   /**
+    * Searches for tokens that match the givem pattern.
+    * <p> The <var>pattern</var> must match the structure of the search matrix in the
+    * browser interface of LaBB-CAT. This is a JSON object with one attribute called
+    * <q>columns</q>, which is an array of JSON objects.
+    * <p>Each element in the <q>columns</q> array contains am JSON object named
+    * <q>layers</q>, whose value is a JSON object for patterns to match on each layer, and
+    * optionally an element named <q>adj</q>, whose value is a number representing the
+    * maximum distance, in tokens, between this column and the next column - if <q>adj</q>
+    * is not specified, the value defaults to 1, so tokens are contiguous.
+    * Each element in the <q>layers</q> JSON object is named after the layer it matches, and
+    * the value is a named list with the following possible attributes:
+    * <dl>
+    *  <dt>pattern</dt> <dd>A regular expression to match against the label</dd>
+    *  <dt>min</dt> <dd>An inclusive minimum numeric value for the label</dd>
+    *  <dt>max</dt> <dd>An exclusive maximum numeric value for the label</dd>
+    *  <dt>not</dt> <dd>TRUE to negate the match</dd>
+    *  <dt>anchorStart</dt> <dd>TRUE to anchor to the start of the annotation on this layer
+    *     (i.e. the matching word token will be the first at/after the start of the matching
+    *     annotation on this layer)</dd>
+    *  <dt>anchorEnd</dt> <dd>TRUE to anchor to the end of the annotation on this layer
+    *     (i.e. the matching word token will be the last before/at the end of the matching
+    *     annotation on this layer)</dd>
+    *  <dt>target</dt> <dd>TRUE to make this layer the target of the search; the results will
+    *     contain one row for each match on the target layer</dd>
+    * </dl>
+    *
+    * <p>Examples of valid pattern objects include:
+    * <pre>// words starting with 'ps...'
+    *  JSONObject pattern = new JSONObject()
+    *     .put("columns", new JSONArray()
+    *          .put(new JSONObject()
+    *               .put("layers", new JSONObject()
+    *                    .put("orthography", new JSONObject()
+    *                         .put("pattern", "ps.*")))));
+    * 
+    * // the word 'the' followed immediately or with one intervening word by
+    * // a hapax legomenon (word with a frequency of 1) that doesn't start with a vowel
+    * JSONObject pattern2 = new JSONObject()
+    *    .put("columns", new JSONArray()
+    *         .put(new JSONObject()
+    *              .put("layers", new JSONObject()
+    *                   .put("orthography", new JSONObject()
+    *                        .put("pattern", "the"))),
+    *              .put("adj", 2)),
+    *         .put(new JSONObject()
+    *              .put("layers", new JSONObject()
+    *                   .put("phonemes", new JSONObject()
+    *                        .put("not", Boolean.TRUE)
+    *                        .put("pattern","[cCEFHiIPqQuUV0123456789~#\\$@].*")),
+    *                   .put("frequency", new JSONObject()
+    *                        .put("max", "2")))));
+    * </pre>
+    * @param pattern An object representing the pattern to search for, which mirrors the
+    * Search Matrix in the browser interface.
+    * @param participantIds An optional list of participant IDs to search the utterances
+    * of. If not null, all utterances in the corpus will be searched.
+    * @param mainParticipant true to search only main-participant utterances, false to
+    * search all utterances. 
+    * @param wordsContext Number of words context to include in the <q>Before Match</q>
+    * and <q>After Match</q> columns in the results.
+    * @return The threadId of the resulting task, which can be passed in to
+    * {@link #taskStatus(String)}, {@link #waitForTask(String)}, etc.
+    * @throws IOException
+    * @throws StoreException
+    */
+   public String getMatches(JSONObject pattern, String[] participantIds, boolean mainParticipant, int wordsContext)
+    throws IOException, StoreException
+   {
+      cancelling = false;
+      if (pattern == null) throw new StoreException("No pattern specified.");
+      URL url = makeUrl("search");
+      HttpRequestGet request = new HttpRequestGet(url, getRequiredHttpAuthorization())
+         .setHeader("Accept", "application/json")
+         .setParameter("command", "search")
+         .setParameter("searchJson", pattern.toString())
+         .setParameter("words_context", wordsContext);
+      if (mainParticipant) request.setParameter("only_main_speaker", true);
+      if (participantIds != null) request.setParameter("participant_id", participantIds);
+      if (verbose) System.out.println("getMatches -> " + request);
+      Response response = new Response(request.get(), verbose);
+      response.checkForErrors(); // throws a ResponseException on error
+      
+      // extract the threadId from model.threadId
+      JSONObject model = (JSONObject)response.getModel();
+      return model.getString("threadId");
+   } // end of getMatches()
+   
+   /**
+    * Gets a list of tokens that were matched by
+    * {@link #getMatches(JSONObject,String[],boolean,int)}.
+    * <p>If the task is still running, then this function will wait for it to finish.
+    * @param threadId A task ID returned by {@link #getMatches(JSONObject,String[],boolean,int)}.
+    * @return A list of IDs that can be used to identify utterances/tokens that were matched by
+    * {@link #getMatches(JSONObject,String[],boolean,int)}, or null if the task was cancelled.
+    * @throws IOException
+    * @throws StoreException
+    */
+   public String[] getMatchIds(String threadId)
+    throws IOException, StoreException
+   {
+      // ensure it's finished
+      waitForTask(threadId, 0);
+      if (cancelling == true) return null;
+      
+      cancelling = false;
+      URL url = makeUrl("resultsStream");
+      HttpRequestGet request = new HttpRequestGet(url, getRequiredHttpAuthorization())
+         .setHeader("Accept", "application/json")
+         .setParameter("threadId", threadId);
+      if (verbose) System.out.println("getMatchIds -> " + request);
+      Response response = new Response(request.get(), verbose);
+      response.checkForErrors(); // throws a ResponseException on error
+      
+      // extract the MatchIds from model
+      JSONObject model = (JSONObject)response.getModel();
+      JSONArray array = model.getJSONArray("MatchId");
+      Vector<String> ids = new Vector<String>();
+      if (array != null)
+      {
+         for (int i = 0; i < array.length(); i++)
+         {
+            ids.add(array.getString(i));
+         }
+      }
+      
+      return ids.toArray(new String[0]);
+   } // end of getMatchIds()
+
+
    // TODO getMatchLabels(matchIds, layerIds, targetOffset=0, annotationsPerLayer=1)
    // TODO String getSoundFragments(id, start, end, sampleRate = NULL)
    // TODO getFragments(id, start, end, layerIds, mimeType = "text/praat-textgrid")
