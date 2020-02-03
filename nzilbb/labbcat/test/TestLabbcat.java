@@ -368,13 +368,13 @@ public class TestLabbcat
       TaskStatus task = labbcat.taskStatus("invalid taskId");
    }
 
-   /*@Test(expected = StoreException.class)*/ public void getMatchesInvalidPattern()
+   /*@Test(expected = StoreException.class)*/ public void searchInvalidPattern()
       throws Exception
    {
-      String threadId = labbcat.getMatches(new JSONObject(), null, false, 0);
+      String threadId = labbcat.search(new JSONObject(), null, false);
    }
 
-   /*@Test(expected = StoreException.class)*/ public void getMatchesAndCancelTask()
+   /*@Test(expected = StoreException.class)*/ public void searchAndCancelTask()
       throws Exception
    {
       // start a long-running search - all words
@@ -384,11 +384,11 @@ public class TestLabbcat
                    .put("layers", new JSONObject()
                         .put("orthography", new JSONObject()
                              .put("pattern", ".*")))));
-      String threadId = labbcat.getMatches(pattern, null, false, 0);
+      String threadId = labbcat.search(pattern, null, false);
       labbcat.cancelTask(threadId);
    }
 
-   @Test public void getMatchesAndGetMatchIds()
+   @Test public void searchAndGetMatches()
       throws Exception
    {
       // get a participant ID to use
@@ -398,13 +398,8 @@ public class TestLabbcat
       String[] participantId = { ids[0] };
 
       // all instances of "and"
-      JSONObject pattern = new JSONObject()
-         .put("columns", new JSONArray()
-              .put(new JSONObject()
-                   .put("layers", new JSONObject()
-                        .put("orthography", new JSONObject()
-                             .put("pattern", "and")))));
-      String threadId = labbcat.getMatches(pattern, participantId, false, 0);
+      JSONObject pattern = new PatternBuilder().addMatchLayer("orthography", "and").build();
+      String threadId = labbcat.search(pattern, participantId, false);
       try
       {
          TaskStatus task = labbcat.waitForTask(threadId, 30);
@@ -413,16 +408,16 @@ public class TestLabbcat
          assertFalse("Upload task finished in a timely manner",
                      task.getRunning());
          
-         String[] matchIds = labbcat.getMatchIds(threadId);
-         if (matchIds.length == 0)
+         Match[] matches = labbcat.getMatches(threadId, 2);
+         if (matches.length == 0)
          {
-            System.out.println("getMatchIds: No matches were returned");
+            System.out.println("getMatches: No matches were returned");
          }
          else
          {
-            System.out.println("There were " + matchIds.length + " matches. e.g...");
-            int upTo = Math.min(10, matchIds.length);
-            for (int m = 0; m < upTo; m++) System.out.println("MatchId: " + matchIds[m]);
+            System.out.println("There were " + matches.length + " matches. e.g...");
+            int upTo = Math.min(10, matches.length);
+            for (int m = 0; m < upTo; m++) System.out.println("Match: " + matches[m]);
          }
       }
       finally

@@ -57,7 +57,13 @@ import org.json.JSONObject;
  * TaskStatus layerGenerationTask = labbcat.{@link #waitForTask(String,int) waitForTask(taskId, 30)};
  *
  * // get all the POS annotations
- * Annotation[] pos = store.{@link GraphStoreQuery#getAnnotations(String,String,Integer,Integer) getAnnotations(transcript.getName(), "pos")};
+ * Annotation[] pos = labbcat.{@link GraphStoreQuery#getAnnotations(String,String,Integer,Integer) getAnnotations(transcript.getName(), "pos")};
+ *
+ * // search for tokens of "and"
+ * Matches[] matches = labbcat.{@link #getMatches(String,int) getMatches}(
+ *     labbcat.{@link #search(JSONObject,String[],boolean) search}(
+ *        new {@link PatternBuilder}().addMatchLayer("orthography", "and").build(),
+ *        participantIds, true), 1);
  * </pre>
  * @author Robert Fromont robert@fromont.net.nz
  */
@@ -425,20 +431,35 @@ public class Labbcat
     *                   .put("frequency", new JSONObject()
     *                        .put("max", "2")))));
     * </pre>
+    * <p>The PatternBuilder class is designed to make constructing valid patterns easier:
+    * <pre> // words starting with 'ps...'
+    * JSONObject pattern = new PatternBuilder().addMatchLayer("orthography", "ps.*").build();
+    * 
+    * // the word 'the' followed immediately or with one intervening word by
+    * // a hapax legomenon (word with a frequency of 1) that doesn't start with a vowel
+    * JSONObject pattern2 = new PatternBuilder()
+    *    .addColumn()
+    *    .addMatchLayer("orthography", "the")
+    *    .addColumn()
+    *    .addNotMatchLayer("phonemes", "[cCEFHiIPqQuUV0123456789~#\\$@].*")
+    *    .addMaxLayer("frequency", 2)
+    *    .build();
+    * </pre>
     * @param pattern An object representing the pattern to search for, which mirrors the
     * Search Matrix in the browser interface.
     * @param participantIds An optional list of participant IDs to search the utterances
     * of. If not null, all utterances in the corpus will be searched.
     * @param mainParticipant true to search only main-participant utterances, false to
     * search all utterances. 
-    * @param wordsContext Number of words context to include in the <q>Before Match</q>
-    * and <q>After Match</q> columns in the results.
     * @return The threadId of the resulting task, which can be passed in to
-    * {@link #taskStatus(String)}, {@link #waitForTask(String)}, etc.
+    * {@link #getMatches(String,int)}, {@link #taskStatus(String)},
+    * {@link #waitForTask(String)}, etc.
+    * @see #getMatches(String,int)
+    * @see PatternBuilder
     * @throws IOException
     * @throws StoreException
     */
-   public String getMatches(JSONObject pattern, String[] participantIds, boolean mainParticipant, int wordsContext)
+   public String search(JSONObject pattern, String[] participantIds, boolean mainParticipant)
     throws IOException, StoreException
    {
       cancelling = false;
@@ -448,10 +469,10 @@ public class Labbcat
          .setHeader("Accept", "application/json")
          .setParameter("command", "search")
          .setParameter("searchJson", pattern.toString())
-         .setParameter("words_context", wordsContext);
+         .setParameter("words_context", 0);
       if (mainParticipant) request.setParameter("only_main_speaker", true);
       if (participantIds != null) request.setParameter("participant_id", participantIds);
-      if (verbose) System.out.println("getMatches -> " + request);
+      if (verbose) System.out.println("search -> " + request);
       Response response = new Response(request.get(), verbose);
       response.checkForErrors(); // throws a ResponseException on error
       
@@ -462,15 +483,23 @@ public class Labbcat
    
    /**
     * Gets a list of tokens that were matched by
-    * {@link #getMatches(JSONObject,String[],boolean,int)}.
+    * {@link #search(JSONObject,String[],boolean)}.
     * <p>If the task is still running, then this function will wait for it to finish.
-    * @param threadId A task ID returned by {@link #getMatches(JSONObject,String[],boolean,int)}.
+    * <p>This means calls can be stacked like this:
+    *  <pre>Matches[] matches = labbcat.getMatches(
+    *     labbcat.search(
+    *        new PatternBuilder().addMatchLayer("orthography", "and").build(),
+    *        participantIds, true), 1);</pre>
+    * @param threadId A task ID returned by {@link #search(JSONObject,String[],boolean)}.
+    * @param wordsContext Number of words context to include in the <q>Before Match</q>
+    * and <q>After Match</q> columns in the results.
     * @return A list of IDs that can be used to identify utterances/tokens that were matched by
-    * {@link #getMatches(JSONObject,String[],boolean,int)}, or null if the task was cancelled.
+    * {@link #search(JSONObject,String[],boolean)}, or null if the task was cancelled.
     * @throws IOException
     * @throws StoreException
+    * @see #getMatches(JSONObject,String[],boolean)}
     */
-   public String[] getMatchIds(String threadId)
+   public Match[] getMatches(String threadId, int wordsContext)
     throws IOException, StoreException
    {
       // ensure it's finished
@@ -481,24 +510,25 @@ public class Labbcat
       URL url = makeUrl("resultsStream");
       HttpRequestGet request = new HttpRequestGet(url, getRequiredHttpAuthorization())
          .setHeader("Accept", "application/json")
-         .setParameter("threadId", threadId);
-      if (verbose) System.out.println("getMatchIds -> " + request);
+         .setParameter("threadId", threadId)
+         .setParameter("words_context", wordsContext);
+      if (verbose) System.out.println("getMatches -> " + request);
       Response response = new Response(request.get(), verbose);
       response.checkForErrors(); // throws a ResponseException on error
       
       // extract the MatchIds from model
       JSONObject model = (JSONObject)response.getModel();
-      JSONArray array = model.getJSONArray("MatchId");
-      Vector<String> ids = new Vector<String>();
+      JSONArray array = model.getJSONArray("matches");
+      Vector<Match> matches = new Vector<Match>();
       if (array != null)
       {
          for (int i = 0; i < array.length(); i++)
          {
-            ids.add(array.getString(i));
+            matches.add(new Match(array.getJSONObject(i)));
          }
       }
       
-      return ids.toArray(new String[0]);
+      return matches.toArray(new Match[0]);
    } // end of getMatchIds()
 
 
