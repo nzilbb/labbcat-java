@@ -388,7 +388,7 @@ public class TestLabbcat
       labbcat.cancelTask(threadId);
    }
 
-   @Test public void searchAndGetMatches()
+   @Test public void searchAndGetMatchesAndGetMatchAnnotations()
       throws Exception
    {
       // get a participant ID to use
@@ -411,13 +411,29 @@ public class TestLabbcat
          Match[] matches = labbcat.getMatches(threadId, 2);
          if (matches.length == 0)
          {
-            System.out.println("getMatches: No matches were returned");
+            System.out.println(
+               "getMatches: No matches were returned, cannot test getMatchAnnotations");
          }
          else
          {
-            System.out.println("There were " + matches.length + " matches. e.g...");
             int upTo = Math.min(10, matches.length);
             for (int m = 0; m < upTo; m++) System.out.println("Match: " + matches[m]);
+
+            String[] layerIds = { "orthography" };
+            Annotation[][] annotations = labbcat.getMatchAnnotations(matches, layerIds, 0, 1);
+            assertEquals("annotations array is same size as matches array",
+                         matches.length, annotations.length);
+            assertEquals("row arrays are the right size",
+                         1, annotations[0].length);
+
+            layerIds[0] = "invalid layer ID";
+            try
+            {
+               labbcat.getMatchAnnotations(matches, layerIds, 0, 1);
+               fail("getMatchAnnotations with invalid layerId should fail");
+            }
+            catch(StoreException exception)
+            {}
          }
       }
       finally

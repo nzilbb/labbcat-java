@@ -22,7 +22,9 @@
 package nzilbb.labbcat;
 
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Collection;
@@ -30,6 +32,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Vector;
+import nzilbb.ag.Annotation;
 import nzilbb.ag.StoreException;
 import nzilbb.labbcat.http.*;
 import org.json.JSONArray;
@@ -376,10 +379,8 @@ public class Labbcat
       }
    } // end of isCancelling()
    
-   // TODO String getMatches(JSONObject pattern, participantId=NULL, main.participant=TRUE, words.context=0)
-   
    /**
-    * Searches for tokens that match the givem pattern.
+    * Searches for tokens that match the given pattern.
     * <p> The <var>pattern</var> must match the structure of the search matrix in the
     * browser interface of LaBB-CAT. This is a JSON object with one attribute called
     * <q>columns</q>, which is an array of JSON objects.
@@ -497,7 +498,7 @@ public class Labbcat
     * {@link #search(JSONObject,String[],boolean)}, or null if the task was cancelled.
     * @throws IOException
     * @throws StoreException
-    * @see #getMatches(JSONObject,String[],boolean)}
+    * @see #search(JSONObject,String[],boolean)}
     */
    public Match[] getMatches(String threadId, int wordsContext)
     throws IOException, StoreException
@@ -531,8 +532,166 @@ public class Labbcat
       return matches.toArray(new Match[0]);
    } // end of getMatchIds()
 
+   /**
+    * Searches for tokens that match the givem pattern and returns a list of matches.
+    * <p>This is similar to invoking:
+    * <pre> Matches[] matches = labbcat.getMatches(
+    *     labbcat.search(pattern, participantIds, mainParticipant), 
+    *     wordsContext);</pre>
+    * <p>As with {@link #search(JSONObject,String[],boolean)} the <var>pattern</var> must
+    * match the structure of the search matrix in the browser interface of LaBB-CAT.
+    * <p>The PatternBuilder class is designed to make constructing valid patterns easier:
+    * <pre> // words starting with 'ps...'
+    * JSONObject pattern = new PatternBuilder().addMatchLayer("orthography", "ps.*").build();
+    * 
+    * // the word 'the' followed immediately or with one intervening word by
+    * // a hapax legomenon (word with a frequency of 1) that doesn't start with a vowel
+    * JSONObject pattern2 = new PatternBuilder()
+    *    .addColumn()
+    *    .addMatchLayer("orthography", "the")
+    *    .addColumn()
+    *    .addNotMatchLayer("phonemes", "[cCEFHiIPqQuUV0123456789~#\\$@].*")
+    *    .addMaxLayer("frequency", 2)
+    *    .build();
+    * </pre>
+    * @param pattern An object representing the pattern to search for, which mirrors the
+    * Search Matrix in the browser interface.
+    * @param participantIds An optional list of participant IDs to search the utterances
+    * of. If not null, all utterances in the corpus will be searched.
+    * @param mainParticipant true to search only main-participant utterances, false to
+    * search all utterances. 
+    * @param wordsContext Number of words context to include in the <q>Before Match</q>
+    * and <q>After Match</q> columns in the results.
+    * @return A list of IDs that can be used to identify utterances/tokens that were matched by
+    * {@link #search(JSONObject,String[],boolean)}, or null if the task was cancelled.
+    * @throws IOException
+    * @throws StoreException
+    * @see #getMatches(JSONObject,String[],boolean)}
+    */
+   public Match[] getMatches(JSONObject pattern, String[] participantIds, boolean mainParticipant, int wordsContext)
+    throws IOException, StoreException
+   {
+      String threadId = search(pattern, participantIds, mainParticipant);
+      try
+      {
+         return  getMatches(threadId, wordsContext);
+      }
+      finally
+      { // release the task to save server resources
+         try { releaseTask(threadId); } catch(Exception exception) {}
+      }
+   }
 
-   // TODO getMatchLabels(matchIds, layerIds, targetOffset=0, annotationsPerLayer=1)
+   /**
+    * Gets annotations on selected layers related to search results returned by a previous
+    * call to {@link #getMatches(String,int)}, {@link #taskStatus(String)}.
+    * @param matches A list of {@link Match}es. 
+    * @param layerIds A vector of layer IDs.
+    * @param targetOffset The distance from the original target of the match, e.g.
+    * <ul>
+    *  <li>0 - find annotations of the match target itself</li>
+    *  <li>1 - find annotations of the token immediately <em>after</em> match target</li>
+    *  <li>-1 - find annotations of the token immediately <em>before</em> match target</li>
+    * </ul>
+    * @param annotationsPerLayer The number of annotations on the given layer to
+    * retrieve. In most cases, there's only one annotation available. However, tokens may,
+    * for example, be annotated with `all possible phonemic transcriptions', in which case
+    * using a value of greater than 1 for this parameter provides other phonemic
+    * transcriptions, for tokens that have more than one.
+    * @return An array of arrays of Annotations, of dimensions <var>matchIds</var>.length
+    * &times; (<var>layerIds</var>.length * <var>annotationsPerLayer</var>). The first
+    * index matches the corresponding index in <var>matchIds</var>. 
+    * @throws IOException
+    * @throws StoreException
+    * @see #getMatches(JSONObject,String[],boolean)}
+    */
+   public Annotation[][] getMatchAnnotations(Match[] matches, String[] layerIds, int targetOffset, int annotationsPerLayer)
+      throws IOException, StoreException
+   {
+      String[] matchIds = new String[matches.length];
+      for (int m = 0; m < matches.length; m++) matchIds[m] = matches[m].getMatchId();
+      return getMatchAnnotations(matchIds, layerIds, targetOffset, annotationsPerLayer);
+   }
+   
+   /**
+    * Gets annotations on selected layers related to search results returned by a previous
+    * call to {@link #getMatches(String,int)}, {@link #taskStatus(String)}.
+    * @param matchIds A list of {@link Match#getId()}s. 
+    * @param layerIds A vector of layer IDs.
+    * @param targetOffset The distance from the original target of the match, e.g.
+    * <ul>
+    *  <li>0 - find annotations of the match target itself</li>
+    *  <li>1 - find annotations of the token immediately <em>after</em> match target</li>
+    *  <li>-1 - find annotations of the token immediately <em>before</em> match target</li>
+    * </ul>
+    * @param annotationsPerLayer The number of annotations on the given layer to
+    * retrieve. In most cases, there's only one annotation available. However, tokens may,
+    * for example, be annotated with `all possible phonemic transcriptions', in which case
+    * using a value of greater than 1 for this parameter provides other phonemic
+    * transcriptions, for tokens that have more than one.
+    * @return An array of arrays of Annotations, of dimensions <var>matchIds</var>.length
+    * &times; (<var>layerIds</var>.length * <var>annotationsPerLayer</var>). The first
+    * index matches the corresponding index in <var>matchIds</var>. 
+    * @throws IOException
+    * @throws StoreException
+    * @see #getMatches(JSONObject,String[],boolean)}
+    */
+   public Annotation[][] getMatchAnnotations(String[] matchIds, String[] layerIds, int targetOffset, int annotationsPerLayer)
+      throws IOException, StoreException
+   {
+      cancelling = false;
+
+      // write the IDs to a temporary file for upload
+      File csvUpload = File.createTempFile("getMatchAnnotations_",".csv");
+      try
+      {
+         csvUpload.deleteOnExit();
+         PrintWriter csvOut = new PrintWriter(csvUpload, "UTF-8");
+         csvOut.println("MatchId");
+         for (String matchId : matchIds) csvOut.println(matchId);
+         csvOut.close();
+         if (verbose) System.out.println("matchIds written to: " + csvUpload.getPath());
+         
+         URL url = makeUrl("api/getMatchAnnotations");
+         HttpRequestPostMultipart request = new HttpRequestPostMultipart(url, getRequiredHttpAuthorization())
+            .setHeader("Accept", "application/json")
+            .setParameter("layer", layerIds)
+            .setParameter("targetOffset", targetOffset)
+            .setParameter("annotationsPerLayer", annotationsPerLayer)
+            .setParameter("csvFieldDelimiter", ",")
+            .setParameter("targetColumn", 0)
+            .setParameter("copyColumns", false)
+            .setParameter("uploadfile", csvUpload);
+         if (verbose) System.out.println("getMatchAnnotations -> " + request);
+         Response response = new Response(request.post(), verbose);
+         response.checkForErrors(); // throws a ResponseException on error
+         
+         // extract the MatchIds from model
+         JSONArray model = (JSONArray)response.getModel();
+         int annotationsPerMatch = layerIds.length*annotationsPerLayer;
+         Annotation[][] result = new Annotation[matchIds.length][annotationsPerMatch];
+         for (int m = 0; m < matchIds.length; m++)
+         {
+            JSONArray annotations = model.getJSONArray(m);
+            for (int a = 0; a < annotationsPerMatch; a++)
+            {
+               Annotation annotation = null;
+               if (!annotations.isNull(a))
+               {
+                  annotation = new Annotation(annotations.getJSONObject(a));
+               }
+               result[m][a] = annotation;
+            } // next annotation
+         } // next match
+         return result;
+      }
+      finally
+      {
+         // delete temporary file
+         csvUpload.delete();
+      }
+   } // end of getMatchIds()
+
    // TODO String getSoundFragments(id, start, end, sampleRate = NULL)
    // TODO getFragments(id, start, end, layerIds, mimeType = "text/praat-textgrid")
 
