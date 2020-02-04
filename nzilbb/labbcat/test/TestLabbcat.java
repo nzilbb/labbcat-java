@@ -75,7 +75,7 @@ public class TestLabbcat
       labbcat.setVerbose(false);
    }
    
-   /*@Test(expected = StoreException.class)*/ public void invalidCredentials()
+   @Test(expected = StoreException.class) public void invalidCredentials()
       throws Exception
    {
       Labbcat labbcat = new Labbcat(labbcatUrl, "xxx", "xxx");
@@ -83,7 +83,7 @@ public class TestLabbcat
       labbcat.getId();
    }
 
-   /*@Test(expected = StoreException.class)*/ public void credentialsRequired()
+   @Test(expected = StoreException.class) public void credentialsRequired()
       throws Exception
    {
       Labbcat labbcat = new Labbcat(labbcatUrl);
@@ -91,7 +91,7 @@ public class TestLabbcat
       labbcat.getId();
    }
    
-   /*@Test(expected = MalformedURLException.class)*/ public void malformedURLException()
+   @Test(expected = MalformedURLException.class) public void malformedURLException()
       throws Exception
    {
       Labbcat labbcat = new Labbcat("xxx", username, password);
@@ -99,7 +99,7 @@ public class TestLabbcat
       labbcat.getId();
    }
 
-   /*@Test(expected = StoreException.class)*/ public void nonLabbcatUrl()
+   @Test(expected = StoreException.class) public void nonLabbcatUrl()
       throws Exception
    {
       Labbcat labbcat = new Labbcat("http://tld/", username, password);
@@ -107,7 +107,7 @@ public class TestLabbcat
       labbcat.getId();
    }
 
-   /*@Test*/ public void inheritedGraphStoreQueryFunctions()
+   @Test public void inheritedGraphStoreQueryFunctions()
       throws Exception
    {
       String id = labbcat.getId();
@@ -258,7 +258,7 @@ public class TestLabbcat
       }
    }
 
-   /*@Test*/ public void getTasks()
+   @Test public void getTasks()
       throws Exception
    {
       Map<String,TaskStatus> tasks = labbcat.getTasks();
@@ -266,7 +266,7 @@ public class TestLabbcat
       for (String id : tasks.keySet()) System.out.println("task " + id + ": " + tasks.get(id));
    }
 
-   /*@Test*/ public void taskStatus()
+   @Test public void taskStatus()
       throws Exception
    {
       // first get a list of tasks
@@ -284,7 +284,7 @@ public class TestLabbcat
       }
    }
 
-   /*@Test*/ public void waitForTask()
+   @Test public void waitForTask()
       throws Exception
    {
       // first get a list of tasks
@@ -302,7 +302,7 @@ public class TestLabbcat
       }
    }
 
-   /*@Test*/ public void newTranscriptUpdateTranscriptAndDeleteGraph()
+   @Test public void newTranscriptUpdateTranscriptAndDeleteGraph()
       throws Exception
    {
       // first get a corpus and transcript type
@@ -356,25 +356,25 @@ public class TestLabbcat
 
    }
 
-   /*@Test(expected = StoreException.class)*/ public void getTaskInvalidNumericId()
+   @Test(expected = StoreException.class) public void getTaskInvalidNumericId()
       throws Exception
    {
       TaskStatus task = labbcat.taskStatus("99999");
    }
 
-   /*@Test(expected = StoreException.class)*/ public void getTaskInvalidAlphaId()
+   @Test(expected = StoreException.class) public void getTaskInvalidAlphaId()
       throws Exception
    {
       TaskStatus task = labbcat.taskStatus("invalid taskId");
    }
 
-   /*@Test(expected = StoreException.class)*/ public void searchInvalidPattern()
+   @Test(expected = StoreException.class) public void searchInvalidPattern()
       throws Exception
    {
       String threadId = labbcat.search(new JSONObject(), null, false);
    }
 
-   /*@Test(expected = StoreException.class)*/ public void searchAndCancelTask()
+   @Test public void searchAndCancelTask()
       throws Exception
    {
       // start a long-running search - all words
