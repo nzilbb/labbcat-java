@@ -26,6 +26,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.io.File;
@@ -230,6 +231,10 @@ public class HttpRequestPost
    public HttpRequestPost setParameter(String name, Object object) throws IOException 
    {
       if (object == null) return this;
+      if (object.getClass().isArray())
+      {
+         object = Arrays.asList((Object[])object);
+      }
       if (object instanceof Iterable) 
       {
          @SuppressWarnings("rawtypes")

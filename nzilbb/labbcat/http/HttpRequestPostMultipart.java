@@ -25,6 +25,7 @@ package nzilbb.labbcat.http;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.io.File;
@@ -341,6 +342,10 @@ public class HttpRequestPostMultipart
    public HttpRequestPostMultipart setParameter(String name, Object object) throws IOException 
    {
       if (object == null) return this; //20100520 robert.fromont@canterbury.ac.nz 
+      if (object.getClass().isArray())
+      {
+         object = Arrays.asList((Object[])object);
+      }
       if (object instanceof File) 
       {
          setParameter(name, (File) object);
