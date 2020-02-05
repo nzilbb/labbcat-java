@@ -263,6 +263,7 @@ public class TestLabbcat
    {
       Map<String,TaskStatus> tasks = labbcat.getTasks();
       // not sure what we expect, but let's just print out what we got
+      System.out.println("Some tasks:");
       for (String id : tasks.keySet()) System.out.println("task " + id + ": " + tasks.get(id));
    }
 
@@ -405,7 +406,7 @@ public class TestLabbcat
          TaskStatus task = labbcat.waitForTask(threadId, 30);
          // if the task is still running, it's taking too long, so cancel it
          if (task.getRunning()) try { labbcat.cancelTask(threadId); } catch(Exception exception) {}
-         assertFalse("Upload task finished in a timely manner",
+         assertFalse("Search task finished in a timely manner",
                      task.getRunning());
          
          Match[] matches = labbcat.getMatches(threadId, 2);
@@ -417,7 +418,7 @@ public class TestLabbcat
          else
          {
             int upTo = Math.min(10, matches.length);
-            for (int m = 0; m < upTo; m++) System.out.println("Match: " + matches[m]);
+            // for (int m = 0; m < upTo; m++) System.out.println("Match: " + matches[m]);
 
             String[] layerIds = { "orthography" };
             Annotation[][] annotations = labbcat.getMatchAnnotations(matches, layerIds, 0, 1);
@@ -434,6 +435,61 @@ public class TestLabbcat
             }
             catch(StoreException exception)
             {}
+         }
+      }
+      finally
+      {
+         labbcat.releaseTask(threadId);
+      }
+   }
+
+   @Test public void getSoundFragments()
+      throws Exception
+   {
+      // get a participant ID to use
+      String[] ids = labbcat.getParticipantIds();
+      assertTrue("getParticipantIds: Some IDs are returned",
+                 ids.length > 0);
+      String[] participantId = { ids[0] };
+      
+
+      // all instances of "and"
+      JSONObject pattern = new PatternBuilder().addMatchLayer("orthography", "and").build();
+      String threadId = labbcat.search(pattern, participantId, false);
+      try
+      {
+         TaskStatus task = labbcat.waitForTask(threadId, 30);
+         // if the task is still running, it's taking too long, so cancel it
+         if (task.getRunning()) try { labbcat.cancelTask(threadId); } catch(Exception exception) {}
+         assertFalse("Search task finished in a timely manner",
+                     task.getRunning());
+         
+         Match[] matches = labbcat.getMatches(threadId, 2);
+         if (matches.length == 0)
+         {
+            System.out.println(
+               "getMatches: No matches were returned, cannot test getSoundFragments");
+         }
+         else
+         {
+            int upTo = Math.min(5, matches.length);
+            Match[] subset = Arrays.copyOfRange(matches, 0, upTo);
+
+            File[] wavs = labbcat.getSoundFragments(subset, 16000, null);
+            try {
+               assertEquals("files array is same size as matches array",
+                            subset.length, wavs.length);
+               
+               for (int m = 0; m < upTo; m++) {
+                  assertNotNull("Non-null sized file: " + subset[m],
+                                wavs[m]);
+                  assertTrue("Non-zero sized file: " + subset[m],
+                             wavs[m].length() > 0);
+                  // System.out.println(wavs[m].getPath());
+               }
+            } finally {
+               for (File wav : wavs) if (wav != null) wav.delete(); 
+            }
          }
       }
       finally

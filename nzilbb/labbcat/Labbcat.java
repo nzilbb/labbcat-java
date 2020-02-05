@@ -25,6 +25,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Collection;
@@ -32,9 +33,14 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Vector;
+import nzilbb.ag.Anchor;
 import nzilbb.ag.Annotation;
+import nzilbb.ag.Graph;
+import nzilbb.ag.PermissionException;
+import nzilbb.ag.GraphNotFoundException;
 import nzilbb.ag.StoreException;
 import nzilbb.labbcat.http.*;
+import nzilbb.util.IO;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -172,7 +178,7 @@ public class Labbcat
    {
       cancelling = false;
       URL url = makeUrl("edit/transcript/new");
-      HttpRequestPostMultipart request = new HttpRequestPostMultipart(url, getRequiredHttpAuthorization())
+      postRequest = new HttpRequestPostMultipart(url, getRequiredHttpAuthorization())
          .setHeader("Accept", "application/json")
          .setParameter("todo", "new")
          .setParameter("auto", true)
@@ -185,11 +191,11 @@ public class Labbcat
          if (mediaSuffix == null) mediaSuffix = "";
          for (int f = 0; f < media.length; f++)
          {
-            request.setParameter("uploadmedia"+mediaSuffix+"1", media[f]);
+            postRequest.setParameter("uploadmedia"+mediaSuffix+"1", media[f]);
          } // next file
       }
-      if (verbose) System.out.println("taskStatus -> " + request);
-      Response response = new Response(request.post(), verbose);
+      if (verbose) System.out.println("taskStatus -> " + postRequest);
+      Response response = new Response(postRequest.post(), verbose);
       response.checkForErrors(); // throws a ResponseException on error
 
       // extract the threadId from model.result.id
@@ -210,13 +216,13 @@ public class Labbcat
    {
       cancelling = false;
       URL url = makeUrl("edit/transcript/new");
-      HttpRequestPostMultipart request = new HttpRequestPostMultipart(url, getRequiredHttpAuthorization())
+      postRequest = new HttpRequestPostMultipart(url, getRequiredHttpAuthorization())
          .setHeader("Accept", "application/json")
          .setParameter("todo", "update")
          .setParameter("auto", true)
          .setParameter("uploadfile1_0", transcript);
-      if (verbose) System.out.println("taskStatus -> " + request);
-      Response response = new Response(request.post(), verbose);
+      if (verbose) System.out.println("taskStatus -> " + postRequest);
+      Response response = new Response(postRequest.post(), verbose);
       response.checkForErrors(); // throws a ResponseException on error
       
       // extract the threadId from model.result.id
@@ -603,7 +609,7 @@ public class Labbcat
     * index matches the corresponding index in <var>matchIds</var>. 
     * @throws IOException
     * @throws StoreException
-    * @see #getMatches(JSONObject,String[],boolean)}
+    * @see #getMatches(JSONObject,String[],boolean)
     */
    public Annotation[][] getMatchAnnotations(Match[] matches, String[] layerIds, int targetOffset, int annotationsPerLayer)
       throws IOException, StoreException
@@ -653,7 +659,7 @@ public class Labbcat
          if (verbose) System.out.println("matchIds written to: " + csvUpload.getPath());
          
          URL url = makeUrl("api/getMatchAnnotations");
-         HttpRequestPostMultipart request = new HttpRequestPostMultipart(url, getRequiredHttpAuthorization())
+         postRequest = new HttpRequestPostMultipart(url, getRequiredHttpAuthorization())
             .setHeader("Accept", "application/json")
             .setParameter("layer", layerIds)
             .setParameter("targetOffset", targetOffset)
@@ -662,8 +668,8 @@ public class Labbcat
             .setParameter("targetColumn", 0)
             .setParameter("copyColumns", false)
             .setParameter("uploadfile", csvUpload);
-         if (verbose) System.out.println("getMatchAnnotations -> " + request);
-         Response response = new Response(request.post(), verbose);
+         if (verbose) System.out.println("getMatchAnnotations -> " + postRequest);
+         Response response = new Response(postRequest.post(), verbose);
          response.checkForErrors(); // throws a ResponseException on error
          
          // extract the MatchIds from model
@@ -693,7 +699,127 @@ public class Labbcat
    } // end of getMatchIds()
 
    // TODO String getSoundFragments(id, start, end, sampleRate = NULL)
+   
    // TODO getFragments(id, start, end, layerIds, mimeType = "text/praat-textgrid")
+
+   /**
+    * Downloads WAV sound fragments.
+    * @param matches A list of {@link Match}es, perhaps returned by
+    * {@link #getMatches(JSONObject,String[],boolean)}. 
+    * @param sampleRate The desired sample rate, or null for no preference.
+    * @param dir A directory in which the files should be stored, or null for a temporary
+    * folder.  If specified, and the directory doesn't exist, it will be created. 
+    * @return A list of WAV files. If <var>dir</var> is null, these files will be stored
+    * under the system's temporary directory, so once processing is finished, they should
+    * be deleted by the caller, or moved to a more permanent location. 
+    * @throws IOException
+    * @throws StoreException
+    */
+   public File[] getSoundFragments(Match[] matches, Integer sampleRate, File dir)
+      throws IOException, StoreException {
+
+      // convert matches into three parallel arrays of IDs/offsets
+      String[] graphIds = new String[matches.length];
+      Double[] startOffsets = new Double[matches.length];
+      Double[] endOffsets = new Double[matches.length];
+
+      for (int i = 0; i < matches.length; i++) {
+         MatchId matchId = new MatchId(matches[i]);
+         graphIds[i] = matchId.getGraphId();
+         if (matchId.getStartOffset() != null) {
+            startOffsets[i] = matchId.getStartOffset();
+            endOffsets[i] = matchId.getEndOffset();
+         } else if (matchId.getStartAnchorId() != null) {
+            String[] anchorIds = { matchId.getStartAnchorId(), matchId.getEndAnchorId() };
+            try {
+               Anchor[] anchors = getAnchors(matchId.getGraphId(), anchorIds);
+               if (anchors[0] != null) startOffsets[i] = anchors[0].getOffset();
+               if (anchors[1] != null) endOffsets[i] = anchors[1].getOffset();
+            }
+            catch(PermissionException exception) {}
+            catch(GraphNotFoundException exception) {}
+         }
+      } // next match
+      
+      return getSoundFragments(graphIds, startOffsets, endOffsets, sampleRate, dir);      
+   }
+   
+   /**
+    * Downloads WAV sound fragments.
+    * @param graphIds A list of graph IDs (transcript names).
+    * @param startOffsets A list of start offsets, with one element for each element in
+    * <var>graphIds</var>. 
+    * @param endOffsets A list of end offsets, with one element for each element in
+    * <var>graphIds</var>. 
+    * @param sampleRate The desired sample rate, or null for no preference.
+    * @param dir A directory in which the files should be stored, or null for a temporary
+    * folder.  If specified, and the directory doesn't exist, it will be created. 
+    * @return A list of WAV files. If <var>dir</var> is null, these files will be stored
+    * under the system's temporary directory, so once processing is finished, they should
+    * be deleted by the caller, or moved to a more permanent location. 
+    * @throws IOException
+    * @throws StoreException
+    */
+   public File[] getSoundFragments(String[] graphIds, Double[] startOffsets, Double[] endOffsets, Integer sampleRate, File dir)
+      throws IOException, StoreException {
+      
+      if (graphIds.length != startOffsets.length || graphIds.length != endOffsets.length) {
+         throw new StoreException(
+            "graphIds ("+graphIds.length +"), startOffsets ("+startOffsets.length
+            +"), and endOffsets ("+endOffsets.length+") must be arrays of equal size.");
+      }
+      File[] fragments = new File[graphIds.length];
+      
+      boolean tempFiles = false;
+      if (dir == null) {
+         dir = File.createTempFile("getSoundFragments_", "_wav");
+         dir.delete();
+         dir.mkdir();
+         dir.deleteOnExit();
+         tempFiles = true;
+      }
+
+      // loop through each triple, getting fragments individually
+      for (int i = 0; i < graphIds.length; i++) {
+         if (cancelling) break;
+         if (graphIds[i] == null || startOffsets[i] == null || endOffsets[i] == null) continue;
+
+         URL url = makeUrl("soundfragment");
+         HttpRequestGet request = new HttpRequestGet(url, getRequiredHttpAuthorization())
+            .setHeader("Accept", "audio/wav")
+            .setParameter("id", graphIds[i])
+            .setParameter("start", startOffsets[i])
+            .setParameter("end", endOffsets[i]);
+         if (sampleRate != null) request.setParameter("sampleRate", sampleRate);
+         if (verbose) System.out.println("getSoundFragments -> " + request);
+         HttpURLConnection connection = request.get();
+         if (connection.getResponseCode() != HttpURLConnection.HTTP_OK) {
+            if (connection.getResponseCode() != HttpURLConnection.HTTP_NOT_FOUND) {
+               System.err.println(
+                  "getSoundFragments: Error " + connection.getResponseCode()
+                  + " " + connection.getResponseMessage());
+            } 
+            continue;
+         } else {
+            fragments[i] = new File(
+               dir, Graph.FragmentId(graphIds[i], startOffsets[i], endOffsets[i]) + ".wav");
+            // use the name given by the server, if any
+            String contentDisposition = connection.getHeaderField("content-disposition");
+            if (contentDisposition != null) {
+               // something like attachment; filename=blah.wav
+               int equals = contentDisposition.indexOf("=");
+               if (equals > 0) {
+                  String fileName = contentDisposition.substring(equals + 1);
+                  if (fileName.length() > 0) fragments[i] = new File(dir, fileName);
+               }
+            }
+            if (tempFiles) fragments[i].deleteOnExit();
+            IO.SaveUrlConnectionToFile(connection, fragments[i]);           
+         } // response ok
+      } // next triple
+
+      return fragments;
+   } // end of getSoundFragments()
 
    // TODO clearLayer(id)
    
