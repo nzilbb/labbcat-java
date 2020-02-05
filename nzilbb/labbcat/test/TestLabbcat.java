@@ -475,7 +475,7 @@ public class TestLabbcat
             int upTo = Math.min(5, matches.length);
             Match[] subset = Arrays.copyOfRange(matches, 0, upTo);
 
-            File[] wavs = labbcat.getSoundFragments(subset, 16000, null);
+            File[] wavs = labbcat.getSoundFragments(subset, null, null);
             try {
                assertEquals("files array is same size as matches array",
                             subset.length, wavs.length);
