@@ -168,13 +168,16 @@ public class Labbcat
    /**
     * Constructs a POST request for the given resource. The resulting request will be
     * authorized if required, but otherwise has no headers or parameters set. 
+    * <p> The post-request is remembered, so subsequent calls to {@link #cancel()} will
+    * cancel the request if it's in-course.
     * @param resource The path to the resource.
     * @return The request.
     * @throws IOException
     * @throws ResponseException
     */
    public HttpRequestPost createPostRequest(String resource) throws IOException, StoreException {
-      return new HttpRequestPost(makeUrl(resource), getRequiredHttpAuthorization());
+      postRequest = new HttpRequestPost(makeUrl(resource), getRequiredHttpAuthorization());
+      return postRequest;
    } // end of createGetRequest()
 
    /**
