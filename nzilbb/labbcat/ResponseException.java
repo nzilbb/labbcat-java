@@ -29,8 +29,8 @@ import nzilbb.ag.StoreException;
  */
 
 public class ResponseException
-  extends StoreException
-{
+  extends StoreException {
+   
    // Attributes:
 
    /**
@@ -49,8 +49,8 @@ public class ResponseException
    /**
     * Constructor.
     */
-   public ResponseException(Response response)
-   {
+   public ResponseException(Response response) {
+      
       super(GenerateMessage(response));
       this.response = response;      
    } // end of constructor
@@ -60,24 +60,20 @@ public class ResponseException
     * @param response
     * @return The message.
     */
-   static private String GenerateMessage(Response response)
-   {
-      if (response.getErrors() != null && response.getErrors().size() > 0)
-      {
+   static private String GenerateMessage(Response response) {
+      
+      if (response.getErrors() != null && response.getErrors().size() > 0) {
          StringBuilder allErrors = new StringBuilder();
-         for (String error : response.getErrors())
-         {
+         for (String error : response.getErrors()) {
             if (allErrors.length() > 0) allErrors.append("\n");
             allErrors.append(error);
          }
          return allErrors.toString();
       }
-      if (response.getCode() > 0)
-      {
+      if (response.getCode() > 0) {
          return "Response code " + response.getCode();
       }
-      if (response.getHttpStatus() > 0)
-      {
+      if (response.getHttpStatus() > 0) {
          return "HTTP status " + response.getHttpStatus();
       }
       return null;

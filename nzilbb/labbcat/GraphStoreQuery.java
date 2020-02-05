@@ -65,8 +65,8 @@ import org.json.JSONObject;
  */
 
 public class GraphStoreQuery
-   implements IGraphStoreQuery
-{
+   implements IGraphStoreQuery {
+   
    // Attributes:
   
    /**
@@ -179,8 +179,7 @@ public class GraphStoreQuery
    /**
     * Default constructor.
     */
-   public GraphStoreQuery()
-   {
+   public GraphStoreQuery() {
    } // end of constructor
    
    /**
@@ -189,8 +188,8 @@ public class GraphStoreQuery
     * e.g. https://labbcat.canterbury.ac.nz/demo/
     */
    public GraphStoreQuery(String labbcatUrl)
-      throws MalformedURLException
-   {
+      throws MalformedURLException {
+      
       setLabbcatUrl(new URL(labbcatUrl));
    } // end of constructor
    
@@ -202,8 +201,8 @@ public class GraphStoreQuery
     * @param password LaBB-CAT password.
     */
    public GraphStoreQuery(String labbcatUrl, String username, String password)
-      throws MalformedURLException
-   {
+      throws MalformedURLException {
+      
       setLabbcatUrl(new URL(labbcatUrl));
       setUsername(username);
       setPassword(password);
@@ -214,8 +213,8 @@ public class GraphStoreQuery
     * @param labbcatUrl The base URL of the LaBB-CAT server -
     * e.g. https://labbcat.canterbury.ac.nz/demo/
     */
-   public GraphStoreQuery(URL labbcatUrl)
-   {
+   public GraphStoreQuery(URL labbcatUrl) {
+      
       setLabbcatUrl(labbcatUrl);
    } // end of constructor
    
@@ -226,8 +225,8 @@ public class GraphStoreQuery
     * @param username LaBB-CAT username.
     * @param password LaBB-CAT password.
     */
-   public GraphStoreQuery(URL labbcatUrl, String username, String password)
-   {
+   public GraphStoreQuery(URL labbcatUrl, String username, String password) {
+      
       setLabbcatUrl(labbcatUrl);
       setUsername(username);
       setPassword(password);
@@ -241,83 +240,62 @@ public class GraphStoreQuery
     * @throws Exception if the user cancels while begin prompted for credentials
     */
    public String getRequiredHttpAuthorization()
-      throws IOException, StoreException
-   {
+      throws IOException, StoreException {
+      
       if (authorization != null) return authorization;
       
       URL testUrl = url(""); // store URL with no path
       HttpURLConnection testConnection = (HttpURLConnection)testUrl.openConnection();
       Response response = null;
-      try
-      {
+      try {
 	 InputStream is = testConnection.getInputStream();
 	 response = new Response(is, verbose);
-      }
-      catch (IOException x)
-      {
-         if (verbose)
-         {
+      } catch (IOException x) {
+         if (verbose) {
             System.out.println(
                "First connection test status ("+(batchMode?"batch":"interacive")+" mode): "
                + testConnection.getResponseCode());
          }            
-	 if (testConnection.getResponseCode() == HttpURLConnection.HTTP_UNAUTHORIZED)
-	 {
-            if (batchMode)
-            { // batchMode - can only try with username/password once
-               if (username != null && password != null)
-               {
+	 if (testConnection.getResponseCode() == HttpURLConnection.HTTP_UNAUTHORIZED) {
+            if (batchMode) { // can only try with username/password once
+               if (username != null && password != null) {
                   authorization = "Basic " + new String(
                      Base64.getMimeEncoder().encode(
                         (username+":"+password).getBytes()), StandardCharsets.UTF_8);
                   testConnection.disconnect();
                   testConnection = (HttpURLConnection)testUrl.openConnection();
                   testConnection.setRequestProperty("Authorization", authorization);
-                  try 
-                  { 
+                  try { 
                      InputStream is = testConnection.getInputStream(); 
                      response = new Response(is, verbose);
-                  }
-                  catch (IOException xx)
-                  {
-                     if (verbose)
-                     {
+                  } catch (IOException xx) {
+                     if (verbose) {
                         System.out.println(
                            "Second connection test status in batch mode: "
                            + testConnection.getResponseCode());
                      }            
-                     if (testConnection.getResponseCode() == HttpURLConnection.HTTP_UNAUTHORIZED)
-                     {
+                     if (testConnection.getResponseCode() == HttpURLConnection.HTTP_UNAUTHORIZED) {
                         authorization = null;
                         username = null;
                         password = null;
                         throw new IOException("Username/password invalid");
-                     }
-                     else
-                     {
+                     } else {
                         throw xx;
                      }
                   }
-               }
-               else
-               {
+               } else {
                   throw new IOException("Username/password required");
                }
-            } // batchMode
-            else
-            { // not batchMode
+            } else { // not batchMode
                JPasswordField txtPassword = new JPasswordField();
                // loop until a username/password works
-               while (authorization == null)
-               {
-                  if (username == null)
-                  {
+               while (authorization == null) {
+                  if (username == null) {
                      username = JOptionPane.showInputDialog(null, "Username", username);
                   }
                   if (username == null) throw new IOException("Cancelled");
                   txtPassword.setText("");
-                  if (password == null || password.length() == 0)
-                  {
+                  if (password == null || password.length() == 0) {
                      JOptionPane.showMessageDialog(
                         null, txtPassword, "Password", JOptionPane.QUESTION_MESSAGE);
                      password = new String(txtPassword.getPassword());
@@ -328,21 +306,16 @@ public class GraphStoreQuery
                   testConnection.disconnect();
                   testConnection = (HttpURLConnection)testUrl.openConnection();
                   testConnection.setRequestProperty("Authorization", authorization);
-                  try 
-                  { 
+                  try { 
                      InputStream is = testConnection.getInputStream(); 
                      response = new Response(is, verbose);
-                  }
-                  catch (Exception xx)
-                  {
-                     if (verbose)
-                     {
+                  } catch (Exception xx) {
+                     if (verbose) {
                         System.out.println(
                            "Next connection test status in interactive mode: "
                            + testConnection.getResponseCode());
                      }
-                     if (testConnection.getResponseCode() == HttpURLConnection.HTTP_UNAUTHORIZED)
-                     {
+                     if (testConnection.getResponseCode() == HttpURLConnection.HTTP_UNAUTHORIZED) {
                         authorization = null;
                         username = null;
                         password = null;
@@ -350,19 +323,15 @@ public class GraphStoreQuery
                   }
                } // next attempt
             } // not batchMode
-	 } // HTTP_UNAUTHORIZED returned
-         else
-         {
+	 } else { // not HTTP_UNAUTHORIZED returned
             throw x;
          }
       } // exception getting content
 
-      if (response != null)
-      { // got a response
+      if (response != null) { // got a response
          // check server version
          if (response.getVersion() == null
-             || response.getVersion().compareTo(minLabbcatVersion) < 0)
-         {
+             || response.getVersion().compareTo(minLabbcatVersion) < 0) {
             throw new StoreException(
                "Server is version " + response.getVersion()
                + " but the minimum required version is " + minLabbcatVersion);
@@ -379,14 +348,11 @@ public class GraphStoreQuery
     * @throws StoreException If the URL is malformed.
     */
    public URL url(String resource)
-      throws StoreException
-   {
-      try
-      {
+      throws StoreException {
+      
+      try {
          return new URL(new URL(labbcatUrl, "store/"), resource);
-      }
-      catch(Throwable t)
-      {
+      } catch(Throwable t) {
          throw new StoreException("Could not construct request URL.", t);
       }
    } // end of makeUrl()   
@@ -400,10 +366,9 @@ public class GraphStoreQuery
     * @throws PermissionException If the operation is not permitted.
     */
    public String getId()
-      throws StoreException, PermissionException
-   {
-      try
-      {
+      throws StoreException, PermissionException {
+      
+      try {
          URL url = url("getId");
          HttpRequestGet request = new HttpRequestGet(url, getRequiredHttpAuthorization())
             .setHeader("Accept", "application/json");
@@ -412,9 +377,7 @@ public class GraphStoreQuery
          response.checkForErrors(); // throws a StoreException on error
          if (response.isModelNull()) return null;
          return (String)response.getModel();
-      }
-      catch(IOException x)
-      {
+      } catch(IOException x) {
          throw new StoreException("Could not get response.", x);
       }
    }
@@ -426,10 +389,9 @@ public class GraphStoreQuery
     * @throws PermissionException If the operation is not permitted.
     */
    public String[] getLayerIds()
-      throws StoreException, PermissionException
-   {
-      try
-      {
+      throws StoreException, PermissionException {
+      
+      try {
          URL url = url("getLayerIds");
          HttpRequestGet request = new HttpRequestGet(url, getRequiredHttpAuthorization())
             .setHeader("Accept", "application/json");
@@ -439,17 +401,13 @@ public class GraphStoreQuery
          if (response.isModelNull()) return null;
          JSONArray array = (JSONArray)response.getModel();
          Vector<String> ids = new Vector<String>();
-         if (array != null)
-         {
-            for (int i = 0; i < array.length(); i++)
-            {
+         if (array != null) {
+            for (int i = 0; i < array.length(); i++) {
                ids.add(array.getString(i));
             }
          }
          return ids.toArray(new String[0]);
-      }
-      catch(IOException x)
-      {
+      } catch(IOException x) {
          throw new StoreException("Could not get response.", x);
       }
    } 
@@ -461,10 +419,9 @@ public class GraphStoreQuery
     * @throws PermissionException If the operation is not permitted.
     */
    public Layer[] getLayers()
-      throws StoreException, PermissionException
-   {
-      try
-      {
+      throws StoreException, PermissionException {
+      
+      try {
          URL url = url("getLayers");
          HttpRequestGet request = new HttpRequestGet(url, getRequiredHttpAuthorization()) 
             .setHeader("Accept", "application/json");
@@ -474,17 +431,13 @@ public class GraphStoreQuery
          if (response.isModelNull()) return null;
          JSONArray array = (JSONArray)response.getModel();
          Vector<Layer> layers = new Vector<Layer>();
-         if (array != null)
-         {
-            for (int i = 0; i < array.length(); i++)
-            {
+         if (array != null) {
+            for (int i = 0; i < array.length(); i++) {
                layers.add(new Layer(array.getJSONObject(i)));
             }
          }
          return layers.toArray(new Layer[0]);
-      }
-      catch(IOException x)
-      {
+      } catch(IOException x) {
          throw new StoreException("Could not get response.", x);
       }
    }
@@ -496,8 +449,7 @@ public class GraphStoreQuery
     * @throws PermissionException If the operation is not permitted.
     */
    public Schema getSchema()
-      throws StoreException, PermissionException
-   {
+      throws StoreException, PermissionException {
       throw new StoreException("Not implemented");
    }
 
@@ -509,10 +461,9 @@ public class GraphStoreQuery
     * @throws PermissionException If the operation is not permitted.
     */
    public Layer getLayer(String id)
-      throws StoreException, PermissionException
-   {
-      try
-      {
+      throws StoreException, PermissionException {
+      
+      try {
          URL url = url("getLayer");
          HttpRequestGet request = new HttpRequestGet(url, getRequiredHttpAuthorization()) 
             .setHeader("Accept", "application/json")
@@ -522,9 +473,7 @@ public class GraphStoreQuery
          response.checkForErrors(); // throws a StoreException on error
          if (response.isModelNull()) return null;
          return new Layer((JSONObject)response.getModel());
-      }
-      catch(IOException x)
-      {
+      } catch(IOException x) {
          throw new StoreException("Could not get response.", x);
       }
    }   
@@ -536,10 +485,9 @@ public class GraphStoreQuery
     * @throws PermissionException If the operation is not permitted.
     */
    public String[] getCorpusIds()
-      throws StoreException, PermissionException
-   {
-      try
-      {
+      throws StoreException, PermissionException {
+      
+      try {
          URL url = url("getCorpusIds");
          HttpRequestGet request = new HttpRequestGet(url, getRequiredHttpAuthorization())
             .setHeader("Accept", "application/json");
@@ -557,9 +505,7 @@ public class GraphStoreQuery
             }
          }
          return ids.toArray(new String[0]);
-      }
-      catch(IOException x)
-      {
+      } catch(IOException x) {
          throw new StoreException("Could not get response.", x);
       }
    } 
@@ -571,10 +517,9 @@ public class GraphStoreQuery
     * @throws PermissionException If the operation is not permitted.
     */
    public String[] getParticipantIds()
-      throws StoreException, PermissionException
-   {
-      try
-      {
+      throws StoreException, PermissionException {
+      
+      try {
          URL url = url("getParticipantIds");
          HttpRequestGet request = new HttpRequestGet(url, getRequiredHttpAuthorization())
             .setHeader("Accept", "application/json");
@@ -584,17 +529,13 @@ public class GraphStoreQuery
          if (response.isModelNull()) return null;
          JSONArray array = (JSONArray)response.getModel();
          Vector<String> ids = new Vector<String>();
-         if (array != null)
-         {
-            for (int i = 0; i < array.length(); i++)
-            {
+         if (array != null) {
+            for (int i = 0; i < array.length(); i++) {
                ids.add(array.getString(i));
             }
          }
          return ids.toArray(new String[0]);
-      }
-      catch(IOException x)
-      {
+      } catch(IOException x) {
          throw new StoreException("Could not get response.", x);
       }
    } 
@@ -608,10 +549,9 @@ public class GraphStoreQuery
     * @throws PermissionException
     */
    public Annotation getParticipant(String id)
-      throws StoreException, PermissionException
-   {
-      try
-      {
+      throws StoreException, PermissionException {
+      
+      try {
          URL url = url("getParticipant");
          HttpRequestGet request = new HttpRequestGet(url, getRequiredHttpAuthorization()) 
             .setHeader("Accept", "application/json")
@@ -621,9 +561,7 @@ public class GraphStoreQuery
          response.checkForErrors(); // throws a StoreException on error
          if (response.isModelNull()) return null;
          return new Annotation((JSONObject)response.getModel());
-      }
-      catch(IOException x)
-      {
+      } catch(IOException x) {
          throw new StoreException("Could not get response.", x);
       }
    }
@@ -649,10 +587,9 @@ public class GraphStoreQuery
     * @throws PermissionException If the operation is not permitted.
     */
    public int countMatchingParticipantIds(String expression)
-      throws StoreException, PermissionException
-   {
-      try
-      {
+      throws StoreException, PermissionException {
+      
+      try {
          URL url = url("countMatchingParticipantIds");
          if (verbose) System.out.println("countMatchingParticipantIds -> " + url);
          HttpRequestGet request = new HttpRequestGet(url, getRequiredHttpAuthorization())
@@ -661,9 +598,7 @@ public class GraphStoreQuery
          Response response = new Response(request.get(), verbose);
          response.checkForErrors(); // throws a StoreException on error
          return (Integer)response.getModel();
-      }
-      catch(IOException x)
-      {
+      } catch(IOException x) {
          throw new StoreException("Could not get response.", x);
       }
    } 
@@ -691,10 +626,9 @@ public class GraphStoreQuery
     * @throws PermissionException If the operation is not permitted.
     */
    public String[] getMatchingParticipantIds(String expression, Integer pageLength, Integer pageNumber)
-      throws StoreException, PermissionException
-   {
-      try
-      {
+      throws StoreException, PermissionException {
+      
+      try {
          URL url = url("getMatchingParticipantIds");
          HttpRequestGet request = new HttpRequestGet(url, getRequiredHttpAuthorization())
             .setHeader("Accept", "application/json")
@@ -715,9 +649,7 @@ public class GraphStoreQuery
             }
          }
          return ids.toArray(new String[0]);
-      }
-      catch(IOException x)
-      {
+      } catch(IOException x) {
          throw new StoreException("Could not get response.", x);
       }
    } 
@@ -729,10 +661,9 @@ public class GraphStoreQuery
     * @throws PermissionException If the operation is not permitted.
     */
    public String[] getGraphIds()
-      throws StoreException, PermissionException
-   {
-      try
-      {
+      throws StoreException, PermissionException {
+      
+      try {
          URL url = url("getGraphIds");
          HttpRequestGet request = new HttpRequestGet(url, getRequiredHttpAuthorization())
             .setHeader("Accept", "application/json");
@@ -750,9 +681,7 @@ public class GraphStoreQuery
             }
          }
          return ids.toArray(new String[0]);
-      }
-      catch(IOException x)
-      {
+      } catch(IOException x) {
          throw new StoreException("Could not get response.", x);
       }
    } 
@@ -765,10 +694,9 @@ public class GraphStoreQuery
     * @throws PermissionException If the operation is not permitted.
     */
    public String[] getGraphIdsInCorpus(String id)
-      throws StoreException, PermissionException
-   {
-      try
-      {
+      throws StoreException, PermissionException {
+      
+      try {
          URL url = url("getGraphIdsInCorpus");
          HttpRequestGet request = new HttpRequestGet(url, getRequiredHttpAuthorization())
             .setParameter("id", id)
@@ -779,17 +707,13 @@ public class GraphStoreQuery
          if (response.isModelNull()) return null;
          JSONArray array = (JSONArray)response.getModel();
          Vector<String> ids = new Vector<String>();
-         if (array != null)
-         {
-            for (int i = 0; i < array.length(); i++)
-            {
+         if (array != null) {
+            for (int i = 0; i < array.length(); i++) {
                ids.add(array.getString(i));
             }
          }
          return ids.toArray(new String[0]);
-      }
-      catch(IOException x)
-      {
+      } catch(IOException x) {
          throw new StoreException("Could not get response.", x);
       }
    } 
@@ -802,10 +726,9 @@ public class GraphStoreQuery
     * @throws PermissionException If the operation is not permitted.
     */
    public String[] getGraphIdsWithParticipant(String id)
-      throws StoreException, PermissionException
-   {
-      try
-      {
+      throws StoreException, PermissionException {
+      
+      try {
          URL url = url("getGraphIdsWithParticipant");
          HttpRequestGet request = new HttpRequestGet(url, getRequiredHttpAuthorization())
             .setParameter("id", id)
@@ -816,17 +739,13 @@ public class GraphStoreQuery
          if (response.isModelNull()) return null;
          JSONArray array = (JSONArray)response.getModel();
          Vector<String> ids = new Vector<String>();
-         if (array != null)
-         {
-            for (int i = 0; i < array.length(); i++)
-            {
+         if (array != null) {
+            for (int i = 0; i < array.length(); i++) {
                ids.add(array.getString(i));
             }
          }
          return ids.toArray(new String[0]);
-      }
-      catch(IOException x)
-      {
+      } catch(IOException x) {
          throw new StoreException("Could not get response.", x);
       }
    } 
@@ -859,10 +778,9 @@ public class GraphStoreQuery
     * @throws PermissionException If the operation is not permitted.
     */
    public int countMatchingGraphIds(String expression)
-      throws StoreException, PermissionException
-   {
-      try
-      {
+      throws StoreException, PermissionException {
+      
+      try {
          URL url = url("countMatchingGraphIds");
          if (verbose) System.out.println("countMatchingGraphIds -> " + url);
          HttpRequestGet request = new HttpRequestGet(url, getRequiredHttpAuthorization())
@@ -871,9 +789,7 @@ public class GraphStoreQuery
          Response response = new Response(request.get(), verbose);
          response.checkForErrors(); // throws a StoreException on error
          return (Integer)response.getModel();
-      }
-      catch(IOException x)
-      {
+      } catch(IOException x) {
          throw new StoreException("Could not get response.", x);
       }
    }    
@@ -914,10 +830,9 @@ public class GraphStoreQuery
     * @throws PermissionException If the operation is not permitted.
     */
    public String[] getMatchingGraphIds(String expression, Integer pageLength, Integer pageNumber, String order)
-      throws StoreException, PermissionException
-   {
-      try
-      {
+      throws StoreException, PermissionException {
+      
+      try {
          URL url = url("getMatchingGraphIds");
          HttpRequestGet request = new HttpRequestGet(url, getRequiredHttpAuthorization()) 
             .setHeader("Accept", "application/json")
@@ -930,17 +845,13 @@ public class GraphStoreQuery
          if (response.isModelNull()) return null;
          JSONArray array = (JSONArray)response.getModel();
          Vector<String> ids = new Vector<String>();
-         if (array != null)
-         {
-            for (int i = 0; i < array.length(); i++)
-            {
+         if (array != null) {
+            for (int i = 0; i < array.length(); i++) {
                ids.add(array.getString(i));
             }
          }
          return ids.toArray(new String[0]);
-      }
-      catch(IOException x)
-      {
+      } catch(IOException x) {
          throw new StoreException("Could not get response.", x);
       }
    } 
@@ -964,10 +875,9 @@ public class GraphStoreQuery
     * @throws PermissionException If the operation is not permitted.
     */
    public int countMatchingAnnotations(String expression)
-      throws StoreException, PermissionException
-   {
-      try
-      {
+      throws StoreException, PermissionException {
+      
+      try {
          URL url = url("countMatchingAnnotations");
          if (verbose) System.out.println("countMatchingAnnotations -> " + url);
          HttpRequestGet request = new HttpRequestGet(url, getRequiredHttpAuthorization())
@@ -976,9 +886,7 @@ public class GraphStoreQuery
          Response response = new Response(request.get(), verbose);
          response.checkForErrors(); // throws a StoreException on error
          return (Integer)response.getModel();
-      }
-      catch(IOException x)
-      {
+      } catch(IOException x) {
          throw new StoreException("Could not get response.", x);
       }
    } 
@@ -1004,10 +912,9 @@ public class GraphStoreQuery
     * @throws PermissionException If the operation is not permitted.
     */
    public Annotation[] getMatchingAnnotations(String expression, Integer pageLength, Integer pageNumber)
-      throws StoreException, PermissionException
-   {
-      try
-      {
+      throws StoreException, PermissionException {
+      
+      try {
          URL url = url("getMatchingAnnotations");
          HttpRequestGet request = new HttpRequestGet(url, getRequiredHttpAuthorization()) 
             .setHeader("Accept", "application/json")
@@ -1020,17 +927,13 @@ public class GraphStoreQuery
          if (response.isModelNull()) return null;
          JSONArray array = (JSONArray)response.getModel();
          Vector<Annotation> annotations = new Vector<Annotation>();
-         if (array != null)
-         {
-            for (int i = 0; i < array.length(); i++)
-            {
+         if (array != null) {
+            for (int i = 0; i < array.length(); i++) {
                annotations.add(new Annotation(array.getJSONObject(i)));
             }
          }
          return annotations.toArray(new Annotation[0]);
-      }
-      catch(IOException x)
-      {
+      } catch(IOException x) {
          throw new StoreException("Could not get response.", x);
       }
    } 
@@ -1045,10 +948,9 @@ public class GraphStoreQuery
     * @throws GraphNotFoundException If the graph was not found in the store.
     */
    public long countAnnotations(String id, String layerId)
-      throws StoreException, PermissionException, GraphNotFoundException
-   {
-      try
-      {
+      throws StoreException, PermissionException, GraphNotFoundException {
+      
+      try {
          URL url = url("countAnnotations");
          if (verbose) System.out.println("countAnnotations -> " + url);
          HttpRequestGet request = new HttpRequestGet(url, getRequiredHttpAuthorization())
@@ -1059,9 +961,7 @@ public class GraphStoreQuery
          response.checkForErrors(); // throws a StoreException on error
          if (response.getModel() instanceof Integer) return (Integer)response.getModel();
          return (Long)response.getModel();
-      }
-      catch(IOException x)
-      {
+      } catch(IOException x) {
          throw new StoreException("Could not get response.", x);
       }
    }
@@ -1078,10 +978,9 @@ public class GraphStoreQuery
     * @throws GraphNotFoundException If the graph was not found in the store.
     */
    public Annotation[] getAnnotations(String id, String layerId, Integer pageLength, Integer pageNumber)
-      throws StoreException, PermissionException, GraphNotFoundException
-   {
-      try
-      {
+      throws StoreException, PermissionException, GraphNotFoundException {
+      
+      try {
          URL url = url("getAnnotations");
          HttpRequestGet request = new HttpRequestGet(url, getRequiredHttpAuthorization()) 
             .setHeader("Accept", "application/json")
@@ -1095,17 +994,13 @@ public class GraphStoreQuery
          if (response.isModelNull()) return null;
          JSONArray array = (JSONArray)response.getModel();
          Vector<Annotation> annotations = new Vector<Annotation>();
-         if (array != null)
-         {
-            for (int i = 0; i < array.length(); i++)
-            {
+         if (array != null) {
+            for (int i = 0; i < array.length(); i++) {
                annotations.add(new Annotation(array.getJSONObject(i)));
             }
          }
          return annotations.toArray(new Annotation[0]);
-      }
-      catch(IOException x)
-      {
+      } catch(IOException x) {
          throw new StoreException("Could not get response.", x);
       }
    }
@@ -1129,8 +1024,8 @@ public class GraphStoreQuery
     * @throws PermissionException If the operation is not permitted.
     */
    public void getMatchAnnotations(Iterator<String> matchIds, String[] layerIds, int targetOffset, int annotationsPerLayer, Consumer<Annotation[]> consumer)
-      throws StoreException, PermissionException
-   {
+      throws StoreException, PermissionException {
+      
       throw new StoreException("Not implemented");
    }
    
@@ -1144,10 +1039,9 @@ public class GraphStoreQuery
     * @throws GraphNotFoundException If the graph was not found in the store.
     */
    public Anchor[] getAnchors(String id, String[] anchorIds)
-      throws StoreException, PermissionException, GraphNotFoundException
-   {
-      try
-      {
+      throws StoreException, PermissionException, GraphNotFoundException {
+      
+      try {
          URL url = url("getAnchors");
          HttpRequestGet request = new HttpRequestGet(url, getRequiredHttpAuthorization()) 
             .setHeader("Accept", "application/json")
@@ -1159,17 +1053,13 @@ public class GraphStoreQuery
          if (response.isModelNull()) return null;
          JSONArray array = (JSONArray)response.getModel();
          Vector<Anchor> anchors = new Vector<Anchor>();
-         if (array != null)
-         {
-            for (int i = 0; i < array.length(); i++)
-            {
+         if (array != null) {
+            for (int i = 0; i < array.length(); i++) {
                anchors.add(new Anchor(array.getJSONObject(i)));
             }
          }
          return anchors.toArray(new Anchor[0]);
-      }
-      catch(IOException x)
-      {
+      } catch(IOException x) {
          throw new StoreException("Could not get response.", x);
       }
    }
@@ -1183,8 +1073,7 @@ public class GraphStoreQuery
     * @throws GraphNotFoundException If the graph was not found in the store.
     */
    public Graph getGraph(String id) 
-      throws StoreException, PermissionException, GraphNotFoundException
-   {
+      throws StoreException, PermissionException, GraphNotFoundException {
       throw new StoreException("Not implemented");
    }
 
@@ -1198,8 +1087,7 @@ public class GraphStoreQuery
     * @throws GraphNotFoundException If the graph was not found in the store.
     */
    public Graph getGraph(String id, String[] layerIds) 
-      throws StoreException, PermissionException, GraphNotFoundException
-   {
+      throws StoreException, PermissionException, GraphNotFoundException {
       throw new StoreException("Not implemented");
    }
 
@@ -1214,8 +1102,7 @@ public class GraphStoreQuery
     * @throws GraphNotFoundException If the graph was not found in the store.
     */
    public Graph getFragment(String graphId, String annotationId) 
-      throws StoreException, PermissionException, GraphNotFoundException
-   {
+      throws StoreException, PermissionException, GraphNotFoundException {
       throw new StoreException("Not implemented");
    }
 
@@ -1231,8 +1118,7 @@ public class GraphStoreQuery
     * @throws GraphNotFoundException If the graph was not found in the store.
     */
    public Graph getFragment(String graphId, String annotationId, String[] layerIds) 
-      throws StoreException, PermissionException, GraphNotFoundException
-   {
+      throws StoreException, PermissionException, GraphNotFoundException {
       throw new StoreException("Not implemented");
    }
    
@@ -1249,8 +1135,7 @@ public class GraphStoreQuery
     * @throws GraphNotFoundException If the graph was not found in the store.
     */
    public Graph getFragment(String graphId, double start, double end, String[] layerIds) 
-      throws StoreException, PermissionException, GraphNotFoundException
-   {
+      throws StoreException, PermissionException, GraphNotFoundException {
       throw new StoreException("Not implemented");
    }
    
@@ -1264,8 +1149,7 @@ public class GraphStoreQuery
     * @throws GraphNotFoundException If the graph was not found in the store.
     */
    public MonitorableSeries<Graph> getFragmentSeries(String seriesId, String[] layerIds) 
-      throws StoreException, PermissionException, GraphNotFoundException
-   {
+      throws StoreException, PermissionException, GraphNotFoundException {
       throw new StoreException("Not implemented");
    }
    
@@ -1276,10 +1160,8 @@ public class GraphStoreQuery
     * @throws PermissionException If the operation is not permitted. 
     */
    public MediaTrackDefinition[] getMediaTracks() 
-      throws StoreException, PermissionException
-   {
-      try
-      {
+      throws StoreException, PermissionException {
+      try {
          URL url = url("getMediaTracks");
          HttpRequestGet request = new HttpRequestGet(url, getRequiredHttpAuthorization()) 
             .setHeader("Accept", "application/json");
@@ -1289,17 +1171,13 @@ public class GraphStoreQuery
          if (response.isModelNull()) return null;
          JSONArray array = (JSONArray)response.getModel();
          Vector<MediaTrackDefinition> tracks = new Vector<MediaTrackDefinition>();
-         if (array != null)
-         {
-            for (int i = 0; i < array.length(); i++)
-            {
+         if (array != null) {
+            for (int i = 0; i < array.length(); i++) {
                tracks.add(new MediaTrackDefinition(array.getJSONObject(i)));
             }
          }
          return tracks.toArray(new MediaTrackDefinition[0]);
-      }
-      catch(IOException x)
-      {
+      } catch(IOException x) {
          throw new StoreException("Could not get response.", x);
       }
    }
@@ -1313,10 +1191,9 @@ public class GraphStoreQuery
     * @throws GraphNotFoundException If the graph was not found in the store.
     */
    public MediaFile[] getAvailableMedia(String id) 
-      throws StoreException, PermissionException, GraphNotFoundException
-   {
-      try
-      {
+      throws StoreException, PermissionException, GraphNotFoundException {
+      
+      try {
          URL url = url("getAvailableMedia");
          HttpRequestGet request = new HttpRequestGet(url, getRequiredHttpAuthorization()) 
             .setHeader("Accept", "application/json")
@@ -1327,17 +1204,13 @@ public class GraphStoreQuery
          if (response.isModelNull()) return null;
          JSONArray array = (JSONArray)response.getModel();
          Vector<MediaFile> files = new Vector<MediaFile>();
-         if (array != null)
-         {
-            for (int i = 0; i < array.length(); i++)
-            {
+         if (array != null) {
+            for (int i = 0; i < array.length(); i++) {
                files.add(new MediaFile(array.getJSONObject(i)));
             }
          }
          return files.toArray(new MediaFile[0]);
-      }
-      catch(IOException x)
-      {
+      } catch(IOException x) {
          throw new StoreException("Could not get response.", x);
       }
    }
@@ -1355,10 +1228,9 @@ public class GraphStoreQuery
     * @throws GraphNotFoundException If the graph was not found in the store.
     */
    public String getMedia(String id, String trackSuffix, String mimeType) 
-      throws StoreException, PermissionException, GraphNotFoundException
-   {
-      try
-      {
+      throws StoreException, PermissionException, GraphNotFoundException {
+      
+      try {
          URL url = url("getMedia");
          HttpRequestGet request = new HttpRequestGet(url, getRequiredHttpAuthorization())
             .setHeader("Accept", "application/json")
@@ -1370,9 +1242,7 @@ public class GraphStoreQuery
          response.checkForErrors(); // throws a StoreException on error
          if (response.isModelNull()) return null;
          return (String)response.getModel();
-      }
-      catch(IOException x)
-      {
+      } catch(IOException x) {
          throw new StoreException("Could not get response.", x);
       }
    }
@@ -1394,10 +1264,9 @@ public class GraphStoreQuery
     * @throws GraphNotFoundException If the graph was not found in the store.
     */
    public String getMedia(String id, String trackSuffix, String mimeType, Double startOffset, Double endOffset) 
-      throws StoreException, PermissionException, GraphNotFoundException
-   {
-      try
-      {
+      throws StoreException, PermissionException, GraphNotFoundException {
+      
+      try {
          URL url = url("getMedia");
          HttpRequestGet request = new HttpRequestGet(url, getRequiredHttpAuthorization())
             .setHeader("Accept", "application/json")
@@ -1411,9 +1280,7 @@ public class GraphStoreQuery
          response.checkForErrors(); // throws a StoreException on error
          if (response.isModelNull()) return null;
          return (String)response.getModel();
-      }
-      catch(IOException x)
-      {
+      } catch(IOException x) {
          throw new StoreException("Could not get response.", x);
       }
    }
@@ -1427,10 +1294,9 @@ public class GraphStoreQuery
     * @throws GraphNotFoundException If the graph doesn't exist.
     */
    public MediaFile[] getEpisodeDocuments(String id)
-      throws StoreException, PermissionException, GraphNotFoundException
-   {
-      try
-      {
+      throws StoreException, PermissionException, GraphNotFoundException {
+      
+      try {
          URL url = url("getEpisodeDocuments");
          HttpRequestGet request = new HttpRequestGet(url, getRequiredHttpAuthorization()) 
             .setHeader("Accept", "application/json")
@@ -1441,17 +1307,13 @@ public class GraphStoreQuery
          if (response.isModelNull()) return null;
          JSONArray array = (JSONArray)response.getModel();
          Vector<MediaFile> files = new Vector<MediaFile>();
-         if (array != null)
-         {
-            for (int i = 0; i < array.length(); i++)
-            {
+         if (array != null) {
+            for (int i = 0; i < array.length(); i++) {
                files.add(new MediaFile(array.getJSONObject(i)));
             }
          }
          return files.toArray(new MediaFile[0]);
-      }
-      catch(IOException x)
-      {
+      } catch(IOException x) {
          throw new StoreException("Could not get response.", x);
       }
    }

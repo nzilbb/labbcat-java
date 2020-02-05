@@ -49,8 +49,8 @@ import nzilbb.ag.serialize.SerializationDescriptor;
 
 public class GraphStoreAdministration
    extends GraphStore
-   implements IGraphStoreAdministration
-{
+   implements IGraphStoreAdministration {
+   
    // Attributes:
   
    // Methods:
@@ -58,8 +58,7 @@ public class GraphStoreAdministration
    /**
     * Default constructor.
     */
-   public GraphStoreAdministration()
-   {
+   public GraphStoreAdministration() {
    } // end of constructor
    
    /**
@@ -67,9 +66,7 @@ public class GraphStoreAdministration
     * @param labbcatUrl The base URL of the LaBB-CAT server -
     * e.g. https://labbcat.canterbury.ac.nz/demo/
     */
-   public GraphStoreAdministration(String labbcatUrl)
-      throws MalformedURLException
-   {
+   public GraphStoreAdministration(String labbcatUrl) throws MalformedURLException {
       super(labbcatUrl);
    } // end of constructor
    
@@ -81,8 +78,7 @@ public class GraphStoreAdministration
     * @param password LaBB-CAT password.
     */
    public GraphStoreAdministration(String labbcatUrl, String username, String password)
-      throws MalformedURLException
-   {
+      throws MalformedURLException {
       super(labbcatUrl, username, password);
    } // end of constructor
    
@@ -91,8 +87,7 @@ public class GraphStoreAdministration
     * @param labbcatUrl The base URL of the LaBB-CAT server -
     * e.g. https://labbcat.canterbury.ac.nz/demo/
     */
-   public GraphStoreAdministration(URL labbcatUrl)
-   {
+   public GraphStoreAdministration(URL labbcatUrl) {
       super(labbcatUrl);
    } // end of constructor
    
@@ -103,8 +98,7 @@ public class GraphStoreAdministration
     * @param username LaBB-CAT username.
     * @param password LaBB-CAT password.
     */
-   public GraphStoreAdministration(URL labbcatUrl, String username, String password)
-   {
+   public GraphStoreAdministration(URL labbcatUrl, String username, String password) {
       super(labbcatUrl, username, password);
    } // end of constructor
 
@@ -114,15 +108,10 @@ public class GraphStoreAdministration
     * @return A URL for the given resource.
     * @throws StoreException If the URL is malformed.
     */
-   public URL adminUrl(String resource)
-      throws StoreException
-   {
-      try
-      {
+   public URL adminUrl(String resource) throws StoreException {
+      try {
          return new URL(new URL(labbcatUrl, "admin/store/"), resource);
-      }
-      catch(Throwable t)
-      {
+      } catch(Throwable t) {
          throw new StoreException("Could not construct request URL.", t);
       }
    } // end of editUrl()   
@@ -135,8 +124,9 @@ public class GraphStoreAdministration
     * @throws StoreException If an error prevents the operation.
     * @throws PermissionException If the operation is not permitted.
     */
-   public void registerDeserializer(IDeserializer deserializer) throws StoreException, PermissionException
-   {
+   public void registerDeserializer(IDeserializer deserializer)
+      throws StoreException, PermissionException {
+      
       throw new StoreException("Not implemented");
    }
 
@@ -146,8 +136,9 @@ public class GraphStoreAdministration
     * @throws StoreException If an error prevents the operation.
     * @throws PermissionException If the operation is not permitted.
     */
-   public void deregisterDeserializer(IDeserializer deserializer) throws StoreException, PermissionException
-   {
+   public void deregisterDeserializer(IDeserializer deserializer)
+      throws StoreException, PermissionException {
+      
       throw new StoreException("Not implemented");
    }
 
@@ -157,8 +148,9 @@ public class GraphStoreAdministration
     * @throws StoreException If an error prevents the operation.
     * @throws PermissionException If the operation is not permitted.
     */
-   public SerializationDescriptor[] getDeserializerDescriptors() throws StoreException, PermissionException
-   {
+   public SerializationDescriptor[] getDeserializerDescriptors()
+      throws StoreException, PermissionException {
+      
       throw new StoreException("Not implemented");
    }
    
@@ -169,8 +161,9 @@ public class GraphStoreAdministration
     * @throws StoreException If an error prevents the operation.
     * @throws PermissionException If the operation is not permitted.
     */
-   public IDeserializer deserializerForMimeType(String mimeType) throws StoreException, PermissionException
-   {
+   public IDeserializer deserializerForMimeType(String mimeType)
+      throws StoreException, PermissionException {
+      
       throw new StoreException("Not implemented");
    }
 
@@ -181,8 +174,9 @@ public class GraphStoreAdministration
     * @throws StoreException If an error prevents the operation.
     * @throws PermissionException If the operation is not permitted.
     */
-   public IDeserializer deserializerForFilesSuffix(String suffix) throws StoreException, PermissionException
-   {
+   public IDeserializer deserializerForFilesSuffix(String suffix)
+      throws StoreException, PermissionException {
+      
       throw new StoreException("Not implemented");
    }
 
@@ -192,8 +186,9 @@ public class GraphStoreAdministration
     * @throws StoreException If an error prevents the operation.
     * @throws PermissionException If the operation is not permitted.
     */
-   public void registerSerializer(ISerializer serializer) throws StoreException, PermissionException
-   {
+   public void registerSerializer(ISerializer serializer)
+      throws StoreException, PermissionException {
+      
       throw new StoreException("Not implemented");
    }
 
@@ -203,8 +198,9 @@ public class GraphStoreAdministration
     * @throws StoreException If an error prevents the operation.
     * @throws PermissionException If the operation is not permitted.
     */
-   public void deregisterSerializer(ISerializer serializer) throws StoreException, PermissionException
-   {
+   public void deregisterSerializer(ISerializer serializer)
+      throws StoreException, PermissionException {
+      
       throw new StoreException("Not implemented");
    }
 
@@ -214,8 +210,9 @@ public class GraphStoreAdministration
     * @throws StoreException If an error prevents the operation.
     * @throws PermissionException If the operation is not permitted.
     */
-   public SerializationDescriptor[] getSerializerDescriptors() throws StoreException, PermissionException
-   {
+   public SerializationDescriptor[] getSerializerDescriptors()
+      throws StoreException, PermissionException {
+      
       throw new StoreException("Not implemented");
    }
    
@@ -226,8 +223,9 @@ public class GraphStoreAdministration
     * @throws StoreException If an error prevents the operation.
     * @throws PermissionException If the operation is not permitted.
     */
-   public ISerializer serializerForMimeType(String mimeType) throws StoreException, PermissionException
-   {
+   public ISerializer serializerForMimeType(String mimeType)
+      throws StoreException, PermissionException {
+      
       throw new StoreException("Not implemented");
    }
 
@@ -238,8 +236,9 @@ public class GraphStoreAdministration
     * @throws StoreException If an error prevents the operation.
     * @throws PermissionException If the operation is not permitted.
     */
-   public ISerializer serializerForFilesSuffix(String suffix) throws StoreException, PermissionException
-   {
+   public ISerializer serializerForFilesSuffix(String suffix)
+      throws StoreException, PermissionException {
+      
       throw new StoreException("Not implemented");
    }
 

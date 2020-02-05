@@ -196,6 +196,7 @@ public class MatchId {
     * @return A reference to this object.
     */
    public MatchId parseId(String matchId) {
+      
       String[] parts = matchId.split(";");
       graphId = parts[0];
       String intervalPart = null;

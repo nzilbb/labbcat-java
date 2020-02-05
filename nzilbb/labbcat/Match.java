@@ -30,8 +30,8 @@ import org.json.JSONObject;
  * @author Robert Fromont robert@fromont.net.nz
  */
 
-public class Match
-{
+public class Match {
+   
    // Attributes:
    
    /**
@@ -199,15 +199,14 @@ public class Match
    /**
     * Default constructor.
     */
-   public Match()
-   {
+   public Match() {      
    } // end of constructor
    
    /**
     * Constructor from JSON.
     */
-   public Match(JSONObject json)
-   {
+   public Match(JSONObject json) {
+      
       MatchId = json.optString("MatchId");
       Transcript = json.optString("Transcript");
       Participant = json.optString("Participant");
@@ -224,8 +223,8 @@ public class Match
     * String represtation for logging.
     * @return A string representation of the object.
     */
-   public String toString()
-   {
+   public String toString() {
+      
       return MatchId + ": [" + BeforeMatch + "] " + Text + " [" + AfterMatch + "]";
    } // end of toString()
 

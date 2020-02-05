@@ -36,8 +36,8 @@ import org.json.JSONObject;
  * @author Robert Fromont robert@fromont.net.nz
  */
 
-public class Response
-{
+public class Response {
+   
    // Attributes:
    
    /**
@@ -155,8 +155,7 @@ public class Response
    /**
     * Default constructor.
     */
-   public Response()
-   {
+   public Response() {
    } // end of constructor
 
    /**
@@ -164,14 +163,11 @@ public class Response
     * @param input The stream to read from.
     */
    public Response(InputStream input)
-      throws StoreException
-   {
-      try
-      {
+      throws StoreException {
+      
+      try {
          load(input);
-      }
-      catch(Exception exception)
-      {
+      } catch(Exception exception) {
          throw new StoreException(exception);
       }
    } // end of constructor
@@ -182,15 +178,12 @@ public class Response
     * @param verbose The verbosity setting to use.
     */
    public Response(InputStream input, boolean verbose)
-      throws StoreException
-   {
+      throws StoreException {
+      
       this.verbose = verbose;
-      try
-      {
+      try {
          load(input);
-      }
-      catch(Exception exception)
-      {
+      } catch(Exception exception) {
          throw new StoreException(exception);
       }
    } // end of constructor
@@ -201,48 +194,36 @@ public class Response
     * @param verbose The verbosity setting to use.
     */
    public Response(HttpURLConnection connection, boolean verbose)
-      throws StoreException
-   {
+      throws StoreException {
+      
       this.verbose = verbose;
-      try
-      {
+      try {
          httpStatus = connection.getResponseCode();
          if (verbose) System.out.println("HTTP status: " + connection.getResponseCode());
-      }
-      catch(IOException exception)
-      {
+      } catch(IOException exception) {
          throw new StoreException(exception);
       }
       if (httpStatus == HttpURLConnection.HTTP_OK)
       {
-         try
-         {
+         try {
             load(connection.getInputStream());
-         }
-         catch(Exception exception)
-         {
+         } catch(Exception exception) {
             throw new StoreException(exception);
          }
       }
       else
       {
-         if (verbose)
-         {
-            try
-            {
-               System.out.println("HTTP error: " + httpStatus + ": " + connection.getResponseMessage());
-            }
-            catch(IOException exception)
-            {
+         if (verbose) {
+            try {
+               System.out.println(
+                  "HTTP error: " + httpStatus + ": " + connection.getResponseMessage());
+            } catch(IOException exception) {
                System.out.println("HTTP error: " + httpStatus);
             }
          }
-         try
-         {
+         try {
             load(connection.getErrorStream());
-         }
-         catch(Exception exception)
-         {
+         } catch(Exception exception) {
             throw new StoreException(exception);
          }
       }
@@ -255,8 +236,7 @@ public class Response
     * @throws IOException, JSONException
     */
    public Response load(InputStream input)
-    throws IOException, JSONException
-   {
+    throws IOException, JSONException {
       return load(IO.InputStreamToString(input));
    } // end of load()
    
@@ -267,8 +247,8 @@ public class Response
     * @throws IOException, JSONException
     */
    public Response load(String text)
-    throws JSONException
-   {      
+    throws JSONException {
+      
       raw = text;
       if (verbose) System.out.println("raw: " + raw);
       JSONObject json = new JSONObject(raw);
@@ -285,10 +265,8 @@ public class Response
       
       JSONArray array = json.getJSONArray("messages");
       messages = new Vector<String>();
-      if (array != null)
-      {
-         for (int i = 0; i < array.length(); i++)
-         {
+      if (array != null) {
+         for (int i = 0; i < array.length(); i++) {
             if (verbose) System.out.println("messages["+i+"]: " + array.getString(i));
             messages.add(array.getString(i));
          }
@@ -296,10 +274,8 @@ public class Response
       
       array = json.getJSONArray("errors");
       errors = new Vector<String>();
-      if (array != null)
-      {
-         for (int i = 0; i < array.length(); i++)
-         {
+      if (array != null) {
+         for (int i = 0; i < array.length(); i++) {
             if (verbose) System.out.println("errors["+i+"]: " + array.getString(i));
             errors.add(array.getString(i));
          }
@@ -313,13 +289,11 @@ public class Response
     * @return A reference to this object,
     * @throws StoreException
     */
-   public Response checkForErrors()
-      throws ResponseException
-   {
+   public Response checkForErrors() throws ResponseException {
+      
       if ((errors != null && errors.size() > 0)
           || code > 0
-          || (httpStatus > 0 && httpStatus != HttpURLConnection.HTTP_OK))
-      {
+          || (httpStatus > 0 && httpStatus != HttpURLConnection.HTTP_OK)) {
          throw new ResponseException(this);
       }
       return this;
@@ -330,10 +304,8 @@ public class Response
     * Determines whether the model is null.
     * @return true if the model returned is null, false otherwise.
     */
-   public boolean isModelNull()
-   {
+   public boolean isModelNull() {
       return model == null || model.equals(null);
    } // end of isModelNull()
-
    
 } // end of class Response

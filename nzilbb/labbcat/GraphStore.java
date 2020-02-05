@@ -60,8 +60,7 @@ public class GraphStore
    /**
     * Default constructor.
     */
-   public GraphStore()
-   {
+   public GraphStore() {
    } // end of constructor
    
    /**
@@ -69,9 +68,7 @@ public class GraphStore
     * @param labbcatUrl The base URL of the LaBB-CAT server -
     * e.g. https://labbcat.canterbury.ac.nz/demo/
     */
-   public GraphStore(String labbcatUrl)
-      throws MalformedURLException
-   {
+   public GraphStore(String labbcatUrl) throws MalformedURLException {
       super(labbcatUrl);
    } // end of constructor
    
@@ -83,8 +80,7 @@ public class GraphStore
     * @param password LaBB-CAT password.
     */
    public GraphStore(String labbcatUrl, String username, String password)
-      throws MalformedURLException
-   {
+      throws MalformedURLException {
       super(labbcatUrl, username, password);
    } // end of constructor
    
@@ -93,8 +89,7 @@ public class GraphStore
     * @param labbcatUrl The base URL of the LaBB-CAT server -
     * e.g. https://labbcat.canterbury.ac.nz/demo/
     */
-   public GraphStore(URL labbcatUrl)
-   {
+   public GraphStore(URL labbcatUrl) {
       super(labbcatUrl);
    } // end of constructor
    
@@ -105,8 +100,7 @@ public class GraphStore
     * @param username LaBB-CAT username.
     * @param password LaBB-CAT password.
     */
-   public GraphStore(URL labbcatUrl, String username, String password)
-   {
+   public GraphStore(URL labbcatUrl, String username, String password) {
       super(labbcatUrl, username, password);
    } // end of constructor
 
@@ -116,15 +110,11 @@ public class GraphStore
     * @return A URL for the given resource.
     * @throws StoreException If the URL is malformed.
     */
-   public URL editUrl(String resource)
-      throws StoreException
-   {
-      try
-      {
+   public URL editUrl(String resource) throws StoreException {
+      
+      try {
          return new URL(new URL(labbcatUrl, "edit/store/"), resource);
-      }
-      catch(Throwable t)
-      {
+      } catch(Throwable t) {
          throw new StoreException("Could not construct request URL.", t);
       }
    } // end of editUrl()   
@@ -141,8 +131,7 @@ public class GraphStore
     * @throws GraphNotFoundException If the graph doesn't exist.
     */
    public boolean saveGraph(Graph graph)
-      throws StoreException, PermissionException, GraphNotFoundException
-   {
+      throws StoreException, PermissionException, GraphNotFoundException {
       throw new StoreException("Not implemented");
    }
 
@@ -164,10 +153,9 @@ public class GraphStore
     * @return The ID of the new annotation.
     */
    public String createAnnotation(String id, String fromId, String toId, String layerId, String label, Integer confidence, String parentId)
-      throws StoreException, PermissionException, GraphNotFoundException
-   {
-      try
-      {
+      throws StoreException, PermissionException, GraphNotFoundException {
+      
+      try {
          URL url = editUrl("createAnnotation");
          HttpRequestPost request = new HttpRequestPost(url, getRequiredHttpAuthorization())
             .setHeader("Accept", "application/json")
@@ -183,9 +171,7 @@ public class GraphStore
          response.checkForErrors(); // throws a StoreException on error
          if (response.isModelNull()) return null;
          return (String)response.getModel();
-      }
-      catch(IOException x)
-      {
+      } catch(IOException x) {
          throw new StoreException("Could not get response.", x);
       }
    }
@@ -196,10 +182,9 @@ public class GraphStore
     * @param annotationId The annotation's ID.
     */
    public void destroyAnnotation(String id, String annotationId)
-      throws StoreException, PermissionException, GraphNotFoundException
-   {
-      try
-      {
+      throws StoreException, PermissionException, GraphNotFoundException {
+      
+      try {
          URL url = editUrl("destroyAnnotation");
          HttpRequestPost request = new HttpRequestPost(url, getRequiredHttpAuthorization())
             .setHeader("Accept", "application/json")
@@ -208,9 +193,7 @@ public class GraphStore
          if (verbose) System.out.println("destroyAnnotation -> " + request);
          Response response = new Response(request.post().getInputStream(), verbose);
          response.checkForErrors(); // throws a StoreException on error
-      }
-      catch(IOException x)
-      {
+      } catch(IOException x) {
          throw new StoreException("Could not get response.", x);
       }
    }
@@ -224,8 +207,8 @@ public class GraphStore
     * @throws PermissionException If saving the participant is not permitted.
     */
    public boolean saveParticipant(Annotation participant)
-      throws StoreException, PermissionException
-   {
+      throws StoreException, PermissionException {
+      
       throw new StoreException("Not implemented");
    }
 
@@ -240,8 +223,8 @@ public class GraphStore
     * @throws GraphNotFoundException If the graph doesn't exist.
     */
    public void saveMedia(String id, String trackSuffix, String mediaUrl)
-      throws StoreException, PermissionException, GraphNotFoundException
-   {
+      throws StoreException, PermissionException, GraphNotFoundException {
+      
       throw new StoreException("Not implemented");
    }
 
@@ -254,8 +237,8 @@ public class GraphStore
     * @throws GraphNotFoundException If the graph doesn't exist.
     */
    public void saveSource(String id, String url)
-      throws StoreException, PermissionException, GraphNotFoundException
-   {
+      throws StoreException, PermissionException, GraphNotFoundException {
+      
       throw new StoreException("Not implemented");
    }
 
@@ -268,8 +251,8 @@ public class GraphStore
     * @throws GraphNotFoundException If the graph doesn't exist.
     */
    public void saveEpisodeDocument(String id, String url)
-      throws StoreException, PermissionException, GraphNotFoundException
-   {
+      throws StoreException, PermissionException, GraphNotFoundException {
+      
       throw new StoreException("Not implemented");
    }
 
@@ -281,10 +264,9 @@ public class GraphStore
     * @throws GraphNotFoundException If the graph doesn't exist.
     */
    public void deleteGraph(String id)
-      throws StoreException, PermissionException, GraphNotFoundException
-   {
-      try
-      {
+      throws StoreException, PermissionException, GraphNotFoundException {
+      
+      try {
          URL url = editUrl("deleteGraph");
          HttpRequestPost request = new HttpRequestPost(url, getRequiredHttpAuthorization())
             .setHeader("Accept", "application/json")
@@ -292,9 +274,7 @@ public class GraphStore
          if (verbose) System.out.println("deleteGraph -> " + request);
          Response response = new Response(request.post(), verbose);
          response.checkForErrors(); // throws a StoreException on error
-      }
-      catch(IOException x)
-      {
+      } catch(IOException x) {
          throw new StoreException("Could not get response.", x);
       }
    }

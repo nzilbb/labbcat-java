@@ -28,8 +28,8 @@ import org.json.JSONObject;
  * @author Robert Fromont robert@fromont.net.nz
  */
 
-public class TaskStatus
-{
+public class TaskStatus {
+   
    // Attributes:
 
    /**
@@ -190,15 +190,14 @@ public class TaskStatus
    /**
     * Default constructor.
     */
-   public TaskStatus()
-   {
+   public TaskStatus() {
    } // end of constructor
    
    /**
     * Constructor from JSON.
     */
-   public TaskStatus(JSONObject json)
-   {
+   public TaskStatus(JSONObject json) {
+      
       threadId = json.optString("threadId");
       threadName = json.optString("threadName");
       running = json.optBoolean("running");
@@ -214,8 +213,7 @@ public class TaskStatus
     * Represents the object as a String, for logging.
     * @return A string representation of the object.
     */
-   public String toString()
-   {
+   public String toString() {
       return "threadId: " + threadId + " ("+threadName+") status: " + status
          + " (" + percentComplete + "% "
          + (running?"running...)":"finished.)")
