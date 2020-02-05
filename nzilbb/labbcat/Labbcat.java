@@ -78,8 +78,8 @@ import org.json.JSONObject;
  */
 
 public class Labbcat
-   extends GraphStoreAdministration
-{
+   extends GraphStoreAdministration {
+   
    // Attributes:
    
    /** Current request, if any */
@@ -90,8 +90,7 @@ public class Labbcat
    /**
     * Default constructor.
     */
-   public Labbcat()
-   {
+   public Labbcat() {
    } // end of constructor
    
    /**
@@ -99,9 +98,7 @@ public class Labbcat
     * @param labbcatUrl The base URL of the LaBB-CAT server -
     * e.g. https://labbcat.canterbury.ac.nz/demo/
     */
-   public Labbcat(String labbcatUrl)
-      throws MalformedURLException
-   {
+   public Labbcat(String labbcatUrl) throws MalformedURLException {
       super(labbcatUrl);
    } // end of constructor
    
@@ -113,8 +110,8 @@ public class Labbcat
     * @param password LaBB-CAT password.
     */
    public Labbcat(String labbcatUrl, String username, String password)
-      throws MalformedURLException
-   {
+      throws MalformedURLException {
+      
       super(labbcatUrl, username, password);
    } // end of constructor
    
@@ -123,8 +120,7 @@ public class Labbcat
     * @param labbcatUrl The base URL of the LaBB-CAT server -
     * e.g. https://labbcat.canterbury.ac.nz/demo/
     */
-   public Labbcat(URL labbcatUrl)
-   {
+   public Labbcat(URL labbcatUrl) {
       super(labbcatUrl);
    } // end of constructor
    
@@ -135,8 +131,7 @@ public class Labbcat
     * @param username LaBB-CAT username.
     * @param password LaBB-CAT password.
     */
-   public Labbcat(URL labbcatUrl, String username, String password)
-   {
+   public Labbcat(URL labbcatUrl, String username, String password) {
       super(labbcatUrl, username, password);
    } // end of constructor
 
@@ -146,9 +141,7 @@ public class Labbcat
     * @return A URL for the given resource.
     * @throws StoreException If the URL is malformed.
     */
-   public URL makeUrl(String resource)
-      throws StoreException
-   {
+   public URL makeUrl(String resource) throws StoreException {
       try
       {
          return new URL(labbcatUrl, resource);
@@ -174,8 +167,8 @@ public class Labbcat
     * @throws ResponseException
     */
    public String newTranscript(File transcript, File[] media, String mediaSuffix, String transcriptType, String corpus, String episode)
-      throws IOException, StoreException
-   {
+      throws IOException, StoreException {
+      
       cancelling = false;
       URL url = makeUrl("edit/transcript/new");
       postRequest = new HttpRequestPostMultipart(url, getRequiredHttpAuthorization())
@@ -186,11 +179,9 @@ public class Labbcat
          .setParameter("corpus", corpus)
          .setParameter("episode", episode)
          .setParameter("uploadfile1_0", transcript);
-      if (media != null && media.length > 0)
-      {
+      if (media != null && media.length > 0) {
          if (mediaSuffix == null) mediaSuffix = "";
-         for (int f = 0; f < media.length; f++)
-         {
+         for (int f = 0; f < media.length; f++) {
             postRequest.setParameter("uploadmedia"+mediaSuffix+"1", media[f]);
          } // next file
       }
@@ -212,8 +203,8 @@ public class Labbcat
     * @throws ResponseException
     */
    public String updateTranscript(File transcript)
-      throws IOException, StoreException
-   {
+      throws IOException, StoreException {
+      
       cancelling = false;
       URL url = makeUrl("edit/transcript/new");
       postRequest = new HttpRequestPostMultipart(url, getRequiredHttpAuthorization())
@@ -239,8 +230,8 @@ public class Labbcat
     * @throws ResponseException
     */
    public TaskStatus taskStatus(String threadId)
-      throws IOException, StoreException
-   {
+      throws IOException, StoreException {
+      
       cancelling = false;
       URL url = makeUrl("thread");
       HttpRequestGet request = new HttpRequestGet(url, getRequiredHttpAuthorization())
@@ -262,27 +253,24 @@ public class Labbcat
     * @throws StoreException
     */
    public TaskStatus waitForTask(String threadId, int maxSeconds)
-    throws IOException, StoreException
-   {
+    throws IOException, StoreException {
+      
       cancelling = false;
       TaskStatus status = taskStatus(threadId);
       
       long endTime = 0;
       if (maxSeconds > 0) endTime = new Date().getTime() + (maxSeconds * 1000);
       
-      while (status.getRunning() && !cancelling)
-      {
+      while (status.getRunning() && !cancelling) {
          long ms = status.getRefreshSeconds() * 1000;
          if (ms <= 0) ms = 2000;
          try { Thread.sleep(ms); } catch(Exception exception) {}
          
-         if (endTime > 0 && new Date().getTime() > endTime)
-         { // is time up?
+         if (endTime > 0 && new Date().getTime() > endTime) { // is time up?
             cancelling = true;
          }
          
-         if (!cancelling)
-         { // are we stopping now?
+         if (!cancelling) { // are we stopping now?
             status = taskStatus(threadId);
          }
       } // loop
@@ -295,9 +283,8 @@ public class Labbcat
     * @throws IOException
     * @throws StoreException
     */
-   public void cancelTask(String threadId)
-    throws IOException, StoreException
-   {
+   public void cancelTask(String threadId) throws IOException, StoreException {
+      
       cancelling = false;
       URL url = makeUrl("threads");
       HttpRequestGet request = new HttpRequestGet(url, getRequiredHttpAuthorization())
@@ -315,9 +302,8 @@ public class Labbcat
     * @throws IOException
     * @throws StoreException
     */
-   public void releaseTask(String threadId)
-    throws IOException, StoreException
-   {
+   public void releaseTask(String threadId) throws IOException, StoreException {
+      
       cancelling = false;
       URL url = makeUrl("threads");
       HttpRequestGet request = new HttpRequestGet(url, getRequiredHttpAuthorization())
@@ -335,9 +321,8 @@ public class Labbcat
     * @throws IOException
     * @throws StoreException
     */
-   public Map<String,TaskStatus> getTasks()
-      throws IOException, StoreException
-   {
+   public Map<String,TaskStatus> getTasks() throws IOException, StoreException {
+      
       cancelling = false;
       URL url = makeUrl("threads");
       HttpRequestGet request = new HttpRequestGet(url, getRequiredHttpAuthorization())
@@ -348,8 +333,7 @@ public class Labbcat
       if (response.isModelNull()) return null;
       JSONObject model = (JSONObject)response.getModel();
       HashMap<String,TaskStatus> result = new HashMap<String,TaskStatus>();
-      for (String threadId : model.keySet())
-      {
+      for (String threadId : model.keySet()) {
          result.put(threadId,
                     new TaskStatus(model.getJSONObject(threadId)));
       } // next task
@@ -360,8 +344,8 @@ public class Labbcat
    /**
     * Cancel the current request, if possible.
     */
-   public void cancel()
-   {
+   public void cancel() {
+      
       cancelling = true;
       if (postRequest != null)
       {
@@ -373,8 +357,8 @@ public class Labbcat
     * Determines whether or not the request is being cancelled.
     * @return true, if the last request has been asked to cancel, false otherwise
     */
-   public boolean isCancelling()
-   {
+   public boolean isCancelling() {
+      
       if (postRequest == null)
       {
 	 return cancelling;
@@ -467,8 +451,8 @@ public class Labbcat
     * @throws StoreException
     */
    public String search(JSONObject pattern, String[] participantIds, boolean mainParticipant)
-    throws IOException, StoreException
-   {
+    throws IOException, StoreException {
+      
       cancelling = false;
       if (pattern == null) throw new StoreException("No pattern specified.");
       URL url = makeUrl("search");
@@ -507,8 +491,8 @@ public class Labbcat
     * @see #search(JSONObject,String[],boolean)}
     */
    public Match[] getMatches(String threadId, int wordsContext)
-    throws IOException, StoreException
-   {
+      throws IOException, StoreException {
+      
       // ensure it's finished
       waitForTask(threadId, 0);
       if (cancelling == true) return null;
@@ -575,15 +559,12 @@ public class Labbcat
     * @see #getMatches(JSONObject,String[],boolean)}
     */
    public Match[] getMatches(JSONObject pattern, String[] participantIds, boolean mainParticipant, int wordsContext)
-    throws IOException, StoreException
-   {
+    throws IOException, StoreException {
+      
       String threadId = search(pattern, participantIds, mainParticipant);
-      try
-      {
+      try {
          return  getMatches(threadId, wordsContext);
-      }
-      finally
-      { // release the task to save server resources
+      } finally { // release the task to save server resources
          try { releaseTask(threadId); } catch(Exception exception) {}
       }
    }
@@ -612,8 +593,8 @@ public class Labbcat
     * @see #getMatches(JSONObject,String[],boolean)
     */
    public Annotation[][] getMatchAnnotations(Match[] matches, String[] layerIds, int targetOffset, int annotationsPerLayer)
-      throws IOException, StoreException
-   {
+      throws IOException, StoreException {
+      
       String[] matchIds = new String[matches.length];
       for (int m = 0; m < matches.length; m++) matchIds[m] = matches[m].getMatchId();
       return getMatchAnnotations(matchIds, layerIds, targetOffset, annotationsPerLayer);
@@ -643,14 +624,13 @@ public class Labbcat
     * @see #getMatches(JSONObject,String[],boolean)}
     */
    public Annotation[][] getMatchAnnotations(String[] matchIds, String[] layerIds, int targetOffset, int annotationsPerLayer)
-      throws IOException, StoreException
-   {
+      throws IOException, StoreException {
+      
       cancelling = false;
 
       // write the IDs to a temporary file for upload
       File csvUpload = File.createTempFile("getMatchAnnotations_",".csv");
-      try
-      {
+      try {
          csvUpload.deleteOnExit();
          PrintWriter csvOut = new PrintWriter(csvUpload, "UTF-8");
          csvOut.println("MatchId");
@@ -676,8 +656,7 @@ public class Labbcat
          JSONArray model = (JSONArray)response.getModel();
          int annotationsPerMatch = layerIds.length*annotationsPerLayer;
          Annotation[][] result = new Annotation[matchIds.length][annotationsPerMatch];
-         for (int m = 0; m < matchIds.length; m++)
-         {
+         for (int m = 0; m < matchIds.length; m++) {
             JSONArray annotations = model.getJSONArray(m);
             for (int a = 0; a < annotationsPerMatch; a++)
             {
@@ -690,16 +669,12 @@ public class Labbcat
             } // next annotation
          } // next match
          return result;
-      }
-      finally
-      {
+      } finally {
          // delete temporary file
          csvUpload.delete();
       }
    } // end of getMatchIds()
 
-   // TODO String getSoundFragments(id, start, end, sampleRate = NULL)
-   
    // TODO getFragments(id, start, end, layerIds, mimeType = "text/praat-textgrid")
 
    /**
