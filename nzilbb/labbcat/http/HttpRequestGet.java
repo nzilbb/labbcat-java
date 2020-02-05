@@ -32,8 +32,8 @@ import java.util.*;
  * @author Robert Fromont robert@fromont.net.nz
  */
 
-public class HttpRequestGet
-{
+public class HttpRequestGet {
+   
    // Attributes:
    
    /**
@@ -51,8 +51,8 @@ public class HttpRequestGet
     * Setter for {@link #urlBaseUrl}: Base URL for the request
     * @param urlNewBaseUrl Base URL for the request
     */
-   public HttpRequestGet setBaseUrl(URL urlNewBaseUrl) 
-   { 
+   public HttpRequestGet setBaseUrl(URL urlNewBaseUrl) {
+      
       urlBaseUrl = urlNewBaseUrl; 
       // double-check there's a cookie handler
       if (CookieHandler.getDefault() == null)
@@ -118,8 +118,7 @@ public class HttpRequestGet
    /**
     * Constructor
     */
-   public HttpRequestGet(URL baseUrl)
-   {
+   public HttpRequestGet(URL baseUrl) {
       setBaseUrl(baseUrl);
    } // end of constructor
    
@@ -127,16 +126,14 @@ public class HttpRequestGet
     * Constructor
     */
    public HttpRequestGet(String baseUrl)
-      throws MalformedURLException
-   {
+      throws MalformedURLException {
       setBaseUrl(new URL(baseUrl));
    } // end of constructor
    
    /**
     * Constructor
     */
-   public HttpRequestGet(URL baseUrl, String authorization)
-   {
+   public HttpRequestGet(URL baseUrl, String authorization) {
       setBaseUrl(baseUrl);
       setAuthorization(authorization);
    } // end of constructor
@@ -145,8 +142,7 @@ public class HttpRequestGet
     * Constructor
     */
    public HttpRequestGet(String baseUrl, String authorization)
-      throws MalformedURLException
-   {
+      throws MalformedURLException {
       setBaseUrl(new URL(baseUrl));
       setAuthorization(authorization);
    } // end of constructor
@@ -156,8 +152,8 @@ public class HttpRequestGet
     * @param sParameter
     * @param oValue
     */
-   public HttpRequestGet setParameter(String sParameter, Object oValue)
-   {
+   public HttpRequestGet setParameter(String sParameter, Object oValue) {
+      
       mParameters.put(sParameter, oValue);
       return this;
    } // end of setParameter()
@@ -167,8 +163,8 @@ public class HttpRequestGet
     * @param sKey
     * @param sValue
     */
-   public HttpRequestGet setHeader(String sKey, String sValue)
-   {
+   public HttpRequestGet setHeader(String sKey, String sValue) {
+      
       mHeaders.put(sKey, sValue);
       return this;
    } // end of setParameter()   
@@ -179,20 +175,17 @@ public class HttpRequestGet
     * @throws IOException
     * @throws MalformedURLException
     */
-   public HttpURLConnection getConnection()
-      throws IOException, MalformedURLException
-   {
+   public HttpURLConnection getConnection() throws IOException, MalformedURLException {
+      
       String sBase = getBaseUrl().toString();
       String sQueryString = getQueryString();
       
       URLConnection connection = new URL(sBase + sQueryString).openConnection();
       connection.setUseCaches(false);
-      for (String sKey: mHeaders.keySet())
-      {
+      for (String sKey: mHeaders.keySet()) {
          connection.setRequestProperty(sKey, mHeaders.get(sKey));
       } // next header
-      if (sAuthorization != null)
-      {
+      if (sAuthorization != null) {
          connection.setRequestProperty("Authorization", sAuthorization);
       }
       return (HttpURLConnection)connection;
@@ -203,35 +196,28 @@ public class HttpRequestGet
     * Generates the query string.
     * @return The query string.
     */
-   public String getQueryString()
-      throws UnsupportedEncodingException
-   {
+   public String getQueryString() throws UnsupportedEncodingException {
+      
       String sBase = getBaseUrl().toString();
       StringBuilder sQueryString = new StringBuilder();
       String sParameterPrefix = "?";
       if (sBase.indexOf('?') >= 0) sParameterPrefix = "&";
-      for (String sParameter : mParameters.keySet())
-      {
+      for (String sParameter : mParameters.keySet()) {
          Object o = mParameters.get(sParameter);
-         if (o.getClass().isArray())
-         {
+         if (o.getClass().isArray()) {
             o = Arrays.asList((Object[])o);
          }
-         if (o instanceof Iterable)
-         {
+         if (o instanceof Iterable) {
             @SuppressWarnings("rawtypes")
 	       Iterator i = ((Iterable)o).iterator();
-            while (i.hasNext())
-            {
+            while (i.hasNext()) {
                sQueryString.append(sParameterPrefix)
                   .append(URLEncoder.encode(sParameter, "UTF8"))
                   .append("=")
                   .append(URLEncoder.encode(i.next().toString(), "UTF8"));
                sParameterPrefix = "&";
             }
-         }
-         else
-         {
+         } else {
             sQueryString.append(sParameterPrefix)
                .append(URLEncoder.encode(sParameter, "UTF8"))
                .append("=")
@@ -250,8 +236,8 @@ public class HttpRequestGet
     * @throws MalformedURLException
     */
    public HttpURLConnection get()
-      throws IOException, MalformedURLException
-   {
+      throws IOException, MalformedURLException {
+      
       return getConnection();
    } // end of get()
    
@@ -259,17 +245,13 @@ public class HttpRequestGet
     * String representation of the request, for logging.
     * @return A String representation of the request, for logging.
     */
-   public String toString()
-   {
-      try
-      {
+   public String toString() {
+      
+      try {
          return "GET " + getBaseUrl() + getQueryString();
-      }
-      catch(UnsupportedEncodingException exception)
-      {
+      } catch(UnsupportedEncodingException exception) {
          return "GET " + getBaseUrl() + " " + mParameters;
       }
    } // end of toString()
-
 
 } // end of class HttpRequestGet

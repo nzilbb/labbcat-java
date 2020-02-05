@@ -40,8 +40,8 @@ import java.util.Iterator;
  * <p>Originally com.myjavatools.web.ClientHttpRequest (version 1.0) by Vlad Patryshev</p>
  * <p>Adapted for LaBB-CAT by Robert Fromont</p>
  */
-public class HttpRequestPostMultipart 
-{
+public class HttpRequestPostMultipart {
+   
    protected HttpURLConnection connection;
    protected OutputStream os = null;
    protected Map<String,String> cookies = new HashMap<String,String>();
@@ -54,8 +54,8 @@ public class HttpRequestPostMultipart
     * @param sKey
     * @param sValue
     */
-   public HttpRequestPostMultipart setHeader(String sKey, String sValue)
-   {
+   public HttpRequestPostMultipart setHeader(String sKey, String sValue) {
+      
       connection.setRequestProperty(sKey, sValue);
       return this;
    } // end of setHeader()
@@ -67,53 +67,49 @@ public class HttpRequestPostMultipart
     * Determines whether or not the request is being cancelled.
     * @return true, if the last request has been asked to cancel, false otherwise
     */
-   public boolean isCancelling()
-   {
+   public boolean isCancelling() {
+      
       return bCancelling;
    } // end of isCancelling()
    
    /**
     * Cancel the current request
     */
-   public void cancel()
-   {
+   public void cancel() {
       bCancelling = true;
    } // end of cancel()
    
-   protected void connect() throws IOException 
-   {
-      if (os == null)
-      {
+   protected void connect() throws IOException {
+      if (os == null) {
          os = connection.getOutputStream();
       }
       // check whether we are cancelling here, as this method is called
       // before every write	
-      if (bCancelling)
-      {
+      if (bCancelling) {
          throw new RequestCancelledException(this);
       }
    }
    
-   protected void write(char c) throws IOException 
-   {
+   protected void write(char c) throws IOException {
+      
       connect();
       os.write(c);
    }
    
-   protected void write(String s) throws IOException 
-   {
+   protected void write(String s) throws IOException {
+      
       connect();
       os.write(s.getBytes());
    }
    
-   protected void newline() throws IOException 
-   {
+   protected void newline() throws IOException {
+      
       connect();
       write("\r\n");
    }
    
-   protected void writeln(String s) throws IOException 
-   {
+   protected void writeln(String s) throws IOException {
+      
       connect();
       write(s);
       newline();
@@ -121,15 +117,15 @@ public class HttpRequestPostMultipart
    
    private static Random random = new Random();
    
-   protected static String randomString() 
-   {
+   protected static String randomString() {
+      
       return Long.toString(random.nextLong(), 36);
    }
    
    String boundary = "---------------------------" + randomString() + randomString() + randomString();
    
-   private void boundary() throws IOException 
-   {
+   private void boundary() throws IOException {
+      
       write("--");
       write(boundary);
    }
@@ -141,12 +137,11 @@ public class HttpRequestPostMultipart
     * @param sAuthorization Authorisation string or null if none is required
     * @throws IOException
     */
-   public HttpRequestPostMultipart(HttpURLConnection connection, String sAuthorization) throws IOException 
-   {
+   public HttpRequestPostMultipart(HttpURLConnection connection, String sAuthorization) throws IOException {
+      
       this.connection = connection;
       connection.setUseCaches(false);
-      if (sAuthorization != null)
-      {
+      if (sAuthorization != null) {
          connection.setRequestProperty(
             "Authorization", sAuthorization);
       }
@@ -163,8 +158,8 @@ public class HttpRequestPostMultipart
     * @param sAuthorization Authorisation string or null if none is required
     * @throws IOException
     */
-   public HttpRequestPostMultipart(URL url, String sAuthorization) throws IOException 
-   {
+   public HttpRequestPostMultipart(URL url, String sAuthorization) throws IOException {
+      
       this((HttpURLConnection)url.openConnection(), sAuthorization);
    }
    
@@ -174,14 +169,14 @@ public class HttpRequestPostMultipart
     * @param urlString the string representation of the URL to send request to
     * @throws IOException
     */
-   public HttpRequestPostMultipart(String urlString, String sAuthorization) throws IOException 
-   {
+   public HttpRequestPostMultipart(String urlString, String sAuthorization) throws IOException {
+      
       this(new URL(urlString), sAuthorization);
    }
    
    @SuppressWarnings("rawtypes")
-   private void postCookies() 
-   {
+   private void postCookies() {
+      
       StringBuffer cookieList = new StringBuffer();
       
       for (Iterator i = cookies.entrySet().iterator(); i.hasNext();) 
@@ -206,8 +201,8 @@ public class HttpRequestPostMultipart
     * @param value cookie value
     * @throws IOException
     */
-   public void setCookie(String name, String value) throws IOException 
-   {
+   public void setCookie(String name, String value) throws IOException {
+      
       cookies.put(name, value);
    }
    
@@ -216,8 +211,8 @@ public class HttpRequestPostMultipart
     * @param cookies the cookie "name-to-value" map
     * @throws IOException
     */
-   public void setCookies(Map<String,String> cookies) throws IOException 
-   {
+   public void setCookies(Map<String,String> cookies) throws IOException {
+      
       if (cookies == null) return;
       this.cookies.putAll(cookies);
    }
@@ -228,8 +223,8 @@ public class HttpRequestPostMultipart
     * + 1] is a value) 
     * @throws IOException
     */
-   public void setCookies(String[] cookies) throws IOException 
-   {
+   public void setCookies(String[] cookies) throws IOException {
+      
       if (cookies == null) return;
       for (int i = 0; i < cookies.length - 1; i+=2) 
       {
@@ -237,8 +232,8 @@ public class HttpRequestPostMultipart
       }
    }
    
-   private void writeName(String name) throws IOException 
-   {
+   private void writeName(String name) throws IOException {
+      
       newline();
       write("Content-Disposition: form-data; name=\"");
       write(name);
@@ -251,8 +246,8 @@ public class HttpRequestPostMultipart
     * @param value parameter value
     * @throws IOException
     */
-   public HttpRequestPostMultipart setParameter(String name, String value) throws IOException 
-   {
+   public HttpRequestPostMultipart setParameter(String name, String value) throws IOException {
+      
       if (value == null) return this; //20100520 robert.fromont@canterbury.ac.nz 
       boundary();
       writeName(name);
@@ -263,17 +258,15 @@ public class HttpRequestPostMultipart
       return this;
    }
    
-   private void pipe(InputStream in, OutputStream out) throws IOException 
-   {
+   private void pipe(InputStream in, OutputStream out) throws IOException {
+      
       //20100521 robert.fromont@canterbury.ac.nz smaller buffer to conserve memory
       byte[] buf = new byte[1024]; 
       int nread;
       int navailable;
       int total = 0;
-      synchronized (in) 
-      {
-         while((nread = in.read(buf, 0, buf.length)) >= 0)
-         {
+      synchronized (in) {
+         while((nread = in.read(buf, 0, buf.length)) >= 0) {
             //20110221 robert.fromont@canterbury.ac.nz added cancelability
             if(bCancelling) throw new RequestCancelledException(this);
             
@@ -292,10 +285,9 @@ public class HttpRequestPostMultipart
     * @param is input stream to read the contents of the file from
     * @throws IOException
     */
-   public HttpRequestPostMultipart setParameter(String name, String filename, InputStream is) throws IOException 
-   {
-      try
-      {
+   public HttpRequestPostMultipart setParameter(String name, String filename, InputStream is) throws IOException {
+      
+      try {
          boundary();
          writeName(name);
          write("; filename=\"");
@@ -311,9 +303,7 @@ public class HttpRequestPostMultipart
          newline();
          // for toString:
          body.append(name).append(" = file (").append(filename).append(") ");
-      }
-      finally
-      {
+      } finally {
          is.close();  //20100521 robert.fromont@canterbury.ac.nz
       }
       return this;
@@ -325,8 +315,8 @@ public class HttpRequestPostMultipart
     * @param file the file to upload
     * @throws IOException
     */
-   public HttpRequestPostMultipart setParameter(String name, File file) throws IOException 
-   {
+   public HttpRequestPostMultipart setParameter(String name, File file) throws IOException {
+      
       if (file == null) return this; //20100520 robert.fromont@canterbury.ac.nz 
       setParameter(name, file.getPath(), new FileInputStream(file));
       return this;
@@ -339,28 +329,22 @@ public class HttpRequestPostMultipart
     * @param object parameter value, a File or anything else that can be stringified
     * @throws IOException
     */
-   public HttpRequestPostMultipart setParameter(String name, Object object) throws IOException 
-   {
+   public HttpRequestPostMultipart setParameter(String name, Object object) throws IOException {
+      
       if (object == null) return this; //20100520 robert.fromont@canterbury.ac.nz 
-      if (object.getClass().isArray())
-      {
+      if (object.getClass().isArray()) {
          object = Arrays.asList((Object[])object);
       }
-      if (object instanceof File) 
-      {
+      if (object instanceof File) {
          setParameter(name, (File) object);
       } 
-      else if (object instanceof Iterable) 
-      {
+      else if (object instanceof Iterable) {
          @SuppressWarnings("rawtypes")
 	    Iterator i = ((Iterable)object).iterator();
-         while (i.hasNext())
-         {
+         while (i.hasNext()) {
             setParameter(name, i.next().toString());
          }
-      } 
-      else 
-      {
+      } else {
          setParameter(name, object.toString());
       }
       return this;
@@ -373,11 +357,10 @@ public class HttpRequestPostMultipart
     * @throws IOException
     */
    @SuppressWarnings("rawtypes")
-   public HttpRequestPostMultipart setParameters(Map<String,String> parameters) throws IOException 
-   {
+   public HttpRequestPostMultipart setParameters(Map<String,String> parameters) throws IOException {
+      
       if (parameters == null) return this;
-      for (Iterator i = parameters.entrySet().iterator(); i.hasNext();) 
-      {
+      for (Iterator i = parameters.entrySet().iterator(); i.hasNext();) {
          Map.Entry entry = (Map.Entry)i.next();
          setParameter(entry.getKey().toString(), entry.getValue());
       }
@@ -391,11 +374,10 @@ public class HttpRequestPostMultipart
     * otherwise it is stringified and sent in the request 
     * @throws IOException
     */
-   public HttpRequestPostMultipart setParameters(Object[] parameters) throws IOException 
-   {
+   public HttpRequestPostMultipart setParameters(Object[] parameters) throws IOException {
+      
       if (parameters == null) return this;
-      for (int i = 0; i < parameters.length - 1; i+=2) 
-      {
+      for (int i = 0; i < parameters.length - 1; i+=2) {
          setParameter(parameters[i].toString(), parameters[i+1]);
       }
       return this;
@@ -406,8 +388,8 @@ public class HttpRequestPostMultipart
     * @return input stream with the server response
     * @throws IOException
     */
-   public HttpURLConnection post() throws IOException 
-   {
+   public HttpURLConnection post() throws IOException {
+      
       boundary();
       writeln("--");
       os.close();
@@ -422,8 +404,8 @@ public class HttpRequestPostMultipart
     * @throws IOException
     * @see #setParameters
     */
-   public HttpURLConnection post(Map<String,String> parameters) throws IOException 
-   {
+   public HttpURLConnection post(Map<String,String> parameters) throws IOException {
+      
       setParameters(parameters);
       return post();
    }
@@ -436,8 +418,8 @@ public class HttpRequestPostMultipart
     * @throws IOException
     * @see #setParameters
     */
-   public HttpURLConnection post(Object[] parameters) throws IOException 
-   {
+   public HttpURLConnection post(Object[] parameters) throws IOException {
+      
       setParameters(parameters);
       return post();
    }
@@ -453,8 +435,8 @@ public class HttpRequestPostMultipart
     * @see #setParameters
     * @see #setCookies
     */
-   public HttpURLConnection post(Map<String,String> cookies, Map<String,String> parameters) throws IOException 
-   {
+   public HttpURLConnection post(Map<String,String> cookies, Map<String,String> parameters) throws IOException {
+      
       setCookies(cookies);
       setParameters(parameters);
       return post();
@@ -471,8 +453,8 @@ public class HttpRequestPostMultipart
     * @see #setParameters
     * @see #setCookies
     */
-   public HttpURLConnection post(String[] cookies, Object[] parameters) throws IOException 
-   {
+   public HttpURLConnection post(String[] cookies, Object[] parameters) throws IOException {
+      
       setCookies(cookies);
       setParameters(parameters);
       return post();
@@ -486,8 +468,8 @@ public class HttpRequestPostMultipart
     * @throws IOException
     * @see #setParameter
     */
-   public HttpURLConnection post(String name, Object value) throws IOException 
-   {
+   public HttpURLConnection post(String name, Object value) throws IOException {
+      
       setParameter(name, value);
       return post();
    }
@@ -502,8 +484,8 @@ public class HttpRequestPostMultipart
     * @throws IOException
     * @see #setParameter
     */
-   public HttpURLConnection post(String name1, Object value1, String name2, Object value2) throws IOException 
-   {
+   public HttpURLConnection post(String name1, Object value1, String name2, Object value2) throws IOException {
+      
       setParameter(name1, value1);
       return post(name2, value2);
    }
@@ -520,8 +502,8 @@ public class HttpRequestPostMultipart
     * @throws IOException
     * @see #setParameter
     */
-   public HttpURLConnection post(String name1, Object value1, String name2, Object value2, String name3, Object value3) throws IOException 
-   {
+   public HttpURLConnection post(String name1, Object value1, String name2, Object value2, String name3, Object value3) throws IOException {
+      
       setParameter(name1, value1);
       return post(name2, value2, name3, value3);
    }
@@ -540,8 +522,8 @@ public class HttpRequestPostMultipart
     * @throws IOException
     * @see #setParameter
     */
-   public HttpURLConnection post(String name1, Object value1, String name2, Object value2, String name3, Object value3, String name4, Object value4) throws IOException 
-   {
+   public HttpURLConnection post(String name1, Object value1, String name2, Object value2, String name3, Object value3, String name4, Object value4) throws IOException {
+      
       setParameter(name1, value1);
       return post(name2, value2, name3, value3, name4, value4);
    }
@@ -553,8 +535,8 @@ public class HttpRequestPostMultipart
     * @throws IOException
     * @see #setParameters
     */
-   public static HttpURLConnection post(URL url, String sAuthorization, Map<String,String> parameters) throws IOException 
-   {
+   public static HttpURLConnection post(URL url, String sAuthorization, Map<String,String> parameters) throws IOException {
+      
       return new HttpRequestPostMultipart(url, sAuthorization).post(parameters);
    }
    
@@ -565,8 +547,8 @@ public class HttpRequestPostMultipart
     * @throws IOException
     * @see #setParameters
     */
-   public static HttpURLConnection post(URL url, String sAuthorization, Object[] parameters) throws IOException 
-   {
+   public static HttpURLConnection post(URL url, String sAuthorization, Object[] parameters) throws IOException {
+      
       return new HttpRequestPostMultipart(url, sAuthorization).post(parameters);
    }
    
@@ -579,8 +561,8 @@ public class HttpRequestPostMultipart
     * @see #setCookies
     * @see #setParameters
     */
-   public static HttpURLConnection post(URL url, String sAuthorization, Map<String,String> cookies, Map<String,String> parameters) throws IOException 
-   {
+   public static HttpURLConnection post(URL url, String sAuthorization, Map<String,String> cookies, Map<String,String> parameters) throws IOException {
+      
       return new HttpRequestPostMultipart(url, sAuthorization).post(cookies, parameters);
    }
    
@@ -593,8 +575,8 @@ public class HttpRequestPostMultipart
     * @see #setCookies
     * @see #setParameters
     */
-   public static HttpURLConnection post(URL url, String sAuthorization, String[] cookies, Object[] parameters) throws IOException 
-   {
+   public static HttpURLConnection post(URL url, String sAuthorization, String[] cookies, Object[] parameters) throws IOException {
+      
       return new HttpRequestPostMultipart(url, sAuthorization).post(cookies, parameters);
    }
    
@@ -606,8 +588,8 @@ public class HttpRequestPostMultipart
     * @throws IOException
     * @see #setParameter
     */
-   public static HttpURLConnection post(URL url, String sAuthorization, String name1, Object value1) throws IOException 
-   {
+   public static HttpURLConnection post(URL url, String sAuthorization, String name1, Object value1) throws IOException {
+      
       return new HttpRequestPostMultipart(url, sAuthorization).post(name1, value1);
    }
    
@@ -621,8 +603,8 @@ public class HttpRequestPostMultipart
     * @throws IOException
     * @see #setParameter
     */
-   public static HttpURLConnection post(URL url, String sAuthorization, String name1, Object value1, String name2, Object value2) throws IOException 
-   {
+   public static HttpURLConnection post(URL url, String sAuthorization, String name1, Object value1, String name2, Object value2) throws IOException {
+      
       return new HttpRequestPostMultipart(url, sAuthorization).post(name1, value1, name2, value2);
    }
    
@@ -638,8 +620,8 @@ public class HttpRequestPostMultipart
     * @throws IOException
     * @see #setParameter
     */
-   public static HttpURLConnection post(URL url, String sAuthorization, String name1, Object value1, String name2, Object value2, String name3, Object value3) throws IOException 
-   {
+   public static HttpURLConnection post(URL url, String sAuthorization, String name1, Object value1, String name2, Object value2, String name3, Object value3) throws IOException {
+      
       return new HttpRequestPostMultipart(url, sAuthorization).post(name1, value1, name2, value2, name3, value3);
    }
    
@@ -657,8 +639,8 @@ public class HttpRequestPostMultipart
     * @throws IOException
     * @see #setParameter
     */
-   public static HttpURLConnection post(URL url, String sAuthorization, String name1, Object value1, String name2, Object value2, String name3, Object value3, String name4, Object value4) throws IOException 
-   {
+   public static HttpURLConnection post(URL url, String sAuthorization, String name1, Object value1, String name2, Object value2, String name3, Object value3, String name4, Object value4) throws IOException {
+      
       return new HttpRequestPostMultipart(url, sAuthorization).post(name1, value1, name2, value2, name3, value3, name4, value4);
    }
    
@@ -666,8 +648,7 @@ public class HttpRequestPostMultipart
     * String representation of the request, for logging.
     * @return A String representation of the request, for logging.
     */
-   public String toString()
-   {
+   public String toString() {
       return "POST " + url + " : " + body;
    } // end of toString()
 }

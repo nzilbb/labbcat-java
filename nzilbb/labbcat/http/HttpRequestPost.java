@@ -41,8 +41,8 @@ import java.util.Iterator;
  * <p>Originally com.myjavatools.web.ClientHttpRequest (version 1.0) by Vlad Patryshev</p>
  * <p>Adapted for LaBB-CAT by Robert Fromont</p>
  */
-public class HttpRequestPost
-{
+public class HttpRequestPost {
+   
    protected HttpURLConnection connection;
    protected OutputStream os = null;
    protected Map<String,String> cookies = new HashMap<String,String>();
@@ -58,42 +58,41 @@ public class HttpRequestPost
     * @param sKey
     * @param sValue
     */
-   public HttpRequestPost setHeader(String sKey, String sValue)
-   {
+   public HttpRequestPost setHeader(String sKey, String sValue) {
+      
       connection.setRequestProperty(sKey, sValue);
       return this;
    } // end of setHeader()
    
-   protected void connect() throws IOException 
-   {
-      if (os == null)
-      {
+   protected void connect() throws IOException {
+      
+      if (os == null) {
          os = connection.getOutputStream();
       }
    }
    
-   protected void write(char c) throws IOException 
-   {
+   protected void write(char c) throws IOException {
+      
       connect();
       os.write(c);
    }
    
-   protected void write(String s) throws IOException 
-   {
+   protected void write(String s) throws IOException {
+      
       body.append(s);
       connect();
       os.write(s.getBytes());
    }
    
-   protected void newline() throws IOException 
-   {
+   protected void newline() throws IOException {
+      
       body.append("\n");
       connect();
       write("\r\n");
    }
    
-   protected void writeln(String s) throws IOException 
-   {
+   protected void writeln(String s) throws IOException {
+      
       connect();
       write(s);
       newline();
@@ -106,12 +105,11 @@ public class HttpRequestPost
     * @param sAuthorization Authorisation string or null if none is required
     * @throws IOException
     */
-   public HttpRequestPost(HttpURLConnection connection, String sAuthorization) throws IOException 
-   {
+   public HttpRequestPost(HttpURLConnection connection, String sAuthorization) throws IOException {
+      
       this.connection = connection;
       connection.setUseCaches(false);
-      if (sAuthorization != null)
-      {
+      if (sAuthorization != null) {
          connection.setRequestProperty(
             "Authorization", sAuthorization);
       }
@@ -126,8 +124,8 @@ public class HttpRequestPost
     * @param sAuthorization Authorisation string or null if none is required
     * @throws IOException
     */
-   public HttpRequestPost(URL url, String sAuthorization) throws IOException 
-   {
+   public HttpRequestPost(URL url, String sAuthorization) throws IOException {
+      
       this((HttpURLConnection)url.openConnection(), sAuthorization);
       this.url = url.toString();
    }
@@ -138,29 +136,26 @@ public class HttpRequestPost
     * @param urlString the string representation of the URL to send request to
     * @throws IOException
     */
-   public HttpRequestPost(String urlString, String sAuthorization) throws IOException 
-   {
+   public HttpRequestPost(String urlString, String sAuthorization) throws IOException {
+      
       this(new URL(urlString), sAuthorization);
       url = urlString;
    }
       
    @SuppressWarnings("rawtypes")
-   private void postCookies() 
-   {
+   private void postCookies() {
+      
       StringBuffer cookieList = new StringBuffer();
       
-      for (Iterator i = cookies.entrySet().iterator(); i.hasNext();) 
-      {
+      for (Iterator i = cookies.entrySet().iterator(); i.hasNext();) {
          Map.Entry entry = (Map.Entry)(i.next());
          cookieList.append(entry.getKey().toString() + "=" + entry.getValue());
 	 
-         if (i.hasNext()) 
-         {
+         if (i.hasNext()) {
             cookieList.append("; ");
          }
       }
-      if (cookieList.length() > 0) 
-      {
+      if (cookieList.length() > 0) {
          connection.setRequestProperty("Cookie", cookieList.toString());
       }
    }
@@ -171,8 +166,8 @@ public class HttpRequestPost
     * @param value cookie value
     * @throws IOException
     */
-   public HttpRequestPost setCookie(String name, String value) throws IOException 
-   {
+   public HttpRequestPost setCookie(String name, String value) throws IOException {
+      
       cookies.put(name, value);
       return this;
    }
@@ -182,8 +177,8 @@ public class HttpRequestPost
     * @param cookies the cookie "name-to-value" map
     * @throws IOException
     */
-   public HttpRequestPost setCookies(Map<String,String> cookies) throws IOException 
-   {
+   public HttpRequestPost setCookies(Map<String,String> cookies) throws IOException {
+      
       if (cookies == null) return this;
       this.cookies.putAll(cookies);
       return this;
@@ -195,11 +190,10 @@ public class HttpRequestPost
     * + 1] is a value) 
     * @throws IOException
     */
-   public HttpRequestPost setCookies(String[] cookies) throws IOException 
-   {
+   public HttpRequestPost setCookies(String[] cookies) throws IOException {
+      
       if (cookies == null) return this;
-      for (int i = 0; i < cookies.length - 1; i+=2) 
-      {
+      for (int i = 0; i < cookies.length - 1; i+=2) {
          setCookie(cookies[i], cookies[i+1]);
       }
       return this;
@@ -211,8 +205,8 @@ public class HttpRequestPost
     * @param value parameter value
     * @throws IOException
     */
-   public HttpRequestPost setParameter(String name, String value) throws IOException 
-   {
+   public HttpRequestPost setParameter(String name, String value) throws IOException {
+      
       if (value == null) return this; //20100520 robert.fromont@canterbury.ac.nz 
       if (!bNoParametersYet) write("&");
       write(URLEncoder.encode(name, "UTF8") 
@@ -228,26 +222,21 @@ public class HttpRequestPost
     * @param object parameter value, or a collection of values
     * @throws IOException
     */
-   public HttpRequestPost setParameter(String name, Object object) throws IOException 
-   {
+   public HttpRequestPost setParameter(String name, Object object) throws IOException {
+      
       if (object == null) return this;
-      if (object.getClass().isArray())
-      {
+      if (object.getClass().isArray()) {
          object = Arrays.asList((Object[])object);
       }
-      if (object instanceof Iterable) 
-      {
+      if (object instanceof Iterable) {
          @SuppressWarnings("rawtypes")
 	    Iterator i = ((Iterable)object).iterator();
-         while (i.hasNext())
-         {
+         while (i.hasNext()) {
             Object o = i.next();
             if (o != null)
                setParameter(name, o.toString());
          }
-      } 
-      else 
-      {
+      } else {
          setParameter(name, object.toString());
       }
       return this;
@@ -260,11 +249,10 @@ public class HttpRequestPost
     * @throws IOException
     */
    @SuppressWarnings("rawtypes")
-   public HttpRequestPost setParameters(Map<String,String> parameters) throws IOException 
-   {
+   public HttpRequestPost setParameters(Map<String,String> parameters) throws IOException {
+      
       if (parameters == null) return this;
-      for (Iterator i = parameters.entrySet().iterator(); i.hasNext();) 
-      {
+      for (Iterator i = parameters.entrySet().iterator(); i.hasNext();) {
          Map.Entry entry = (Map.Entry)i.next();
          setParameter(entry.getKey().toString(), entry.getValue());
       }
@@ -278,11 +266,10 @@ public class HttpRequestPost
     * otherwise it is stringified and sent in the request 
     * @throws IOException
     */
-   public HttpRequestPost setParameters(Object[] parameters) throws IOException 
-   {
+   public HttpRequestPost setParameters(Object[] parameters) throws IOException {
+      
       if (parameters == null) return this;
-      for (int i = 0; i < parameters.length - 1; i+=2) 
-      {
+      for (int i = 0; i < parameters.length - 1; i+=2) {
          setParameter(parameters[i].toString(), parameters[i+1]);
       }
       return this;
@@ -293,8 +280,8 @@ public class HttpRequestPost
     * @return input stream with the server response
     * @throws IOException
     */
-   public HttpURLConnection post() throws IOException 
-   {
+   public HttpURLConnection post() throws IOException {
+      
       os.close();
       return connection;
    }
@@ -307,8 +294,8 @@ public class HttpRequestPost
     * @throws IOException
     * @see #setParameters
     */
-   public HttpURLConnection post(Map<String,String> parameters) throws IOException 
-   {
+   public HttpURLConnection post(Map<String,String> parameters) throws IOException {
+      
       setParameters(parameters);
       return post();
    }
@@ -321,8 +308,8 @@ public class HttpRequestPost
     * @throws IOException
     * @see #setParameters
     */
-   public HttpURLConnection post(Object[] parameters) throws IOException 
-   {
+   public HttpURLConnection post(Object[] parameters) throws IOException {
+      
       setParameters(parameters);
       return post();
    }
@@ -338,8 +325,8 @@ public class HttpRequestPost
     * @see #setParameters
     * @see #setCookies
     */
-   public HttpURLConnection post(Map<String,String> cookies, Map<String,String> parameters) throws IOException 
-   {
+   public HttpURLConnection post(Map<String,String> cookies, Map<String,String> parameters) throws IOException {
+      
       setCookies(cookies);
       setParameters(parameters);
       return post();
@@ -356,8 +343,8 @@ public class HttpRequestPost
     * @see #setParameters
     * @see #setCookies
     */
-   public HttpURLConnection post(String[] cookies, Object[] parameters) throws IOException 
-   {
+   public HttpURLConnection post(String[] cookies, Object[] parameters) throws IOException {
+      
       setCookies(cookies);
       setParameters(parameters);
       return post();
@@ -371,8 +358,8 @@ public class HttpRequestPost
     * @throws IOException
     * @see #setParameter
     */
-   public HttpURLConnection post(String name, Object value) throws IOException 
-   {
+   public HttpURLConnection post(String name, Object value) throws IOException {
+      
       setParameter(name, value);
       return post();
    }
@@ -387,8 +374,8 @@ public class HttpRequestPost
     * @throws IOException
     * @see #setParameter
     */
-   public HttpURLConnection post(String name1, Object value1, String name2, Object value2) throws IOException 
-   {
+   public HttpURLConnection post(String name1, Object value1, String name2, Object value2) throws IOException {
+      
       setParameter(name1, value1);
       return post(name2, value2);
    }
@@ -405,8 +392,8 @@ public class HttpRequestPost
     * @throws IOException
     * @see #setParameter
     */
-   public HttpURLConnection post(String name1, Object value1, String name2, Object value2, String name3, Object value3) throws IOException 
-   {
+   public HttpURLConnection post(String name1, Object value1, String name2, Object value2, String name3, Object value3) throws IOException {
+      
       setParameter(name1, value1);
       return post(name2, value2, name3, value3);
    }
@@ -425,8 +412,8 @@ public class HttpRequestPost
     * @throws IOException
     * @see #setParameter
     */
-   public HttpURLConnection post(String name1, Object value1, String name2, Object value2, String name3, Object value3, String name4, Object value4) throws IOException 
-   {
+   public HttpURLConnection post(String name1, Object value1, String name2, Object value2, String name3, Object value3, String name4, Object value4) throws IOException {
+      
       setParameter(name1, value1);
       return post(name2, value2, name3, value3, name4, value4);
    }
@@ -438,8 +425,8 @@ public class HttpRequestPost
     * @throws IOException
     * @see #setParameters
     */
-   public static HttpURLConnection post(URL url, String sAuthorization, Map<String,String> parameters) throws IOException 
-   {
+   public static HttpURLConnection post(URL url, String sAuthorization, Map<String,String> parameters) throws IOException {
+      
       return new HttpRequestPost(url, sAuthorization).post(parameters);
    }
    
@@ -450,8 +437,8 @@ public class HttpRequestPost
     * @throws IOException
     * @see #setParameters
     */
-   public static HttpURLConnection post(URL url, String sAuthorization, Object[] parameters) throws IOException 
-   {
+   public static HttpURLConnection post(URL url, String sAuthorization, Object[] parameters) throws IOException {
+      
       return new HttpRequestPost(url, sAuthorization).post(parameters);
    }
    
@@ -464,8 +451,8 @@ public class HttpRequestPost
     * @see #setCookies
     * @see #setParameters
     */
-   public static HttpURLConnection post(URL url, String sAuthorization, Map<String,String> cookies, Map<String,String> parameters) throws IOException 
-   {
+   public static HttpURLConnection post(URL url, String sAuthorization, Map<String,String> cookies, Map<String,String> parameters) throws IOException {
+      
       return new HttpRequestPost(url, sAuthorization).post(cookies, parameters);
    }
    
@@ -478,8 +465,8 @@ public class HttpRequestPost
     * @see #setCookies
     * @see #setParameters
     */
-   public static HttpURLConnection post(URL url, String sAuthorization, String[] cookies, Object[] parameters) throws IOException 
-   {
+   public static HttpURLConnection post(URL url, String sAuthorization, String[] cookies, Object[] parameters) throws IOException {
+      
       return new HttpRequestPost(url, sAuthorization).post(cookies, parameters);
    }
    
@@ -491,8 +478,8 @@ public class HttpRequestPost
     * @throws IOException
     * @see #setParameter
     */
-   public static HttpURLConnection post(URL url, String sAuthorization, String name1, Object value1) throws IOException 
-   {
+   public static HttpURLConnection post(URL url, String sAuthorization, String name1, Object value1) throws IOException {
+      
       return new HttpRequestPost(url, sAuthorization).post(name1, value1);
    }
    
@@ -506,8 +493,8 @@ public class HttpRequestPost
     * @throws IOException
     * @see #setParameter
     */
-   public static HttpURLConnection post(URL url, String sAuthorization, String name1, Object value1, String name2, Object value2) throws IOException 
-   {
+   public static HttpURLConnection post(URL url, String sAuthorization, String name1, Object value1, String name2, Object value2) throws IOException {
+      
       return new HttpRequestPost(url, sAuthorization).post(name1, value1, name2, value2);
    }
    
@@ -523,8 +510,8 @@ public class HttpRequestPost
     * @throws IOException
     * @see #setParameter
     */
-   public static HttpURLConnection post(URL url, String sAuthorization, String name1, Object value1, String name2, Object value2, String name3, Object value3) throws IOException 
-   {
+   public static HttpURLConnection post(URL url, String sAuthorization, String name1, Object value1, String name2, Object value2, String name3, Object value3) throws IOException {
+      
       return new HttpRequestPost(url, sAuthorization).post(name1, value1, name2, value2, name3, value3);
    }
    
@@ -542,8 +529,8 @@ public class HttpRequestPost
     * @throws IOException
     * @see #setParameter
     */
-   public static HttpURLConnection post(URL url, String sAuthorization, String name1, Object value1, String name2, Object value2, String name3, Object value3, String name4, Object value4) throws IOException 
-   {
+   public static HttpURLConnection post(URL url, String sAuthorization, String name1, Object value1, String name2, Object value2, String name3, Object value3, String name4, Object value4) throws IOException {
+      
       return new HttpRequestPost(url, sAuthorization).post(name1, value1, name2, value2, name3, value3, name4, value4);
    }
 
@@ -551,8 +538,7 @@ public class HttpRequestPost
     * String representation of the request, for logging.
     * @return A String representation of the request, for logging.
     */
-   public String toString()
-   {
+   public String toString() {
       return "POST " + url + " : " + body;
    } // end of toString()
 }

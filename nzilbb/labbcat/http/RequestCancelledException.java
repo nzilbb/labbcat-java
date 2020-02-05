@@ -29,8 +29,8 @@ import java.io.IOException;
  */
 
 public class RequestCancelledException
-   extends IOException
-{
+   extends IOException {
+   
    private static final long serialVersionUID = 1;
    /**
     * The request that was cancelled
@@ -52,23 +52,20 @@ public class RequestCancelledException
    /**
     * Default constructor
     */
-   public RequestCancelledException()
-   {
+   public RequestCancelledException() {
    } // end of constructor
    
    /**
     * Constructor
     */
-   public RequestCancelledException(String s)
-   {
+   public RequestCancelledException(String s) {
       super(s);
    } // end of constructor
    
    /**
     * Default constructor
     */
-   public RequestCancelledException(HttpRequestPostMultipart request)
-   {	 
+   public RequestCancelledException(HttpRequestPostMultipart request) {	 
       setRequest(request);
    } // end of constructor
 
