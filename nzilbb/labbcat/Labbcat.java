@@ -161,9 +161,9 @@ public class Labbcat
     * @throws IOException
     * @throws ResponseException
     */
-   public HttpRequestGet createGetRequest(String resource) throws IOException, StoreException {
+   public HttpRequestGet get(String resource) throws IOException, StoreException {
       return new HttpRequestGet(makeUrl(resource), getRequiredHttpAuthorization());
-   } // end of createGetRequest()
+   } // end of get()
 
    /**
     * Constructs a POST request for the given resource. The resulting request will be
@@ -175,10 +175,9 @@ public class Labbcat
     * @throws IOException
     * @throws ResponseException
     */
-   public HttpRequestPost createPostRequest(String resource) throws IOException, StoreException {
-      postRequest = new HttpRequestPost(makeUrl(resource), getRequiredHttpAuthorization());
-      return postRequest;
-   } // end of createGetRequest()
+   public HttpRequestPost post(String resource) throws IOException, StoreException {
+      return new HttpRequestPost(makeUrl(resource), getRequiredHttpAuthorization());
+   } // end of post()
 
    /**
     * Constructs a multipart POST request for the given resource. The resulting request
@@ -188,10 +187,13 @@ public class Labbcat
     * @throws IOException
     * @throws ResponseException
     */
-   public HttpRequestPostMultipart createPostMultipartRequest(String resource)
+   public HttpRequestPostMultipart postMultipart(String resource)
       throws IOException, StoreException {
-      return new HttpRequestPostMultipart(makeUrl(resource), getRequiredHttpAuthorization());
-   } // end of createGetRequest()
+      
+      postRequest = new HttpRequestPostMultipart(
+         makeUrl(resource), getRequiredHttpAuthorization());
+      return postRequest;
+   } // end of postMultipart()
 
    // LaBB-CAT functions beyond the graph store ones:
    
