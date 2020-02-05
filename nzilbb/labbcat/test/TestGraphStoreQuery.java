@@ -45,74 +45,62 @@ import nzilbb.labbcat.*;
  * and the first participant listed must have some transcripts.
  *
  */
-public class TestGraphStoreQuery 
-{
+public class TestGraphStoreQuery {
+   
    // YOU MUST ENSURE THE FOLLOWING SETTINGS ARE VALID FOR YOU TEST LABBCAT SERVER:
    static String labbcatUrl = "http://localhost:8080/labbcat/";
    static String username = "labbcat";
    static String password = "labbcat";
    static GraphStoreQuery store;
 
-   @BeforeClass public static void createStore()
-   {
-      try
-      {
+   @BeforeClass public static void createStore() {
+      try {
          store = new GraphStoreQuery(labbcatUrl, username, password).setBatchMode(true);
-      }
-      catch(MalformedURLException exception)
-      {
+      } catch(MalformedURLException exception) {
          fail("Could not create GraphStoreQuery object");
       }
    }
 
-   @After public void notVerbose()
-   {
+   @After public void notVerbose() {
       store.setVerbose(false);
    }
 
    @Test(expected = StoreException.class) public void invalidCredentials()
-      throws Exception
-   {
+      throws Exception {
       GraphStoreQuery store = new GraphStoreQuery(labbcatUrl, "xxx", "xxx")
          .setBatchMode(true);
       store.getId();
    }
 
    @Test(expected = StoreException.class) public void credentialsRequired()
-      throws Exception
-   {
+      throws Exception {
       GraphStoreQuery store = new GraphStoreQuery(labbcatUrl)
          .setBatchMode(true);
       store.getId();
    }
    
    @Test(expected = MalformedURLException.class) public void malformedURLException()
-      throws Exception
-   {
+      throws Exception {
       GraphStoreQuery store = new GraphStoreQuery("xxx", username, password)
          .setBatchMode(true);
       store.getId();
    }
 
    @Test(expected = StoreException.class) public void nonLabbcatUrl()
-      throws Exception
-   {
+      throws Exception {
       GraphStoreQuery store = new GraphStoreQuery("http://tld/", username, password)
          .setBatchMode(true);
       store.getId();
    }
 
    @Test public void getId()
-      throws Exception
-   {
+      throws Exception {
       String id = store.getId();
       assertEquals("ID matches the url",
                    labbcatUrl, id);
    }
 
-   @Test public void getLayerIds()
-      throws Exception
-   {
+   @Test public void getLayerIds() throws Exception {
       String[] ids = store.getLayerIds();
       //for (String id : ids) System.out.println("layer " + id);
       assertTrue("Some IDs are returned",
@@ -128,9 +116,7 @@ public class TestGraphStoreQuery
                  idSet.contains("transcript_type"));
    }
 
-   @Test public void getLayers()
-      throws Exception
-   {
+   @Test public void getLayers() throws Exception {
       Layer[] layers = store.getLayers();
       //for (String id : ids) System.out.println("layer " + id);
       assertTrue("Some IDs are returned",
@@ -148,62 +134,47 @@ public class TestGraphStoreQuery
                  idSet.contains("transcript_type"));
    }
 
-   @Test public void getCorpusIds()
-      throws Exception
-   {
+   @Test public void getCorpusIds() throws Exception {
       String[] ids = store.getCorpusIds();
       // for (String id : ids) System.out.println("corpus " + id);
       assertTrue("Some IDs are returned",
                  ids.length > 0);
    }
 
-   @Test public void getParticipantIds()
-      throws Exception
-   {
+   @Test public void getParticipantIds() throws Exception {
       String[] ids = store.getParticipantIds();
       // for (String id : ids) System.out.println("participant " + id);
       assertTrue("Some IDs are returned",
                  ids.length > 0);
    }
 
-   @Test public void getGraphIds()
-      throws Exception
-   {
+   @Test public void getGraphIds() throws Exception {
       String[] ids = store.getGraphIds();
       // for (String id : ids) System.out.println("graph " + id);
       assertTrue("Some IDs are returned",
                  ids.length > 0);
    }
 
-   @Test public void countMatchingParticipantIds()
-      throws Exception
-   {
+   @Test public void countMatchingParticipantIds() throws Exception {
       int count = store.countMatchingParticipantIds("id MATCHES '.+'");
       assertTrue("There are some matches",
                  count > 0);
    }
 
-   @Test public void getMatchingParticipantIds()
-      throws Exception
-   {
+   @Test public void getMatchingParticipantIds() throws Exception {
       String[] ids = store.getMatchingParticipantIds("id MATCHES '.+'");
       assertTrue("Some IDs are returned",
                  ids.length > 0);
-      if (ids.length < 2)
-      {
+      if (ids.length < 2) {
          System.out.println("Too few participants to test pagination");
-      }
-      else
-      {
+      } else {
          ids = store.getMatchingParticipantIds("id MATCHES '.+'", 2, 0);
          assertEquals("Two IDs are returned",
                       2, ids.length);
       }         
    }
 
-   @Test public void getGraphIdsInCorpus()
-      throws Exception
-   {
+   @Test public void getGraphIdsInCorpus() throws Exception {
       String[] ids = store.getCorpusIds();
       assertTrue("There's at least one corpus",
                  ids.length > 0);
@@ -213,9 +184,7 @@ public class TestGraphStoreQuery
                  ids.length > 0);
    }
 
-   @Test public void getGraphIdsWithParticipant()
-      throws Exception
-   {
+   @Test public void getGraphIdsWithParticipant() throws Exception {
       String[] ids = store.getParticipantIds();
       assertTrue("There's at least one participant",
                  ids.length > 0);
@@ -225,35 +194,26 @@ public class TestGraphStoreQuery
                  ids.length > 0);
    }
 
-   @Test public void countMatchingGraphIds()
-      throws Exception
-   {
+   @Test public void countMatchingGraphIds() throws Exception {
       int count = store.countMatchingGraphIds("id MATCHES '.+'");
       assertTrue("There are some matches",
                  count > 0);
    }
 
-   @Test public void getMatchingGraphIds()
-      throws Exception
-   {
+   @Test public void getMatchingGraphIds() throws Exception {
       String[] ids = store.getMatchingGraphIds("id MATCHES '.+'");
       assertTrue("Some IDs are returned",
                  ids.length > 0);
-      if (ids.length < 2)
-      {
+      if (ids.length < 2) {
          System.out.println("Too few graphs to test pagination");
-      }
-      else
-      {
+      } else {
          ids = store.getMatchingGraphIds("id MATCHES '.+'", 2, 0, "id DESC");
          assertEquals("Two IDs are returned",
                       2, ids.length);
       }         
    }
 
-   @Test public void countAnnotations()
-      throws Exception
-   {
+   @Test public void countAnnotations() throws Exception {
       String[] ids = store.getMatchingGraphIds("id MATCHES '.+'", 1, 0);
       assertTrue("Some graph IDs are returned",
                  ids.length > 0);
@@ -263,9 +223,7 @@ public class TestGraphStoreQuery
                  count > 0);
    }
 
-   @Test public void getAnnotations()
-      throws Exception
-   {
+   @Test public void getAnnotations() throws Exception {
       String[] ids = store.getMatchingGraphIds("id MATCHES '.+'", 1, 0);
       assertTrue("Some graph IDs are returned",
                  ids.length > 0);
@@ -273,20 +231,15 @@ public class TestGraphStoreQuery
       
       long count = store.countAnnotations(graphId, "orthography");
       Annotation[] annotations = store.getAnnotations(graphId, "orthography", 2, 0);
-      if (count < 2)
-      {
+      if (count < 2) {
          System.out.println("Too few annotations to test pagination");
-      }
-      else
-      {
+      } else {
          assertEquals("Two annotations are returned",
                       2, annotations.length);
       }
    }
 
-   @Test public void getAnchors()
-      throws Exception
-   {
+   @Test public void getAnchors() throws Exception {
       // get a graph to work with
       String[] ids = store.getMatchingGraphIds("id MATCHES '.+'", 1, 0);
       assertTrue("Some graph IDs are returned",
@@ -295,12 +248,9 @@ public class TestGraphStoreQuery
 
       // get some annotations so we have valid anchor IDs
       Annotation[] annotations = store.getAnnotations(graphId, "orthography", 2, 0);
-      if (annotations.length == 0)
-      {
+      if (annotations.length == 0) {
          System.out.println("Can't test getAnchors() - no annotations in " + graphId);
-      }
-      else
-      {
+      } else {
          // create an array of anchorIds
          String[] anchorIds = new String[annotations.length];
          for (int i = 0; i < annotations.length; i++) anchorIds[i] = annotations[i].getStartId();
@@ -312,9 +262,7 @@ public class TestGraphStoreQuery
       }
    }
    
-   @Test public void getMedia()
-      throws Exception
-   {
+   @Test public void getMedia() throws Exception {
       String[] ids = store.getMatchingGraphIds("id MATCHES 'Agnes.+\\.trs'", 1, 0);
       assertTrue("Some graph IDs are returned",
                  ids.length > 0);
@@ -324,9 +272,7 @@ public class TestGraphStoreQuery
                     url);
    }
 
-   @Test public void getMediaFragment()
-      throws Exception
-   {
+   @Test public void getMediaFragment() throws Exception {
       String[] ids = store.getMatchingGraphIds("id MATCHES 'Agnes.+\\.trs'", 1, 0);
       assertTrue("Some graph IDs are returned",
                  ids.length > 0);
@@ -336,17 +282,13 @@ public class TestGraphStoreQuery
                     url);
    }
 
-   @Test public void getLayer()
-      throws Exception
-   {
+   @Test public void getLayer() throws Exception {
       Layer layer = store.getLayer("orthography");
       assertEquals("Correct layer",
                    "orthography", layer.getId());
    }
 
-   @Test public void getParticipant()
-      throws Exception
-   {
+   @Test public void getParticipant() throws Exception {
       // find a participant ID to use
       String[] ids = store.getParticipantIds();
       // for (String id : ids) System.out.println("participant " + id);
@@ -358,27 +300,21 @@ public class TestGraphStoreQuery
                    participantId, participant.getLabel()); // not getId()
    }
 
-   @Test public void countMatchingAnnotations()
-      throws Exception
-   {
+   @Test public void countMatchingAnnotations() throws Exception {
       int count = store.countMatchingAnnotations(
          "layer.id = 'orthography' AND label MATCHES 'and'");
       assertTrue("There are some matches",
                  count > 0);
    }
 
-   @Test public void getMatchingAnnotations()
-      throws Exception
-   {
+   @Test public void getMatchingAnnotations() throws Exception {
       Annotation[] annotations = store.getMatchingAnnotations(
          "layer.id = 'orthography' AND label MATCHES 'and'", 2, 0);
       assertEquals("Two annotations are returned",
                    2, annotations.length);
    }
 
-   @Test public void getMediaTracks()
-      throws Exception
-   {
+   @Test public void getMediaTracks() throws Exception {
       MediaTrackDefinition[] tracks = store.getMediaTracks();
       //for (String track : tracks) System.out.println("track " + track);
       assertTrue("Some tracks are returned",
@@ -390,9 +326,7 @@ public class TestGraphStoreQuery
                  idSet.contains(""));
    }
    
-   @Test public void getAvailableMedia()
-      throws Exception
-   {
+   @Test public void getAvailableMedia() throws Exception {
       // get a graph to work with
       String[] ids = store.getMatchingGraphIds("id MATCHES '.+'", 1, 0);
       assertTrue("Some graph IDs are returned",
@@ -405,9 +339,7 @@ public class TestGraphStoreQuery
                  files.length > 0);
    }
    
-   @Test public void getEpisodeDocuments()
-      throws Exception
-   {
+   @Test public void getEpisodeDocuments() throws Exception {
       // get a graph to work with
       String[] ids = store.getMatchingGraphIds("id MATCHES '.+'", 1, 0);
       assertTrue("Some graph IDs are returned",
@@ -419,8 +351,7 @@ public class TestGraphStoreQuery
       if (files.length == 0) System.out.println(graphId + " has no documents");
    }
    
-   public static void main(String args[]) 
-   {
+   public static void main(String args[]) {
       org.junit.runner.JUnitCore.main("nzilbb.labbcat.test.TestGraphStoreQuery");
    }
 }
