@@ -621,7 +621,7 @@ public class Labbcat
     * index matches the corresponding index in <var>matchIds</var>. 
     * @throws IOException
     * @throws StoreException
-    * @see #getMatches(JSONObject,String[],boolean)}
+    * @see #getMatches(JSONObject,String[],boolean)
     */
    public Annotation[][] getMatchAnnotations(String[] matchIds, String[] layerIds, int targetOffset, int annotationsPerLayer)
       throws IOException, StoreException {
@@ -679,8 +679,11 @@ public class Labbcat
 
    /**
     * Downloads WAV sound fragments.
+    * <p> This utility method translates a {@link Match} array of the kind returned by 
+    * {@link #getMatches(String,int)} to the parallel arrays required by
+    * {@link #getSoundFragments(String[],Double[],Double[],Integer,File)}, using {@link MatchId}.
     * @param matches A list of {@link Match}es, perhaps returned by
-    * {@link #getMatches(JSONObject,String[],boolean)}. 
+    * {@link #getMatches(String,int)}. 
     * @param sampleRate The desired sample rate, or null for no preference.
     * @param dir A directory in which the files should be stored, or null for a temporary
     * folder.  If specified, and the directory doesn't exist, it will be created. 
