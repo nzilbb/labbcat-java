@@ -28,6 +28,7 @@ import java.io.PrintWriter;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.file.Files;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
@@ -36,8 +37,8 @@ import java.util.Vector;
 import nzilbb.ag.Anchor;
 import nzilbb.ag.Annotation;
 import nzilbb.ag.Graph;
-import nzilbb.ag.PermissionException;
 import nzilbb.ag.GraphNotFoundException;
+import nzilbb.ag.PermissionException;
 import nzilbb.ag.StoreException;
 import nzilbb.labbcat.http.*;
 import nzilbb.util.IO;
@@ -675,8 +676,6 @@ public class Labbcat
       }
    } // end of getMatchIds()
 
-   // TODO getFragments(id, start, end, layerIds, mimeType = "text/praat-textgrid")
-
    /**
     * Downloads WAV sound fragments.
     * <p> This utility method translates a {@link Match} array of the kind returned by 
@@ -755,6 +754,8 @@ public class Labbcat
          dir.mkdir();
          dir.deleteOnExit();
          tempFiles = true;
+      } else {
+         if (!dir.exists()) Files.createDirectory(dir.toPath());
       }
 
       // loop through each triple, getting fragments individually
@@ -779,8 +780,6 @@ public class Labbcat
             } 
             continue;
          } else {
-            fragments[i] = new File(
-               dir, Graph.FragmentId(graphIds[i], startOffsets[i], endOffsets[i]) + ".wav");
             // use the name given by the server, if any
             String contentDisposition = connection.getHeaderField("content-disposition");
             if (contentDisposition != null) {
@@ -791,6 +790,11 @@ public class Labbcat
                   if (fileName.length() > 0) fragments[i] = new File(dir, fileName);
                }
             }
+            if (fragments[i] == null) { // no name was suggested
+               // invent a name
+               fragments[i] = new File(
+                  dir, Graph.FragmentId(graphIds[i], startOffsets[i], endOffsets[i]) + ".wav");
+            }
             if (tempFiles) fragments[i].deleteOnExit();
             IO.SaveUrlConnectionToFile(connection, fragments[i]);           
          } // response ok
@@ -798,6 +802,139 @@ public class Labbcat
 
       return fragments;
    } // end of getSoundFragments()
+
+   /**
+    * Get graph fragments in a specified format.
+    * <p> This utility method translates a {@link Match} array of the kind returned by 
+    * {@link #getMatches(String,int)} to the parallel arrays required by
+    * {@link #getFragments(String[],Double[],Double[],String[],String,File)}, 
+    * using {@link MatchId}.
+    * @param matches A list of {@link Match}es, perhaps returned by
+    * {@link #getMatches(String,int)}. 
+    * @param layerIds A list of IDs of annotation layers to include in the fragment.
+    * @param mimeType The desired format, for example "text/praat-textgrid" for Praat
+    * TextGrids, "text/plain" for plain text, etc.
+    * @param dir A directory in which the files should be stored, or null for a temporary
+    * folder.  If specified, and the directory doesn't exist, it will be created. 
+    * @return A list of files. If <var>dir</var> is null, these files will be stored under the
+    * system's temporary directory, so once processing is finished, they should be deleted
+    * byt the caller, or moved to a more permanent location. 
+    * @throws IOException
+    * @throws StoreException
+    */
+   public File[] getFragments(Match[] matches, String[] layerIds, String mimeType, File dir)
+    throws IOException, StoreException {
+      
+      // convert matches into three parallel arrays of IDs/offsets
+      String[] graphIds = new String[matches.length];
+      Double[] startOffsets = new Double[matches.length];
+      Double[] endOffsets = new Double[matches.length];
+      
+      for (int i = 0; i < matches.length; i++) {
+         MatchId matchId = new MatchId(matches[i]);
+         graphIds[i] = matchId.getGraphId();
+         if (matchId.getStartOffset() != null) {
+            startOffsets[i] = matchId.getStartOffset();
+            endOffsets[i] = matchId.getEndOffset();
+         } else if (matchId.getStartAnchorId() != null) {
+            String[] anchorIds = { matchId.getStartAnchorId(), matchId.getEndAnchorId() };
+            try {
+               Anchor[] anchors = getAnchors(matchId.getGraphId(), anchorIds);
+               if (anchors[0] != null) startOffsets[i] = anchors[0].getOffset();
+               if (anchors[1] != null) endOffsets[i] = anchors[1].getOffset();
+            }
+            catch(PermissionException exception) {}
+            catch(GraphNotFoundException exception) {}
+         }
+      } // next match
+      
+      return getFragments(graphIds, startOffsets, endOffsets, layerIds, mimeType, dir);      
+   } // end of getFragments()
+
+   /**
+    * Get graph fragments in a specified format.
+    * @param graphIds A list of graph IDs (transcript names).
+    * @param startOffsets A list of start offsets, with one element for each element in
+    * <var>graphIds</var>. 
+    * @param endOffsets A list of end offsets, with one element for each element in
+    * <var>graphIds</var>. 
+    * @param layerIds A list of IDs of annotation layers to include in the fragment.
+    * @param mimeType The desired format, for example "text/praat-textgrid" for Praat
+    * TextGrids, "text/plain" for plain text, etc.
+    * @param dir A directory in which the files should be stored, or null for a temporary
+    * folder.  If specified, and the directory doesn't exist, it will be created. 
+    * @return A list of files. If <var>dir</var> is null, these files will be stored under the
+    * system's temporary directory, so once processing is finished, they should be deleted
+    * byt the caller, or moved to a more permanent location. 
+    * @throws IOException
+    * @throws StoreException
+    */
+   public File[] getFragments(String[] graphIds, Double[] startOffsets, Double[] endOffsets, String[] layerIds, String mimeType, File dir)
+    throws IOException, StoreException {
+      
+      if (graphIds.length != startOffsets.length || graphIds.length != endOffsets.length) {
+         throw new StoreException(
+            "graphIds ("+graphIds.length +"), startOffsets ("+startOffsets.length
+            +"), and endOffsets ("+endOffsets.length+") must be arrays of equal size.");
+      }
+      File[] fragments = new File[graphIds.length];
+      
+      boolean tempFiles = false;
+      if (dir == null) {
+         dir = File.createTempFile("getSoundFragments_", "_wav");
+         dir.delete();
+         dir.mkdir();
+         dir.deleteOnExit();
+         tempFiles = true;
+      } else {
+         if (!dir.exists()) Files.createDirectory(dir.toPath());
+      }
+
+      // loop through each triple, getting fragments individually
+      for (int i = 0; i < graphIds.length; i++) {
+         if (cancelling) break;
+         if (graphIds[i] == null || startOffsets[i] == null || endOffsets[i] == null) continue;
+
+         URL url = makeUrl("convertfragment");
+         HttpRequestGet request = new HttpRequestGet(url, getRequiredHttpAuthorization())
+            .setHeader("Accept", "audio/wav")
+            .setParameter("id", graphIds[i])
+            .setParameter("start", startOffsets[i])
+            .setParameter("end", endOffsets[i])
+            .setParameter("mimeType", mimeType)
+            .setParameter("layerId", layerIds);
+         if (verbose) System.out.println("getFragments -> " + request);
+         HttpURLConnection connection = request.get();
+         if (connection.getResponseCode() != HttpURLConnection.HTTP_OK) {
+            if (connection.getResponseCode() != HttpURLConnection.HTTP_NOT_FOUND) {
+               System.err.println(
+                  "getSoundFragments: Error " + connection.getResponseCode()
+                  + " " + connection.getResponseMessage());
+            } 
+            continue;
+         } else {
+            // use the name given by the server, if any
+            String contentDisposition = connection.getHeaderField("content-disposition");
+            if (contentDisposition != null) {
+               // something like attachment; filename=blah.wav
+               int equals = contentDisposition.indexOf("=");
+               if (equals > 0) {
+                  String fileName = contentDisposition.substring(equals + 1);
+                  if (fileName.length() > 0) fragments[i] = new File(dir, fileName);
+               }
+            }
+            if (fragments[i] == null) { // no suggested name
+               // invent a name
+               fragments[i] = new File(
+                  dir, Graph.FragmentId(graphIds[i], startOffsets[i], endOffsets[i]));
+            }
+            if (tempFiles) fragments[i].deleteOnExit();
+            IO.SaveUrlConnectionToFile(connection, fragments[i]);           
+         } // response ok
+      } // next triple
+
+      return fragments;
+   } // end of getFragments()
 
    // TODO clearLayer(id)
    

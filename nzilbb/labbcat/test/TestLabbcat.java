@@ -450,8 +450,7 @@ public class TestLabbcat
       String[] ids = labbcat.getParticipantIds();
       assertTrue("getParticipantIds: Some IDs are returned",
                  ids.length > 0);
-      String[] participantId = { ids[0] };
-      
+      String[] participantId = { ids[0] };      
 
       // all instances of "and"
       JSONObject pattern = new PatternBuilder().addMatchLayer("orthography", "and").build();
@@ -489,6 +488,63 @@ public class TestLabbcat
                }
             } finally {
                for (File wav : wavs) if (wav != null) wav.delete(); 
+            }
+         }
+      }
+      finally
+      {
+         labbcat.releaseTask(threadId);
+      }
+   }
+
+   @Test public void getFragments()
+      throws Exception
+   {
+      // get a participant ID to use
+      String[] ids = labbcat.getParticipantIds();
+      assertTrue("getParticipantIds: Some IDs are returned",
+                 ids.length > 0);
+      String[] participantId = { ids[0] };      
+
+      // all instances of "and"
+      JSONObject pattern = new PatternBuilder().addMatchLayer("orthography", "and").build();
+      String threadId = labbcat.search(pattern, participantId, false);
+      try
+      {
+         TaskStatus task = labbcat.waitForTask(threadId, 30);
+         // if the task is still running, it's taking too long, so cancel it
+         if (task.getRunning()) try { labbcat.cancelTask(threadId); } catch(Exception exception) {}
+         assertFalse("Search task finished in a timely manner",
+                     task.getRunning());
+         
+         Match[] matches = labbcat.getMatches(threadId, 2);
+         if (matches.length == 0)
+         {
+            System.out.println(
+               "getMatches: No matches were returned, cannot test getFragments");
+         }
+         else
+         {
+            int upTo = Math.min(5, matches.length);
+            Match[] subset = Arrays.copyOfRange(matches, 0, upTo);
+
+            File dir = new File("getFragments");
+            String[] layerIds = { "orthography" };
+            File[] fragments = labbcat.getFragments(subset, layerIds, "text/praat-textgrid", dir);
+            try {
+               assertEquals("files array is same size as matches array",
+                            subset.length, fragments.length);
+               
+               for (int m = 0; m < upTo; m++) {
+                  assertNotNull("Non-null sized file: " + subset[m],
+                                fragments[m]);
+                  assertTrue("Non-zero sized file: " + subset[m],
+                             fragments[m].length() > 0);
+                  // System.out.println(fragments[m].getPath());
+               }
+            } finally {
+               for (File fragment : fragments) if (fragment != null) fragment.delete();
+               dir.delete();
             }
          }
       }
