@@ -152,6 +152,43 @@ public class Labbcat
          throw new StoreException("Could not construct request URL.", t);
       }
    } // end of editUrl()
+   
+   /**
+    * Constructs a GET request for the given resource. The resulting request will be
+    * authorized if required, but otherwise has no headers or parameters set. 
+    * @param resource The path to the resource.
+    * @return The request.
+    * @throws IOException
+    * @throws ResponseException
+    */
+   public HttpRequestGet createGetRequest(String resource) throws IOException, StoreException {
+      return new HttpRequestGet(makeUrl(resource), getRequiredHttpAuthorization());
+   } // end of createGetRequest()
+
+   /**
+    * Constructs a POST request for the given resource. The resulting request will be
+    * authorized if required, but otherwise has no headers or parameters set. 
+    * @param resource The path to the resource.
+    * @return The request.
+    * @throws IOException
+    * @throws ResponseException
+    */
+   public HttpRequestPost createPostRequest(String resource) throws IOException, StoreException {
+      return new HttpRequestPost(makeUrl(resource), getRequiredHttpAuthorization());
+   } // end of createGetRequest()
+
+   /**
+    * Constructs a multipart POST request for the given resource. The resulting request
+    * will be authorized if required, but otherwise has no headers or parameters set. 
+    * @param resource The path to the resource.
+    * @return The request.
+    * @throws IOException
+    * @throws ResponseException
+    */
+   public HttpRequestPostMultipart createPostMultipartRequest(String resource)
+      throws IOException, StoreException {
+      return new HttpRequestPostMultipart(makeUrl(resource), getRequiredHttpAuthorization());
+   } // end of createGetRequest()
 
    // LaBB-CAT functions beyond the graph store ones:
    
