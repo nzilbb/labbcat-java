@@ -39,11 +39,12 @@ import nzilbb.labbcat.*;
 
 /**
  * Unit tests for GraphStoreQuery.
- * <p>These tests are general in nature. They assume the existence of a valid LaBB-CAT
- * instance (configured by labbcatUrl) but do not assume specific corpus content. For the
- * tests to work, the first graph listed in LaBB-CAT must have some words and some media,
- * and the first participant listed must have some transcripts.
- *
+ * <p>These tests test the functionality of the client library, not the server. 
+ * <p>They assume the existence of a valid LaBB-CAT instance (configured by
+ * <var>labbcatUrl</var>) which responds correctly to requests, but do not generally test
+ * that the server behaves correctly , nor assume specific corpus content. For the tests
+ * to work, the first graph listed in LaBB-CAT must have some words and some media, and
+ * the first participant listed must have some transcripts. 
  */
 public class TestGraphStoreQuery {
    
