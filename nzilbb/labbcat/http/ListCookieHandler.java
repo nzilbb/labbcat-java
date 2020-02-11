@@ -40,7 +40,7 @@ public class Fetch5 {
 public class ListCookieHandler extends CookieHandler {
   private List<Cookie> cookieJar = new LinkedList<Cookie>();
 
-  public void put(URI uri, Map<String, List<String>> responseHeaders) throws IOException {
+  public synchronized void put(URI uri, Map<String, List<String>> responseHeaders) throws IOException {
     List<String> setCookieList = responseHeaders.get("Set-Cookie");
     if (setCookieList != null) {
       for (String item : setCookieList) {
@@ -57,7 +57,7 @@ public class ListCookieHandler extends CookieHandler {
     }
   }
 
-  public Map<String, List<String>> get(URI uri, Map<String, List<String>> requestHeaders)
+  public synchronized Map<String, List<String>> get(URI uri, Map<String, List<String>> requestHeaders)
       throws IOException {
     StringBuilder cookies = new StringBuilder();
     for (Cookie cookie : cookieJar) {

@@ -189,7 +189,8 @@ public class GraphStoreQuery
     */
    public GraphStoreQuery(String labbcatUrl)
       throws MalformedURLException {
-      
+
+      if (!labbcatUrl.endsWith("/")) labbcatUrl += "/";
       setLabbcatUrl(new URL(labbcatUrl));
    } // end of constructor
    
@@ -203,6 +204,7 @@ public class GraphStoreQuery
    public GraphStoreQuery(String labbcatUrl, String username, String password)
       throws MalformedURLException {
       
+      if (!labbcatUrl.endsWith("/")) labbcatUrl += "/";
       setLabbcatUrl(new URL(labbcatUrl));
       setUsername(username);
       setPassword(password);

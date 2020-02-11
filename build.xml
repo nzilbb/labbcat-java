@@ -67,7 +67,7 @@
           description="Document the source" >
     <javadoc destdir="${javadoc}"
              classpath="${lib}/nzilbb.ag.jar"
-             packagenames="nzilbb.labbcat nzilbb.labbcat.http"
+             packagenames="nzilbb.labbcat nzilbb.labbcat.http nzilbb.labbcat.util"
              access="public"
 	     Author="yes"
              Windowtitle="nzilbb.labbcat"

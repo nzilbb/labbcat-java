@@ -33,6 +33,8 @@ import java.util.*;
  */
 
 public class HttpRequestGet {
+
+   static Object cookieHandlerSynchronizer = new Object();
    
    // Attributes:
    
@@ -55,9 +57,11 @@ public class HttpRequestGet {
       
       urlBaseUrl = urlNewBaseUrl; 
       // double-check there's a cookie handler
-      if (CookieHandler.getDefault() == null)
-      {
-	 CookieHandler.setDefault(new ListCookieHandler());
+      synchronized (cookieHandlerSynchronizer) {
+         if (CookieHandler.getDefault() == null)
+         {
+            CookieHandler.setDefault(new ListCookieHandler());
+         }
       }
       return this;
    }

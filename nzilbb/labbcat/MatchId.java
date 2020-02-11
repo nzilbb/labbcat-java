@@ -45,10 +45,6 @@ import java.util.Map;
  * 		<em>...</em>;p_<em>speakernumber</em><br>
  * 		e.g.&nbsp;<tt>g_243;n_72700-n_72709;p_76</tt></li>
  * 	<li>
- * 		matching subparts can be identified by appending a list of annotation UIDs for insertion into {@link #mMatchAnnotationUids}, the keys being enclosed in square brackets:<br>
- * 		...;<em>[key]=uid;[key]=uid</em><br>
- * 		e.g. <samp>g_243;n_72700-n_72709;[0,0]=ew_0_123;[1,0]ew_0_234</samp></li>
- * 	<li>
  * 		a target annotation by appending a uid prefixed by <samp>#=</samp>:<br>
  * 		...;#=<em>uid</em><br>
  * 		e.g. <samp>g_243;n_72700-n_72709;#=ew_0_123</samp></li>

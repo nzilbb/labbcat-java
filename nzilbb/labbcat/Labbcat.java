@@ -487,7 +487,7 @@ public class Labbcat
     * search all utterances. 
     * @return The threadId of the resulting task, which can be passed in to
     * {@link #getMatches(String,int)}, {@link #taskStatus(String)},
-    * {@link #waitForTask(String)}, etc.
+    * {@link #waitForTask(String,int)}, etc.
     * @see #getMatches(String,int)
     * @see PatternBuilder
     * @throws IOException
@@ -599,7 +599,7 @@ public class Labbcat
     * {@link #search(JSONObject,String[],boolean)}, or null if the task was cancelled.
     * @throws IOException
     * @throws StoreException
-    * @see #getMatches(JSONObject,String[],boolean)}
+    * @see #getMatches(String,int)}
     */
    public Match[] getMatches(JSONObject pattern, String[] participantIds, boolean mainParticipant, int wordsContext)
     throws IOException, StoreException {
@@ -633,7 +633,7 @@ public class Labbcat
     * index matches the corresponding index in <var>matchIds</var>. 
     * @throws IOException
     * @throws StoreException
-    * @see #getMatches(JSONObject,String[],boolean)
+    * @see #getMatches(String,int)}
     */
    public Annotation[][] getMatchAnnotations(Match[] matches, String[] layerIds, int targetOffset, int annotationsPerLayer)
       throws IOException, StoreException {
@@ -646,7 +646,7 @@ public class Labbcat
    /**
     * Gets annotations on selected layers related to search results returned by a previous
     * call to {@link #getMatches(String,int)}, {@link #taskStatus(String)}.
-    * @param matchIds A list of {@link Match#getId()}s. 
+    * @param matchIds A list of {@link Match#getMatchId()}s. 
     * @param layerIds A vector of layer IDs.
     * @param targetOffset The distance from the original target of the match, e.g.
     * <ul>
@@ -664,7 +664,7 @@ public class Labbcat
     * index matches the corresponding index in <var>matchIds</var>. 
     * @throws IOException
     * @throws StoreException
-    * @see #getMatches(JSONObject,String[],boolean)
+    * @see #getMatches(String,int)}
     */
    public Annotation[][] getMatchAnnotations(String[] matchIds, String[] layerIds, int targetOffset, int annotationsPerLayer)
       throws IOException, StoreException {
@@ -806,7 +806,7 @@ public class Labbcat
             if (connection.getResponseCode() != HttpURLConnection.HTTP_NOT_FOUND) {
                System.err.println(
                   "getSoundFragments: Error " + connection.getResponseCode()
-                  + " " + connection.getResponseMessage());
+                  + " " + connection.getResponseMessage() + " - " + request);
             } 
             continue;
          } else {
@@ -899,7 +899,7 @@ public class Labbcat
       
       boolean tempFiles = false;
       if (dir == null) {
-         dir = File.createTempFile("getSoundFragments_", "_frag");
+         dir = File.createTempFile("getFragments_", "_frag");
          dir.delete();
          dir.mkdir();
          dir.deleteOnExit();
@@ -915,7 +915,7 @@ public class Labbcat
 
          URL url = makeUrl("convertfragment");
          HttpRequestGet request = new HttpRequestGet(url, getRequiredHttpAuthorization())
-            .setHeader("Accept", "audio/wav")
+            .setHeader("Accept", mimeType)
             .setParameter("id", graphIds[i])
             .setParameter("start", startOffsets[i])
             .setParameter("end", endOffsets[i])
@@ -926,8 +926,8 @@ public class Labbcat
          if (connection.getResponseCode() != HttpURLConnection.HTTP_OK) {
             if (connection.getResponseCode() != HttpURLConnection.HTTP_NOT_FOUND) {
                System.err.println(
-                  "getSoundFragments: Error " + connection.getResponseCode()
-                  + " " + connection.getResponseMessage());
+                  "getFragments: Error " + connection.getResponseCode()
+                  + " " + connection.getResponseMessage() + " - " + request);
             } 
             continue;
          } else {
