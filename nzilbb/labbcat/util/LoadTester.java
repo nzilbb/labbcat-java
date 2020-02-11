@@ -70,7 +70,23 @@ import org.json.JSONObject;
  *  <li>--verbose - Produce verbose logging.</li>
  * </ul>
  * <p>Once the utility is complete, a report is printed showing the mean time for each
- * step of the task, compared with the idle-conditions time for the same step.
+ * step of the task, compared with the idle-conditions time for the same step, e.g.:
+ * <pre>Getting statistics when idle.........
+ * Match count from searching for "i": 910
+ * Idle conditions:
+ * 	search: 4.339s
+ * 	getMatches: 3.208s
+ * 	getMatchAnnotations: 0.133s
+ * 	getFragments: 66.088s
+ * 	getSoundFragments: 0.675s
+ * Simulating 10 clients doing 1 search each...............................................................
+ * Load conditions:
+ * 	search: 14.960s (idle: 4.339s)
+ * 	getMatches: 7.820s (idle: 3.208s)
+ * 	getMatchAnnotations: 0.184s (idle: 0.133s)
+ * 	getFragments: 292.374s (idle: 66.088s)
+ * 	getSoundFragments: 0.948s (idle: 0.675s)
+ * </pre>
  * @author Robert Fromont robert@fromont.net.nz
  */
 
