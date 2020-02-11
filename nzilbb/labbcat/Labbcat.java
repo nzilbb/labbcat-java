@@ -337,7 +337,7 @@ public class Labbcat
       if (verbose) System.out.println("taskStatus -> " + request);
       Response response = new Response(request.get(), verbose);
       response.checkForErrors(); // throws a ResponseException on error
-   } // end of releaseTask()
+   } // end of cancelTask()
 
    /**
     * Release a finished task, to free up server resources.
@@ -513,7 +513,7 @@ public class Labbcat
       // extract the threadId from model.threadId
       JSONObject model = (JSONObject)response.getModel();
       return model.getString("threadId");
-   } // end of getMatches()
+   } // end of search()
    
    /**
     * Gets a list of tokens that were matched by
@@ -860,7 +860,7 @@ public class Labbcat
     * folder.  If specified, and the directory doesn't exist, it will be created. 
     * @return A list of files. If <var>dir</var> is null, these files will be stored under the
     * system's temporary directory, so once processing is finished, they should be deleted
-    * byt the caller, or moved to a more permanent location. 
+    * by the caller, or moved to a more permanent location. 
     * @throws IOException
     * @throws StoreException
     */
@@ -907,7 +907,7 @@ public class Labbcat
     * folder.  If specified, and the directory doesn't exist, it will be created. 
     * @return A list of files. If <var>dir</var> is null, these files will be stored under the
     * system's temporary directory, so once processing is finished, they should be deleted
-    * byt the caller, or moved to a more permanent location. 
+    * by the caller, or moved to a more permanent location. 
     * @throws IOException
     * @throws StoreException
     */
@@ -923,7 +923,7 @@ public class Labbcat
       
       boolean tempFiles = false;
       if (dir == null) {
-         dir = File.createTempFile("getSoundFragments_", "_wav");
+         dir = File.createTempFile("getSoundFragments_", "_frag");
          dir.delete();
          dir.mkdir();
          dir.deleteOnExit();
