@@ -21,18 +21,19 @@
 //
 package nzilbb.labbcat.util;
 
+import java.io.File;
+import java.text.DecimalFormat;
+import java.util.Arrays;
+import java.util.LinkedHashMap;
+import java.util.Vector;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
-import java.io.File;
-import java.util.Vector;
-import java.util.LinkedHashMap;
-import java.text.DecimalFormat;
 import nzilbb.ag.Annotation;
 import nzilbb.labbcat.Labbcat;
 import nzilbb.labbcat.Match;
-import nzilbb.labbcat.TaskStatus;
 import nzilbb.labbcat.PatternBuilder;
+import nzilbb.labbcat.TaskStatus;
 import nzilbb.util.CommandLineProgram;
 import nzilbb.util.ProgramDescription;
 import nzilbb.util.Switch;
@@ -63,6 +64,9 @@ import org.json.JSONObject;
  *  <li>--repetitions=<i>n</i> - Number of clients to simulate (default is 1)</li>
  *  <li>--clientdelay=<i>n</i> - Number of seconds to wait before starting each new client
  * (default is 5).</li> 
+ *  <li>--searchfor=<i>s</i> - The orthography to search for when running searches
+ * (default is <q>i</q>)</li>
+ *  <li>--maxMatches=<i>n</i> - The maximum number of matches to process (default is 200). </li>
  *  <li>--verbose - Produce verbose logging.</li>
  * </ul>
  * <p>Once the utility is complete, a report is printed showing the mean time for each
@@ -193,6 +197,41 @@ public class LoadTester extends CommandLineProgram {
    public LoadTester setClientDelay(Integer newClientDelay) { clientDelay = newClientDelay; return this; }
 
    /**
+    * The orthography to search for when running searches.
+    * @see #getSearchFor()
+    * @see #setSearchFor(String)
+    */
+   protected String searchFor = "i";
+   /**
+    * Getter for {@link #searchFor}: The orthography to search for when running searches.
+    * @return The orthography to search for when running searches.
+    */
+   public String getSearchFor() { return searchFor; }
+   /**
+    * Setter for {@link #searchFor}: The orthography to search for when running searches.
+    * @param newSearchFor The orthography to search for when running searches.
+    */
+   @Switch("The orthography to search for when running searches (default is \"i\").")
+   public LoadTester setSearchFor(String newSearchFor) { searchFor = newSearchFor; return this; }
+
+   /**
+    * The maximum number of matches to process (for annotations and fragments).
+    * @see #getMaxMatches()
+    * @see #setMaxMatches(Integer)
+    */
+   protected Integer maxMatches = Integer.valueOf(200);
+   /**
+    * Getter for {@link #maxMatches}: The maximum number of matches to process (for annotations and fragments).
+    * @return The maximum number of matches to process (for annotations and fragments).
+    */
+   public Integer getMaxMatches() { return maxMatches; }
+   /**
+    * Setter for {@link #maxMatches}: The maximum number of matches to process (for annotations and fragments).
+    * @param newMaxMatches The maximum number of matches to process (for annotations and fragments).
+    */
+   @Switch("The maximum number of matches to process (default is 200).")
+   public LoadTester setMaxMatches(Integer newMaxMatches) { maxMatches = newMaxMatches; return this; }
+   /**
     * Whether to produce verbose logging.
     * @see #getVerbose()
     * @see #setVerbose(Boolean)
@@ -226,7 +265,8 @@ public class LoadTester extends CommandLineProgram {
       System.out.print("Getting statistics when idle...");
       idleClient.run();
       if (!verbose) System.out.println();
-      System.out.println("Match count from search: " + idleClient.matchCount);
+      System.out.println(
+         "Match count from searching for \""+searchFor+"\": " + idleClient.matchCount);
       System.out.println("Idle conditions:");
       // now get times
       LinkedHashMap<String,Long> idleTotals = idleClient.timers.getTotals();
@@ -312,7 +352,7 @@ public class LoadTester extends CommandLineProgram {
          try {
             Labbcat labbcat = new Labbcat(labbcatUrl, username, password);
             //labbcat.setVerbose(verbose);
-            JSONObject pattern = new PatternBuilder().addMatchLayer("orthography", "interesting").build();
+            JSONObject pattern = new PatternBuilder().addMatchLayer("orthography", searchFor).build();
             for (int r = 0; r < repetitions; r++) {
                if (verbose) System.out.println("Client "+c+" Repetition: " + r);
                if (!verbose) System.out.print(".");
@@ -329,6 +369,10 @@ public class LoadTester extends CommandLineProgram {
                   matchCount = matches.length;
                   if (!verbose) System.out.print(".");
                   if (verbose) System.out.println("Client "+c+" "+matches.length+" matches returned.");
+                  if (matches.length > maxMatches) {
+                     if (verbose) System.out.println("Matches list truncated to " + maxMatches);
+                     matches = Arrays.copyOf(matches, maxMatches);
+                  }
                   
                   if (matches.length == 0)
                   {
