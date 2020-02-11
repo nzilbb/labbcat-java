@@ -37,7 +37,7 @@ import nzilbb.labbcat.http.*;
  * <a href="https://nzilbb.github.io/ag/javadoc/nzilbb/ag/IGraphStore.html">nzilbb.ag.IGraphStore</a>.
  * <p> e.g.
  * <pre> // create annotation store client
- * GraphStoreQuery store = new GraphStore("https://labbcat.canterbury.ac.nz", "demo", "demo");
+ * GraphStore store = new GraphStore("https://labbcat.canterbury.ac.nz", "demo", "demo");
  * // get some basic information
  * String id = store.getId();
  * String[] layers = store.getLayerIds();
