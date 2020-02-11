@@ -743,21 +743,9 @@ public class Labbcat
       Double[] endOffsets = new Double[matches.length];
 
       for (int i = 0; i < matches.length; i++) {
-         MatchId matchId = new MatchId(matches[i]);
-         graphIds[i] = matchId.getGraphId();
-         if (matchId.getStartOffset() != null) {
-            startOffsets[i] = matchId.getStartOffset();
-            endOffsets[i] = matchId.getEndOffset();
-         } else if (matchId.getStartAnchorId() != null) {
-            String[] anchorIds = { matchId.getStartAnchorId(), matchId.getEndAnchorId() };
-            try {
-               Anchor[] anchors = getAnchors(matchId.getGraphId(), anchorIds);
-               if (anchors[0] != null) startOffsets[i] = anchors[0].getOffset();
-               if (anchors[1] != null) endOffsets[i] = anchors[1].getOffset();
-            }
-            catch(PermissionException exception) {}
-            catch(GraphNotFoundException exception) {}
-         }
+         graphIds[i] = matches[i].getTranscript();
+         startOffsets[i] = matches[i].getLine();
+         endOffsets[i] = matches[i].getLineEnd();
       } // next match
       
       return getSoundFragments(graphIds, startOffsets, endOffsets, sampleRate, dir);      
@@ -873,23 +861,11 @@ public class Labbcat
       Double[] endOffsets = new Double[matches.length];
       
       for (int i = 0; i < matches.length; i++) {
-         MatchId matchId = new MatchId(matches[i]);
-         graphIds[i] = matchId.getGraphId();
-         if (matchId.getStartOffset() != null) {
-            startOffsets[i] = matchId.getStartOffset();
-            endOffsets[i] = matchId.getEndOffset();
-         } else if (matchId.getStartAnchorId() != null) {
-            String[] anchorIds = { matchId.getStartAnchorId(), matchId.getEndAnchorId() };
-            try {
-               Anchor[] anchors = getAnchors(matchId.getGraphId(), anchorIds);
-               if (anchors[0] != null) startOffsets[i] = anchors[0].getOffset();
-               if (anchors[1] != null) endOffsets[i] = anchors[1].getOffset();
-            }
-            catch(PermissionException exception) {}
-            catch(GraphNotFoundException exception) {}
-         }
+         graphIds[i] = matches[i].getTranscript();
+         startOffsets[i] = matches[i].getLine();
+         endOffsets[i] = matches[i].getLineEnd();
       } // next match
-      
+            
       return getFragments(graphIds, startOffsets, endOffsets, layerIds, mimeType, dir);      
    } // end of getFragments()
 
