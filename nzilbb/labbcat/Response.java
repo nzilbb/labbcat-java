@@ -236,7 +236,7 @@ public class Response {
     * @throws IOException, JSONException
     */
    public Response load(InputStream input)
-    throws IOException, JSONException {
+    throws IOException {
       return load(IO.InputStreamToString(input));
    } // end of load()
    
@@ -244,42 +244,55 @@ public class Response {
     * Loads the response from the given stream.
     * @param text The raw text of the response.
     * @return A reference to this object,
-    * @throws IOException, JSONException
     */
-   public Response load(String text)
-    throws JSONException {
+   public Response load(String text) {
       
       raw = text;
       if (verbose) System.out.println("raw: " + raw);
-      JSONObject json = new JSONObject(raw);
-      
-      title = json.getString("title");
-      if (verbose) System.out.println("title: " + title);
-      version = json.optString("version");
-      if (verbose) System.out.println("version: " + version);
-      code = json.getInt("code");
-      if (verbose) System.out.println("code: " + code);
-      model = json.get("model");      
-      if (verbose) System.out.println("model: " + model);
-      if (verbose && model != null) System.out.println("model type: " + model.getClass().getName());
-      
-      JSONArray array = json.getJSONArray("messages");
-      messages = new Vector<String>();
-      if (array != null) {
-         for (int i = 0; i < array.length(); i++) {
-            if (verbose) System.out.println("messages["+i+"]: " + array.getString(i));
-            messages.add(array.getString(i));
+      if (raw == null || raw.length() == 0) {
+         errors = new Vector<String>();
+         errors.add("Empty response from server.");
+      } else {
+         try {      
+            JSONObject json = new JSONObject(raw);
+            
+            title = json.getString("title");
+            if (verbose) System.out.println("title: " + title);
+            version = json.optString("version");
+            if (verbose) System.out.println("version: " + version);
+            code = json.getInt("code");
+            if (verbose) System.out.println("code: " + code);
+            model = json.get("model");      
+            if (verbose) System.out.println("model: " + model);
+            if (verbose && model != null) System.out.println("model type: " + model.getClass().getName());
+            
+            JSONArray array = json.getJSONArray("messages");
+            messages = new Vector<String>();
+            if (array != null) {
+               for (int i = 0; i < array.length(); i++) {
+                  if (verbose) System.out.println("messages["+i+"]: " + array.getString(i));
+                  messages.add(array.getString(i));
+               }
+            }
+            
+            array = json.getJSONArray("errors");
+            errors = new Vector<String>();
+            if (array != null) {
+               for (int i = 0; i < array.length(); i++) {
+                  if (verbose) System.out.println("errors["+i+"]: " + array.getString(i));
+                  errors.add(array.getString(i));
+               }
+            }
+         } catch (JSONException x) {
+            // not JSON response
+            if (verbose) {
+               System.out.println("JSONException: " + x.getMessage());
+               System.out.println(raw);
+            }
+            errors = new Vector<String>();
+            errors.add("Response not JSON: " + raw);
          }
-      }
-      
-      array = json.getJSONArray("errors");
-      errors = new Vector<String>();
-      if (array != null) {
-         for (int i = 0; i < array.length(); i++) {
-            if (verbose) System.out.println("errors["+i+"]: " + array.getString(i));
-            errors.add(array.getString(i));
-         }
-      }
+      } // text not blank 
       return this;
    } // end of load()
    
