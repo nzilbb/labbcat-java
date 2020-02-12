@@ -55,6 +55,12 @@
     <jar jarfile="${dist}/${ant.project.name}.jar" 
          basedir="${build}"
          comment="version ${DSTAMP}.${TSTAMP}">
+      <manifest>
+	<attribute name="Application-Name" value="LaBB-CAT Command Line Utility"/>
+	<attribute name="Permissions" value="all-permissions"/>
+	<attribute name="Main-Class" value="nzilbb.labbcat.util.CommandLine"/>
+	<attribute name="Class-Path" value="../lib/nzilbb.ag.jar nzilbb.ag.jar"/>
+      </manifest>
       <!-- include source code -->
       <fileset dir="${src}" includes="${srcfiles}" />
       <!-- include this build file -->

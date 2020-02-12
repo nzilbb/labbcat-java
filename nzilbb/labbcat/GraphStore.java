@@ -167,7 +167,7 @@ public class GraphStore
             .setParameter("confidence", confidence)
             .setParameter("parentId", parentId);
          if (verbose) System.out.println("createAnnotation -> " + request);
-         Response response = new Response(request.post().getInputStream(), verbose);
+         response = new Response(request.post().getInputStream(), verbose);
          response.checkForErrors(); // throws a StoreException on error
          if (response.isModelNull()) return null;
          return (String)response.getModel();
@@ -191,7 +191,7 @@ public class GraphStore
             .setParameter("id", id)
             .setParameter("annotationId", annotationId);
          if (verbose) System.out.println("destroyAnnotation -> " + request);
-         Response response = new Response(request.post().getInputStream(), verbose);
+         response = new Response(request.post().getInputStream(), verbose);
          response.checkForErrors(); // throws a StoreException on error
       } catch(IOException x) {
          throw new StoreException("Could not get response.", x);
@@ -272,7 +272,7 @@ public class GraphStore
             .setHeader("Accept", "application/json")
             .setParameter("id", id);
          if (verbose) System.out.println("deleteGraph -> " + request);
-         Response response = new Response(request.post(), verbose);
+         response = new Response(request.post(), verbose);
          response.checkForErrors(); // throws a StoreException on error
       } catch(IOException x) {
          throw new StoreException("Could not get response.", x);

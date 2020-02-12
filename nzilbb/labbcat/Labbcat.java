@@ -229,7 +229,7 @@ public class Labbcat
          } // next file
       }
       if (verbose) System.out.println("taskStatus -> " + postRequest);
-      Response response = new Response(postRequest.post(), verbose);
+      response = new Response(postRequest.post(), verbose);
       response.checkForErrors(); // throws a ResponseException on error
 
       // extract the threadId from model.result.id
@@ -256,7 +256,7 @@ public class Labbcat
          .setParameter("auto", true)
          .setParameter("uploadfile1_0", transcript);
       if (verbose) System.out.println("taskStatus -> " + postRequest);
-      Response response = new Response(postRequest.post(), verbose);
+      response = new Response(postRequest.post(), verbose);
       response.checkForErrors(); // throws a ResponseException on error
       
       // extract the threadId from model.result.id
@@ -281,7 +281,7 @@ public class Labbcat
          .setHeader("Accept", "application/json")
          .setParameter("threadId", threadId);
       if (verbose) System.out.println("taskStatus -> " + request);
-      Response response = new Response(request.get(), verbose);
+      response = new Response(request.get(), verbose);
       response.checkForErrors(); // throws a ResponseException on error
       if (response.isModelNull()) return null;
       return new TaskStatus((JSONObject)response.getModel());
@@ -335,7 +335,7 @@ public class Labbcat
          .setParameter("threadId", threadId)
          .setParameter("command", "cancel");
       if (verbose) System.out.println("taskStatus -> " + request);
-      Response response = new Response(request.get(), verbose);
+      response = new Response(request.get(), verbose);
       response.checkForErrors(); // throws a ResponseException on error
    } // end of cancelTask()
 
@@ -354,7 +354,7 @@ public class Labbcat
          .setParameter("threadId", threadId)
          .setParameter("command", "release");
       if (verbose) System.out.println("taskStatus -> " + request);
-      Response response = new Response(request.get(), verbose);
+      response = new Response(request.get(), verbose);
       response.checkForErrors(); // throws a ResponseException on error
    } // end of releaseTask()
 
@@ -371,7 +371,7 @@ public class Labbcat
       HttpRequestGet request = new HttpRequestGet(url, getRequiredHttpAuthorization())
          .setHeader("Accept", "application/json");
       if (verbose) System.out.println("getTasks -> " + request);
-      Response response = new Response(request.get(), verbose);
+      response = new Response(request.get(), verbose);
       response.checkForErrors(); // throws a ResponseException on error
       if (response.isModelNull()) return null;
       JSONObject model = (JSONObject)response.getModel();
@@ -507,7 +507,7 @@ public class Labbcat
       if (mainParticipant) request.setParameter("only_main_speaker", true);
       if (participantIds != null) request.setParameter("participant_id", participantIds);
       if (verbose) System.out.println("search -> " + request);
-      Response response = new Response(request.get(), verbose);
+      response = new Response(request.get(), verbose);
       response.checkForErrors(); // throws a ResponseException on error
       
       // extract the threadId from model.threadId
@@ -547,7 +547,7 @@ public class Labbcat
          .setParameter("threadId", threadId)
          .setParameter("words_context", wordsContext);
       if (verbose) System.out.println("getMatches -> " + request);
-      Response response = new Response(request.get(), verbose);
+      response = new Response(request.get(), verbose);
       response.checkForErrors(); // throws a ResponseException on error
       
       // extract the MatchIds from model
@@ -692,7 +692,7 @@ public class Labbcat
             .setParameter("copyColumns", false)
             .setParameter("uploadfile", csvUpload);
          if (verbose) System.out.println("getMatchAnnotations -> " + postRequest);
-         Response response = new Response(postRequest.post(), verbose);
+         response = new Response(postRequest.post(), verbose);
          response.checkForErrors(); // throws a ResponseException on error
          
          // extract the MatchIds from model

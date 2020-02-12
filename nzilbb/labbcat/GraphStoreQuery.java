@@ -174,6 +174,23 @@ public class GraphStoreQuery
     */
    public String getMinLabbcatVersion() { return minLabbcatVersion; }
 
+
+   /**
+    * The last response received from the server.
+    * @see #getResponse()
+    * @see #setResponse(Response)
+    */
+   protected Response response;
+   /**
+    * Getter for {@link #response}: The last response received from the server.
+    * @return The last response received from the server.
+    */
+   public Response getResponse() { return response; }
+   /**
+    * Setter for {@link #response}: The last response received from the server.
+    * @param newResponse The last response received from the server.
+    */
+   public GraphStoreQuery setResponse(Response newResponse) { response = newResponse; return this; }
    // Methods:
    
    /**
@@ -248,7 +265,7 @@ public class GraphStoreQuery
       
       URL testUrl = url(""); // store URL with no path
       HttpURLConnection testConnection = (HttpURLConnection)testUrl.openConnection();
-      Response response = null;
+      response = null;
       try {
 	 InputStream is = testConnection.getInputStream();
 	 response = new Response(is, verbose);
@@ -375,7 +392,7 @@ public class GraphStoreQuery
          HttpRequestGet request = new HttpRequestGet(url, getRequiredHttpAuthorization())
             .setHeader("Accept", "application/json");
          if (verbose) System.out.println("getId -> " + request);
-         Response response = new Response(request.get(), verbose);
+         response = new Response(request.get(), verbose);
          response.checkForErrors(); // throws a StoreException on error
          if (response.isModelNull()) return null;
          return (String)response.getModel();
@@ -398,7 +415,7 @@ public class GraphStoreQuery
          HttpRequestGet request = new HttpRequestGet(url, getRequiredHttpAuthorization())
             .setHeader("Accept", "application/json");
          if (verbose) System.out.println("getLayerIds -> " + request);
-         Response response = new Response(request.get(), verbose);
+         response = new Response(request.get(), verbose);
          response.checkForErrors(); // throws a StoreException on error
          if (response.isModelNull()) return null;
          JSONArray array = (JSONArray)response.getModel();
@@ -428,7 +445,7 @@ public class GraphStoreQuery
          HttpRequestGet request = new HttpRequestGet(url, getRequiredHttpAuthorization()) 
             .setHeader("Accept", "application/json");
          if (verbose) System.out.println("getLayers -> " + request);
-         Response response = new Response(request.get(), verbose);
+         response = new Response(request.get(), verbose);
          response.checkForErrors(); // throws a StoreException on error
          if (response.isModelNull()) return null;
          JSONArray array = (JSONArray)response.getModel();
@@ -471,7 +488,7 @@ public class GraphStoreQuery
             .setHeader("Accept", "application/json")
             .setParameter("id", id);
          if (verbose) System.out.println("getLayer -> " + request);
-         Response response = new Response(request.get(), verbose);
+         response = new Response(request.get(), verbose);
          response.checkForErrors(); // throws a StoreException on error
          if (response.isModelNull()) return null;
          return new Layer((JSONObject)response.getModel());
@@ -494,7 +511,7 @@ public class GraphStoreQuery
          HttpRequestGet request = new HttpRequestGet(url, getRequiredHttpAuthorization())
             .setHeader("Accept", "application/json");
          if (verbose) System.out.println("getCorpusIds -> " + request);
-         Response response = new Response(request.get(), verbose);
+         response = new Response(request.get(), verbose);
          response.checkForErrors(); // throws a StoreException on error
          if (response.isModelNull()) return null;
          JSONArray array = (JSONArray)response.getModel();
@@ -526,7 +543,7 @@ public class GraphStoreQuery
          HttpRequestGet request = new HttpRequestGet(url, getRequiredHttpAuthorization())
             .setHeader("Accept", "application/json");
          if (verbose) System.out.println("getParticipantIds -> " + request);
-         Response response = new Response(request.get(), verbose);
+         response = new Response(request.get(), verbose);
          response.checkForErrors(); // throws a StoreException on error
          if (response.isModelNull()) return null;
          JSONArray array = (JSONArray)response.getModel();
@@ -559,7 +576,7 @@ public class GraphStoreQuery
             .setHeader("Accept", "application/json")
             .setParameter("id", id);
          if (verbose) System.out.println("getParticipant -> " + request);
-         Response response = new Response(request.get(), verbose);
+         response = new Response(request.get(), verbose);
          response.checkForErrors(); // throws a StoreException on error
          if (response.isModelNull()) return null;
          return new Annotation((JSONObject)response.getModel());
@@ -597,7 +614,7 @@ public class GraphStoreQuery
          HttpRequestGet request = new HttpRequestGet(url, getRequiredHttpAuthorization())
             .setParameter("expression", expression)
             .setHeader("Accept", "application/json");
-         Response response = new Response(request.get(), verbose);
+         response = new Response(request.get(), verbose);
          response.checkForErrors(); // throws a StoreException on error
          return (Integer)response.getModel();
       } catch(IOException x) {
@@ -638,7 +655,7 @@ public class GraphStoreQuery
          if (verbose) System.out.println("getMatchingParticipantIds -> " + request);
          if (pageLength != null) request.setParameter("pageLength", pageLength);
          if (pageNumber != null) request.setParameter("pageNumber", pageNumber);
-         Response response = new Response(request.get(), verbose);
+         response = new Response(request.get(), verbose);
          response.checkForErrors(); // throws a StoreException on error
          if (response.isModelNull()) return null;
          JSONArray array = (JSONArray)response.getModel();
@@ -670,7 +687,7 @@ public class GraphStoreQuery
          HttpRequestGet request = new HttpRequestGet(url, getRequiredHttpAuthorization())
             .setHeader("Accept", "application/json");
          if (verbose) System.out.println("getGraphIds -> " + request);
-         Response response = new Response(request.get(), verbose);
+         response = new Response(request.get(), verbose);
          response.checkForErrors(); // throws a StoreException on error
          if (response.isModelNull()) return null;
          JSONArray array = (JSONArray)response.getModel();
@@ -704,7 +721,7 @@ public class GraphStoreQuery
             .setParameter("id", id)
             .setHeader("Accept", "application/json");
          if (verbose) System.out.println("getGraphIdsInCorpus -> " + request);
-         Response response = new Response(request.get(), verbose);
+         response = new Response(request.get(), verbose);
          response.checkForErrors(); // throws a StoreException on error
          if (response.isModelNull()) return null;
          JSONArray array = (JSONArray)response.getModel();
@@ -736,7 +753,7 @@ public class GraphStoreQuery
             .setParameter("id", id)
             .setHeader("Accept", "application/json");
          if (verbose) System.out.println("getGraphIdsWithParticipant -> " + request);
-         Response response = new Response(request.get(), verbose);
+         response = new Response(request.get(), verbose);
          response.checkForErrors(); // throws a StoreException on error
          if (response.isModelNull()) return null;
          JSONArray array = (JSONArray)response.getModel();
@@ -788,7 +805,7 @@ public class GraphStoreQuery
          HttpRequestGet request = new HttpRequestGet(url, getRequiredHttpAuthorization())
             .setParameter("expression", expression)
             .setHeader("Accept", "application/json");
-         Response response = new Response(request.get(), verbose);
+         response = new Response(request.get(), verbose);
          response.checkForErrors(); // throws a StoreException on error
          return (Integer)response.getModel();
       } catch(IOException x) {
@@ -842,7 +859,7 @@ public class GraphStoreQuery
          if (pageLength != null) request.setParameter("pageLength", pageLength);
          if (pageNumber != null) request.setParameter("pageNumber", pageNumber);
          if (verbose) System.out.println("getMatchingGraphIds -> " + request);
-         Response response = new Response(request.get(), verbose);
+         response = new Response(request.get(), verbose);
          response.checkForErrors(); // throws a StoreException on error
          if (response.isModelNull()) return null;
          JSONArray array = (JSONArray)response.getModel();
@@ -885,7 +902,7 @@ public class GraphStoreQuery
          HttpRequestGet request = new HttpRequestGet(url, getRequiredHttpAuthorization())
             .setParameter("expression", expression)
             .setHeader("Accept", "application/json");
-         Response response = new Response(request.get(), verbose);
+         response = new Response(request.get(), verbose);
          response.checkForErrors(); // throws a StoreException on error
          return (Integer)response.getModel();
       } catch(IOException x) {
@@ -924,7 +941,7 @@ public class GraphStoreQuery
          if (pageLength != null) request.setParameter("pageLength", pageLength);
          if (pageNumber != null) request.setParameter("pageNumber", pageNumber);
          if (verbose) System.out.println("getMatchingGraphIds -> " + request);
-         Response response = new Response(request.get(), verbose);
+         response = new Response(request.get(), verbose);
          response.checkForErrors(); // throws a StoreException on error
          if (response.isModelNull()) return null;
          JSONArray array = (JSONArray)response.getModel();
@@ -959,7 +976,7 @@ public class GraphStoreQuery
             .setParameter("id", id)
             .setParameter("layerId", layerId)
             .setHeader("Accept", "application/json");
-         Response response = new Response(request.get(), verbose);
+         response = new Response(request.get(), verbose);
          response.checkForErrors(); // throws a StoreException on error
          if (response.getModel() instanceof Integer) return (Integer)response.getModel();
          return (Long)response.getModel();
@@ -991,7 +1008,7 @@ public class GraphStoreQuery
          if (pageLength != null) request.setParameter("pageLength", pageLength);
          if (pageNumber != null) request.setParameter("pageNumber", pageNumber);
          if (verbose) System.out.println("getAnnotations -> " + request);
-         Response response = new Response(request.get(), verbose);
+         response = new Response(request.get(), verbose);
          response.checkForErrors(); // throws a StoreException on error
          if (response.isModelNull()) return null;
          JSONArray array = (JSONArray)response.getModel();
@@ -1050,7 +1067,7 @@ public class GraphStoreQuery
             .setParameter("id", id)
             .setParameter("anchorIds", anchorIds);
          if (verbose) System.out.println("getAnchors -> " + request);
-         Response response = new Response(request.get(), verbose);
+         response = new Response(request.get(), verbose);
          response.checkForErrors(); // throws a StoreException on error
          if (response.isModelNull()) return null;
          JSONArray array = (JSONArray)response.getModel();
@@ -1168,7 +1185,7 @@ public class GraphStoreQuery
          HttpRequestGet request = new HttpRequestGet(url, getRequiredHttpAuthorization()) 
             .setHeader("Accept", "application/json");
          if (verbose) System.out.println("getMediaTracks -> " + request);
-         Response response = new Response(request.get(), verbose);
+         response = new Response(request.get(), verbose);
          response.checkForErrors(); // throws a StoreException on error
          if (response.isModelNull()) return null;
          JSONArray array = (JSONArray)response.getModel();
@@ -1201,7 +1218,7 @@ public class GraphStoreQuery
             .setHeader("Accept", "application/json")
             .setParameter("id", id);
          if (verbose) System.out.println("getAvailableMedia -> " + request);
-         Response response = new Response(request.get(), verbose);
+         response = new Response(request.get(), verbose);
          response.checkForErrors(); // throws a StoreException on error
          if (response.isModelNull()) return null;
          JSONArray array = (JSONArray)response.getModel();
@@ -1240,7 +1257,7 @@ public class GraphStoreQuery
             .setParameter("trackSuffix", trackSuffix)
             .setParameter("mimeType", mimeType);
          if (verbose) System.out.println("getMedia -> " + request);
-         Response response = new Response(request.get(), verbose);
+         response = new Response(request.get(), verbose);
          response.checkForErrors(); // throws a StoreException on error
          if (response.isModelNull()) return null;
          return (String)response.getModel();
@@ -1278,7 +1295,7 @@ public class GraphStoreQuery
             .setParameter("startOffset", startOffset)
             .setParameter("endOffset", endOffset);
          if (verbose) System.out.println("getMedia -> " + request);
-         Response response = new Response(request.get(), verbose);
+         response = new Response(request.get(), verbose);
          response.checkForErrors(); // throws a StoreException on error
          if (response.isModelNull()) return null;
          return (String)response.getModel();
@@ -1304,7 +1321,7 @@ public class GraphStoreQuery
             .setHeader("Accept", "application/json")
             .setParameter("id", id);
          if (verbose) System.out.println("getEpisodeDocuments -> " + request);
-         Response response = new Response(request.get(), verbose);
+         response = new Response(request.get(), verbose);
          response.checkForErrors(); // throws a StoreException on error
          if (response.isModelNull()) return null;
          JSONArray array = (JSONArray)response.getModel();
