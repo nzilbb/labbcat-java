@@ -34,16 +34,16 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 /**
- * Utility for making LaBB-CAT requests from the command line, which generally returns the
- * JSON response from the server.
- * e.g. <br>
- * <tt>java -jar nzilbb.labbcat.jar --labbcaturl=... getLayerIds</tt>
- * <br> might print:
- * <tt>{"title":"LaBB-CAT","version":"20200212.1030","code":0,"errors":[],"messages":[],"model":"http://localhost:8080/labbcat/"}</tt>
+ * Command-line utility for making ad-hoc LaBB-CAT API calls.
+ * <p> The utility generally prints the JSON response from the server.
+ * e.g. 
+ * <p><tt>java -jar nzilbb.labbcat.jar --labbcaturl=&hellip; --username=&hellip; --password=&hellip; getLayerIds</tt>
+ * <p> &hellip; might print:
+ * <p><tt>{"title":"LaBB-CAT","version":"20200212.1030","code":0,"errors":[],"messages":[],"model":"http://localhost:8080/labbcat/"}</tt>
  * <p>Human-readable JSON can be obtained using the <tt>--indent</tt> switch, 
- * e.g. <br>
- * <tt>java -jar nzilbb.labbcat.jar <b>--indent</b> --labbcaturl=... getLayer orthography</tt>
- * <br> might print:
+ * e.g.
+ * <p><tt>java -jar nzilbb.labbcat.jar <b>--indent</b> --labbcaturl=&hellip; getLayer orthography</tt>
+ * <p> &hellip; might print:
  * <pre>{
  *     "title": "LaBB-CAT",
  *     "version": "20200212.1030",
@@ -68,7 +68,7 @@ import org.json.JSONObject;
  * @author Robert Fromont robert@fromont.net.nz
  */
 
-@ProgramDescription(value="Utility for making LaBB-CAT request from the command line.",arguments="function [arg ...]")
+@ProgramDescription(value="Command-line utility for making ad-hoc LaBB-CAT API calls.",arguments="function [arg ...]")
 public class CommandLine extends CommandLineProgram {
    
    public static void main(String argv[]) {
@@ -249,6 +249,7 @@ public class CommandLine extends CommandLineProgram {
                labbcat.cancelTask(arguments.get(1));
             } else if (function.equalsIgnoreCase("cancelTask")) {
                labbcat.cancelTask(arguments.get(1));
+               // TODO explicitly map more functions - it should be faster
             } else { // not a predetermined function - use reflection to figure it out
                Method[] methods = labbcat.getClass().getMethods();
                for (Method method : methods) {
