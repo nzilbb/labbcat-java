@@ -231,22 +231,48 @@ public class LoadTester extends CommandLineProgram {
    public LoadTester setSearchFor(String newSearchFor) { searchFor = newSearchFor; return this; }
 
    /**
+    * ID of other layer (apart from orthography) to get annotations from (default is "phonemes").
+    * @see #getOtherLayer()
+    * @see #setOtherLayer(String)
+    */
+   protected String otherLayer = "phonemes";
+   /**
+    * Getter for {@link #otherLayer}: ID of other layer (apart from orthography) to get
+    * annotations from (default is "phonemes"). 
+    * @return ID of other layer (apart from orthography) to get annotations from (default
+    * is "phonemes"). 
+    */
+   public String getOtherLayer() { return otherLayer; }
+   /**
+    * Setter for {@link #otherLayer}: ID of other layer (apart from orthography) to get
+    * annotations from (default is "phonemes"). 
+    * @param newOtherLayer ID of other layer (apart from orthography) to get annotations
+    * from (default is "phonemes"). 
+    */
+   @Switch("ID of other layer (apart from orthography) to get annotations from (default is \"phonemes\").")
+   public LoadTester setOtherLayer(String newOtherLayer) { otherLayer = newOtherLayer; return this; }
+   
+   /**
     * The maximum number of matches to process (for annotations and fragments).
     * @see #getMaxMatches()
     * @see #setMaxMatches(Integer)
     */
    protected Integer maxMatches = Integer.valueOf(200);
    /**
-    * Getter for {@link #maxMatches}: The maximum number of matches to process (for annotations and fragments).
+    * Getter for {@link #maxMatches}: The maximum number of matches to process (for
+    * annotations and fragments). 
     * @return The maximum number of matches to process (for annotations and fragments).
     */
    public Integer getMaxMatches() { return maxMatches; }
    /**
-    * Setter for {@link #maxMatches}: The maximum number of matches to process (for annotations and fragments).
-    * @param newMaxMatches The maximum number of matches to process (for annotations and fragments).
+    * Setter for {@link #maxMatches}: The maximum number of matches to process (for
+    * annotations and fragments). 
+    * @param newMaxMatches The maximum number of matches to process (for annotations and
+    * fragments). 
     */
    @Switch("The maximum number of matches to process (default is 200).")
    public LoadTester setMaxMatches(Integer newMaxMatches) { maxMatches = newMaxMatches; return this; }
+   
    /**
     * Whether to produce verbose logging.
     * @see #getVerbose()
@@ -397,7 +423,7 @@ public class LoadTester extends CommandLineProgram {
                   }
                   else
                   {
-                     String[] layerIds = { "orthography", "phonemes" };
+                     String[] layerIds = { "orthography", otherLayer };
                      timers.start("getMatchAnnotations");
                      Annotation[][] annotations = labbcat.getMatchAnnotations(matches, layerIds, 0, 1);
                      timers.end("getMatchAnnotations");
