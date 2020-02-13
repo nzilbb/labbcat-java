@@ -640,6 +640,55 @@ public class Labbcat
    }
 
    /**
+    * Searches for tokens that match the given pattern and returns the first
+    * <var>maxMatches</var> matches. 
+    * <p>This is similar to invoking:
+    * <pre> Matches[] matches = labbcat.getMatches(
+    *     labbcat.search(pattern, participantIds, mainParticipant), 
+    *     wordsContext);</pre>
+    * <p>As with {@link #search(JSONObject,String[],boolean)} the <var>pattern</var> must
+    * match the structure of the search matrix in the browser interface of LaBB-CAT.
+    * <p>The PatternBuilder class is designed to make constructing valid patterns easier:
+    * <pre> // words starting with 'ps...'
+    * JSONObject pattern = new PatternBuilder().addMatchLayer("orthography", "ps.*").build();
+    * 
+    * // the word 'the' followed immediately or with one intervening word by
+    * // a hapax legomenon (word with a frequency of 1) that doesn't start with a vowel
+    * JSONObject pattern2 = new PatternBuilder()
+    *    .addColumn()
+    *    .addMatchLayer("orthography", "the")
+    *    .addColumn()
+    *    .addNotMatchLayer("phonemes", "[cCEFHiIPqQuUV0123456789~#\\$@].*")
+    *    .addMaxLayer("frequency", 2)
+    *    .build();
+    * </pre>
+    * @param pattern An object representing the pattern to search for, which mirrors the
+    * Search Matrix in the browser interface.
+    * @param participantIds An optional list of participant IDs to search the utterances
+    * of. If not null, all utterances in the corpus will be searched.
+    * @param mainParticipant true to search only main-participant utterances, false to
+    * search all utterances. 
+    * @param wordsContext Number of words context to include in the <q>Before Match</q>
+    * and <q>After Match</q> columns in the results.
+    * @param maxMatches The maximum number of matches to return, or null to return all.
+    * @return A list of IDs that can be used to identify utterances/tokens that were matched by
+    * {@link #search(JSONObject,String[],boolean)}, or null if the task was cancelled.
+    * @throws IOException
+    * @throws StoreException
+    * @see #getMatches(String,int)}
+    */
+   public Match[] getMatches(JSONObject pattern, String[] participantIds, boolean mainParticipant, int wordsContext, Integer maxMatches)
+    throws IOException, StoreException {
+      
+      String threadId = search(pattern, participantIds, mainParticipant);
+      try {
+         return  getMatches(threadId, wordsContext, maxMatches, 0);
+      } finally { // release the task to save server resources
+         try { releaseTask(threadId); } catch(Exception exception) {}
+      }
+   }
+
+   /**
     * Gets annotations on selected layers related to search results returned by a previous
     * call to {@link #getMatches(String,int)}, {@link #taskStatus(String)}.
     * @param matches A list of {@link Match}es. 
