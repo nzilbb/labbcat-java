@@ -269,7 +269,7 @@ public class TestGraphStoreQuery {
                  ids.length > 0);
       String graphId = ids[0];
       String url = store.getMedia(graphId, "", "audio/wav");
-      assertNotNull("There is some media",
+      assertNotNull("There is some media (check the first graph listed, "+graphId+")",
                     url);
    }
 

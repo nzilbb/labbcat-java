@@ -216,7 +216,7 @@ public class TestGraphStore
       }
 
       String url = store.getMedia(graphId, "", "audio/wav");
-      assertNotNull("getMedia: There is some media",
+      assertNotNull("getMedia: There is some media (check the first graph listed, "+graphId+")",
                     url);
 
       Layer layer = store.getLayer("orthography");
