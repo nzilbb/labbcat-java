@@ -220,7 +220,7 @@ public class TestLabbcat
       }
 
       String url = labbcat.getMedia(graphId, "", "audio/wav");
-      assertNotNull("getMedia: There is some media",
+      assertNotNull("getMedia: There is some media (check the first graph listed, "+graphId+")",
                     url);
 
       Layer layer = labbcat.getLayer("orthography");
@@ -419,6 +419,10 @@ public class TestLabbcat
          {
             int upTo = Math.min(10, matches.length);
             // for (int m = 0; m < upTo; m++) System.out.println("Match: " + matches[m]);
+
+            matches = labbcat.getMatches(threadId, 2, upTo, 0);
+            assertEquals("pagination works ("+upTo+")",
+                         upTo, matches.length);
 
             String[] layerIds = { "orthography" };
             Annotation[][] annotations = labbcat.getMatchAnnotations(matches, layerIds, 0, 1);
