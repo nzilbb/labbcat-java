@@ -652,9 +652,9 @@ public class GraphStoreQuery
          HttpRequestGet request = new HttpRequestGet(url, getRequiredHttpAuthorization())
             .setHeader("Accept", "application/json")
             .setParameter("expression", expression);
-         if (verbose) System.out.println("getMatchingParticipantIds -> " + request);
          if (pageLength != null) request.setParameter("pageLength", pageLength);
          if (pageNumber != null) request.setParameter("pageNumber", pageNumber);
+         if (verbose) System.out.println("getMatchingParticipantIds -> " + request);
          response = new Response(request.get(), verbose);
          response.checkForErrors(); // throws a StoreException on error
          if (response.isModelNull()) return null;
