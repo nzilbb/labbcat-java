@@ -534,6 +534,31 @@ public class Labbcat
     * @see #search(JSONObject,String[],boolean)}
     */
    public Match[] getMatches(String threadId, int wordsContext)
+      throws IOException, StoreException {      
+      return getMatches(threadId, wordsContext, null, null);
+   } // end of getMatchIds()
+
+   /**
+    * Gets a list of tokens that were matched by
+    * {@link #search(JSONObject,String[],boolean)}.
+    * <p>If the task is still running, then this function will wait for it to finish.
+    * <p>This means calls can be stacked like this:
+    *  <pre>Matches[] matches = labbcat.getMatches(
+    *     labbcat.search(
+    *        new PatternBuilder().addMatchLayer("orthography", "and").build(),
+    *        participantIds, true), 1);</pre>
+    * @param threadId A task ID returned by {@link #search(JSONObject,String[],boolean)}.
+    * @param wordsContext Number of words context to include in the <q>Before Match</q>
+    * and <q>After Match</q> columns in the results.
+    * @param pageLength The maximum number of matches to return, or null to return all.
+    * @param pageNumber The zero-based page number to return, or null to return the first page.
+    * @return A list of IDs that can be used to identify utterances/tokens that were matched by
+    * {@link #search(JSONObject,String[],boolean)}, or null if the task was cancelled.
+    * @throws IOException
+    * @throws StoreException
+    * @see #search(JSONObject,String[],boolean)}
+    */
+   public Match[] getMatches(String threadId, int wordsContext, Integer pageLength, Integer pageNumber)
       throws IOException, StoreException {
       
       // ensure it's finished
@@ -546,6 +571,8 @@ public class Labbcat
          .setHeader("Accept", "application/json")
          .setParameter("threadId", threadId)
          .setParameter("words_context", wordsContext);
+      if (pageLength != null) request.setParameter("pageLength", pageLength);
+      if (pageNumber != null) request.setParameter("pageNumber", pageNumber);
       if (verbose) System.out.println("getMatches -> " + request);
       response = new Response(request.get(), verbose);
       response.checkForErrors(); // throws a ResponseException on error
