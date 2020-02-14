@@ -157,19 +157,19 @@ public class TestGraphStoreQuery {
    }
 
    @Test public void countMatchingParticipantIds() throws Exception {
-      int count = store.countMatchingParticipantIds("id MATCHES '.+'");
+      int count = store.countMatchingParticipantIds("/.+/.test(id)");
       assertTrue("There are some matches",
                  count > 0);
    }
 
    @Test public void getMatchingParticipantIds() throws Exception {
-      String[] ids = store.getMatchingParticipantIds("id MATCHES '.+'");
+      String[] ids = store.getMatchingParticipantIds("/.+/.test(id)");
       assertTrue("Some IDs are returned",
                  ids.length > 0);
       if (ids.length < 2) {
          System.out.println("Too few participants to test pagination");
       } else {
-         ids = store.getMatchingParticipantIds("id MATCHES '.+'", 2, 0);
+         ids = store.getMatchingParticipantIds("/.+/.test(id)", 2, 0);
          assertEquals("Two IDs are returned",
                       2, ids.length);
       }         
@@ -196,26 +196,26 @@ public class TestGraphStoreQuery {
    }
 
    @Test public void countMatchingGraphIds() throws Exception {
-      int count = store.countMatchingGraphIds("id MATCHES '.+'");
+      int count = store.countMatchingGraphIds("/.+/.test(id)");
       assertTrue("There are some matches",
                  count > 0);
    }
 
    @Test public void getMatchingGraphIds() throws Exception {
-      String[] ids = store.getMatchingGraphIds("id MATCHES '.+'");
+      String[] ids = store.getMatchingGraphIds("/.+/.test(id)");
       assertTrue("Some IDs are returned",
                  ids.length > 0);
       if (ids.length < 2) {
          System.out.println("Too few graphs to test pagination");
       } else {
-         ids = store.getMatchingGraphIds("id MATCHES '.+'", 2, 0, "id DESC");
+         ids = store.getMatchingGraphIds("/.+/.test(id)", 2, 0, "id DESC");
          assertEquals("Two IDs are returned",
                       2, ids.length);
       }         
    }
 
    @Test public void countAnnotations() throws Exception {
-      String[] ids = store.getMatchingGraphIds("id MATCHES '.+'", 1, 0);
+      String[] ids = store.getMatchingGraphIds("/.+/.test(id)", 1, 0);
       assertTrue("Some graph IDs are returned",
                  ids.length > 0);
       String graphId = ids[0];
@@ -225,7 +225,7 @@ public class TestGraphStoreQuery {
    }
 
    @Test public void getAnnotations() throws Exception {
-      String[] ids = store.getMatchingGraphIds("id MATCHES '.+'", 1, 0);
+      String[] ids = store.getMatchingGraphIds("/.+/.test(id)", 1, 0);
       assertTrue("Some graph IDs are returned",
                  ids.length > 0);
       String graphId = ids[0];
@@ -242,7 +242,7 @@ public class TestGraphStoreQuery {
 
    @Test public void getAnchors() throws Exception {
       // get a graph to work with
-      String[] ids = store.getMatchingGraphIds("id MATCHES '.+'", 1, 0);
+      String[] ids = store.getMatchingGraphIds("/.+/.test(id)", 1, 0);
       assertTrue("Some graph IDs are returned",
                  ids.length > 0);
       String graphId = ids[0];
@@ -264,7 +264,7 @@ public class TestGraphStoreQuery {
    }
    
    @Test public void getMedia() throws Exception {
-      String[] ids = store.getMatchingGraphIds("id MATCHES 'Agnes.+\\.trs'", 1, 0);
+      String[] ids = store.getMatchingGraphIds("/AP511.+\\.eaf/.test(id)", 1, 0);
       assertTrue("Some graph IDs are returned",
                  ids.length > 0);
       String graphId = ids[0];
@@ -274,7 +274,7 @@ public class TestGraphStoreQuery {
    }
 
    @Test public void getMediaFragment() throws Exception {
-      String[] ids = store.getMatchingGraphIds("id MATCHES 'Agnes.+\\.trs'", 1, 0);
+      String[] ids = store.getMatchingGraphIds("/AP511.+\\.eaf/.test(id)", 1, 0);
       assertTrue("Some graph IDs are returned",
                  ids.length > 0);
       String graphId = ids[0];
@@ -303,14 +303,14 @@ public class TestGraphStoreQuery {
 
    @Test public void countMatchingAnnotations() throws Exception {
       int count = store.countMatchingAnnotations(
-         "layer.id = 'orthography' AND label MATCHES 'and'");
+         "layer.id == 'orthography' && label == 'and'");
       assertTrue("There are some matches",
                  count > 0);
    }
 
    @Test public void getMatchingAnnotations() throws Exception {
       Annotation[] annotations = store.getMatchingAnnotations(
-         "layer.id = 'orthography' AND label MATCHES 'and'", 2, 0);
+         "layer.id == 'orthography' && label == 'and'", 2, 0);
       assertEquals("Two annotations are returned",
                    2, annotations.length);
    }
@@ -329,7 +329,7 @@ public class TestGraphStoreQuery {
    
    @Test public void getAvailableMedia() throws Exception {
       // get a graph to work with
-      String[] ids = store.getMatchingGraphIds("id MATCHES '.+'", 1, 0);
+      String[] ids = store.getMatchingGraphIds("/.+/.test(id)", 1, 0);
       assertTrue("Some graph IDs are returned",
                  ids.length > 0);
       String graphId = ids[0];
@@ -342,7 +342,7 @@ public class TestGraphStoreQuery {
    
    @Test public void getEpisodeDocuments() throws Exception {
       // get a graph to work with
-      String[] ids = store.getMatchingGraphIds("id MATCHES '.+'", 1, 0);
+      String[] ids = store.getMatchingGraphIds("/.+/.test(id)", 1, 0);
       assertTrue("Some graph IDs are returned",
                  ids.length > 0);
       String graphId = ids[0];

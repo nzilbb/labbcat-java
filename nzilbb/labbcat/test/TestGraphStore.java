@@ -140,11 +140,11 @@ public class TestGraphStore
       assertTrue("getGraphIds: Some IDs are returned",
                  ids.length > 0);
 
-      long count = store.countMatchingParticipantIds("id MATCHES '.+'");
+      long count = store.countMatchingParticipantIds("/.+/.test(id)");
       assertTrue("countMatchingParticipantIds: There are some matches",
                  count > 0);
 
-      ids = store.getMatchingParticipantIds("id MATCHES '.+'");
+      ids = store.getMatchingParticipantIds("/.+/.test(id)");
       assertTrue("getMatchingParticipantIds: Some IDs are returned",
                  ids.length > 0);
       if (ids.length < 2)
@@ -153,7 +153,7 @@ public class TestGraphStore
       }
       else
       {
-         ids = store.getMatchingParticipantIds("id MATCHES '.+'", 2, 0);
+         ids = store.getMatchingParticipantIds("/.+/.test(id)", 2, 0);
          assertEquals("getMatchingParticipantIds: Two IDs are returned",
                       2, ids.length);
       }
@@ -166,11 +166,11 @@ public class TestGraphStore
       assertTrue("getGraphIdsWithParticipant: Some IDs are returned for participant " + participantId,
                  ids.length > 0);
 
-      count = store.countMatchingGraphIds("id MATCHES '.+'");
+      count = store.countMatchingGraphIds("/.+/.test(id)");
       assertTrue("countMatchingGraphIds: There are some matches",
                  count > 0);
 
-      ids = store.getMatchingGraphIds("id MATCHES '.+'");
+      ids = store.getMatchingGraphIds("/.+/.test(id)");
       assertTrue("countMatchingGraphIds: Some IDs are returned",
                  ids.length > 0);
       String graphId = ids[0];
@@ -180,7 +180,7 @@ public class TestGraphStore
       }
       else
       {
-         ids = store.getMatchingGraphIds("id MATCHES '.+'", 2, 0, "id DESC");
+         ids = store.getMatchingGraphIds("/.+/.test(id)", 2, 0, "id DESC");
          assertEquals("getMatchingGraphIds: Two IDs are returned",
                       2, ids.length);
       }         
@@ -228,12 +228,12 @@ public class TestGraphStore
                    participantId, participant.getLabel()); // not getId()
 
       count = store.countMatchingAnnotations(
-         "layer.id = 'orthography' AND label MATCHES 'and'");
+         "layer.id == 'orthography' && label == 'and'");
       assertTrue("countMatchingAnnotations: There are some matches",
                  count > 0);
 
       annotations = store.getMatchingAnnotations(
-         "layer.id = 'orthography' AND label MATCHES 'and'", 2, 0);
+         "layer.id == 'orthography' && label == 'and'", 2, 0);
       assertEquals("getMatchingAnnotations: Two annotations are returned",
                    2, annotations.length);
 
