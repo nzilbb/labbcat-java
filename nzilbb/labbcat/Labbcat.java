@@ -482,9 +482,15 @@ public class Labbcat
     * @param pattern An object representing the pattern to search for, which mirrors the
     * Search Matrix in the browser interface.
     * @param participantIds An optional list of participant IDs to search the utterances
-    * of. If not null, all utterances in the corpus will be searched.
+    * of. If null, all utterances in the corpus will be searched.
+    * @param transcriptTypes An optional list of transcript types to limit the results
+    * to. If null, all transcript types will be searched. 
     * @param mainParticipant true to search only main-participant utterances, false to
     * search all utterances. 
+    * @param aligned true to include only words that are aligned (i.e. have anchor
+    * confidence &ge; 50, false to search include un-aligned words as well. 
+    * @param matchesPerTranscript Optional maximum number of matches per transcript to
+    * return. <tt>null</tt> means all matches.
     * @return The threadId of the resulting task, which can be passed in to
     * {@link #getMatches(String,int)}, {@link #taskStatus(String)},
     * {@link #waitForTask(String,int)}, etc.
@@ -493,7 +499,7 @@ public class Labbcat
     * @throws IOException
     * @throws StoreException
     */
-   public String search(JSONObject pattern, String[] participantIds, boolean mainParticipant)
+   public String search(JSONObject pattern, String[] participantIds, String[] transcriptTypes, boolean mainParticipant, boolean aligned, Integer matchesPerTranscript)
     throws IOException, StoreException {
       
       cancelling = false;
@@ -504,8 +510,22 @@ public class Labbcat
          .setParameter("command", "search")
          .setParameter("searchJson", pattern.toString())
          .setParameter("words_context", 0);
-      if (mainParticipant) request.setParameter("only_main_speaker", true);
-      if (participantIds != null) request.setParameter("participant_id", participantIds);
+      if (mainParticipant) {
+         request.setParameter("only_main_speaker", true);
+      }
+      if (aligned) {
+         request.setParameter("only_aligned", true);
+      }
+      if (matchesPerTranscript != null) {
+         request.setParameter("matches_per_transcript", matchesPerTranscript);
+      }
+      if (participantIds != null) {
+         request.setParameter("participant_id", participantIds);
+      }
+      if (transcriptTypes != null) {
+         request.setParameter("transcript_type", transcriptTypes);
+      }
+      
       if (verbose) System.out.println("search -> " + request);
       response = new Response(request.get(), verbose);
       response.checkForErrors(); // throws a ResponseException on error
@@ -618,8 +638,14 @@ public class Labbcat
     * Search Matrix in the browser interface.
     * @param participantIds An optional list of participant IDs to search the utterances
     * of. If not null, all utterances in the corpus will be searched.
+    * @param transcriptTypes An optional list of transcript types to limit the results
+    * to. If null, all transcript types will be searched. 
     * @param mainParticipant true to search only main-participant utterances, false to
     * search all utterances. 
+    * @param aligned true to include only words that are aligned (i.e. have anchor
+    * confidence &ge; 50, false to search include un-aligned words as well. 
+    * @param matchesPerTranscript Optional maximum number of matches per transcript to
+    * return. <tt>null</tt> means all matches.
     * @param wordsContext Number of words context to include in the <q>Before Match</q>
     * and <q>After Match</q> columns in the results.
     * @return A list of IDs that can be used to identify utterances/tokens that were matched by
@@ -628,10 +654,11 @@ public class Labbcat
     * @throws StoreException
     * @see #getMatches(String,int)}
     */
-   public Match[] getMatches(JSONObject pattern, String[] participantIds, boolean mainParticipant, int wordsContext)
+   public Match[] getMatches(JSONObject pattern, String[] participantIds, String[] transcriptTypes, boolean mainParticipant, boolean aligned, Integer matchesPerTranscript, int wordsContext)
     throws IOException, StoreException {
       
-      String threadId = search(pattern, participantIds, mainParticipant);
+      String threadId = search(
+         pattern, participantIds, transcriptTypes, mainParticipant, aligned, matchesPerTranscript);
       try {
          return  getMatches(threadId, wordsContext);
       } finally { // release the task to save server resources
@@ -666,8 +693,14 @@ public class Labbcat
     * Search Matrix in the browser interface.
     * @param participantIds An optional list of participant IDs to search the utterances
     * of. If not null, all utterances in the corpus will be searched.
+    * @param transcriptTypes An optional list of transcript types to limit the results
+    * to. If null, all transcript types will be searched. 
     * @param mainParticipant true to search only main-participant utterances, false to
     * search all utterances. 
+    * @param aligned true to include only words that are aligned (i.e. have anchor
+    * confidence &ge; 50, false to search include un-aligned words as well. 
+    * @param matchesPerTranscript Optional maximum number of matches per transcript to
+    * return. <tt>null</tt> means all matches.
     * @param wordsContext Number of words context to include in the <q>Before Match</q>
     * and <q>After Match</q> columns in the results.
     * @param maxMatches The maximum number of matches to return, or null to return all.
@@ -677,10 +710,11 @@ public class Labbcat
     * @throws StoreException
     * @see #getMatches(String,int)}
     */
-   public Match[] getMatches(JSONObject pattern, String[] participantIds, boolean mainParticipant, int wordsContext, Integer maxMatches)
+   public Match[] getMatches(JSONObject pattern, String[] participantIds, String[] transcriptTypes, boolean mainParticipant, boolean aligned, Integer matchesPerTranscript, int wordsContext, Integer maxMatches)
     throws IOException, StoreException {
       
-      String threadId = search(pattern, participantIds, mainParticipant);
+      String threadId = search(
+         pattern, participantIds, transcriptTypes, mainParticipant, aligned, matchesPerTranscript);
       try {
          return  getMatches(threadId, wordsContext, maxMatches, 0);
       } finally { // release the task to save server resources
