@@ -71,9 +71,9 @@ import org.json.JSONObject;
  *
  * // search for tokens of "and"
  * Matches[] matches = labbcat.{@link #getMatches(String,int) getMatches}(
- *     labbcat.{@link #search(JSONObject,String[],boolean) search}(
+ *     labbcat.{@link #search(JSONObject,String[],String[],boolean,boolean,Integer) search}(
  *        new {@link PatternBuilder}().addMatchLayer("orthography", "and").build(),
- *        participantIds, true), 1);
+ *        participantIds, null, true, false, null), 1);
  * </pre>
  * @author Robert Fromont robert@fromont.net.nz
  */
@@ -537,21 +537,23 @@ public class Labbcat
    
    /**
     * Gets a list of tokens that were matched by
-    * {@link #search(JSONObject,String[],boolean)}.
+    * {@link #search(JSONObject,String[],String[],boolean,boolean,Integer)}.
     * <p>If the task is still running, then this function will wait for it to finish.
     * <p>This means calls can be stacked like this:
     *  <pre>Matches[] matches = labbcat.getMatches(
     *     labbcat.search(
     *        new PatternBuilder().addMatchLayer("orthography", "and").build(),
     *        participantIds, true), 1);</pre>
-    * @param threadId A task ID returned by {@link #search(JSONObject,String[],boolean)}.
+    * @param threadId A task ID returned by
+    * {@link #search(JSONObject,String[],String[],boolean,boolean,Integer)}.
     * @param wordsContext Number of words context to include in the <q>Before Match</q>
     * and <q>After Match</q> columns in the results.
     * @return A list of IDs that can be used to identify utterances/tokens that were matched by
-    * {@link #search(JSONObject,String[],boolean)}, or null if the task was cancelled.
+    * {@link #search(JSONObject,String[],String[],boolean,boolean,Integer)}, or null if
+    * the task was cancelled. 
     * @throws IOException
     * @throws StoreException
-    * @see #search(JSONObject,String[],boolean)}
+    * @see #search(JSONObject,String[],String[],boolean,boolean,Integer)}
     */
    public Match[] getMatches(String threadId, int wordsContext)
       throws IOException, StoreException {      
@@ -560,23 +562,25 @@ public class Labbcat
 
    /**
     * Gets a list of tokens that were matched by
-    * {@link #search(JSONObject,String[],boolean)}.
+    * {@link #search(JSONObject,String[],String[],boolean,boolean,Integer)}.
     * <p>If the task is still running, then this function will wait for it to finish.
     * <p>This means calls can be stacked like this:
     *  <pre>Matches[] matches = labbcat.getMatches(
     *     labbcat.search(
     *        new PatternBuilder().addMatchLayer("orthography", "and").build(),
     *        participantIds, true), 1);</pre>
-    * @param threadId A task ID returned by {@link #search(JSONObject,String[],boolean)}.
+    * @param threadId A task ID returned by 
+    * {@link #search(JSONObject,String[],String[],boolean,boolean,Integer)}.
     * @param wordsContext Number of words context to include in the <q>Before Match</q>
     * and <q>After Match</q> columns in the results.
     * @param pageLength The maximum number of matches to return, or null to return all.
     * @param pageNumber The zero-based page number to return, or null to return the first page.
     * @return A list of IDs that can be used to identify utterances/tokens that were matched by
-    * {@link #search(JSONObject,String[],boolean)}, or null if the task was cancelled.
+    * {@link #search(JSONObject,String[],String[],boolean,boolean,Integer)}, or null if
+    * the task was cancelled. 
     * @throws IOException
     * @throws StoreException
-    * @see #search(JSONObject,String[],boolean)}
+    * @see #search(JSONObject,String[],String[],boolean,boolean,Integer)}
     */
    public Match[] getMatches(String threadId, int wordsContext, Integer pageLength, Integer pageNumber)
       throws IOException, StoreException {
@@ -618,7 +622,8 @@ public class Labbcat
     * <pre> Matches[] matches = labbcat.getMatches(
     *     labbcat.search(pattern, participantIds, mainParticipant), 
     *     wordsContext);</pre>
-    * <p>As with {@link #search(JSONObject,String[],boolean)} the <var>pattern</var> must
+    * <p>As with {@link #search(JSONObject,String[],String[],boolean,boolean,Integer)} the
+    * <var>pattern</var> must 
     * match the structure of the search matrix in the browser interface of LaBB-CAT.
     * <p>The PatternBuilder class is designed to make constructing valid patterns easier:
     * <pre> // words starting with 'ps...'
@@ -649,7 +654,8 @@ public class Labbcat
     * @param wordsContext Number of words context to include in the <q>Before Match</q>
     * and <q>After Match</q> columns in the results.
     * @return A list of IDs that can be used to identify utterances/tokens that were matched by
-    * {@link #search(JSONObject,String[],boolean)}, or null if the task was cancelled.
+    * {@link #search(JSONObject,String[],String[],boolean,boolean,Integer)}, or null if
+    * the task was cancelled. 
     * @throws IOException
     * @throws StoreException
     * @see #getMatches(String,int)}
@@ -673,7 +679,8 @@ public class Labbcat
     * <pre> Matches[] matches = labbcat.getMatches(
     *     labbcat.search(pattern, participantIds, mainParticipant), 
     *     wordsContext);</pre>
-    * <p>As with {@link #search(JSONObject,String[],boolean)} the <var>pattern</var> must
+    * <p>As with {@link #search(JSONObject,String[],String[],boolean,boolean,Integer)} the
+    * <var>pattern</var> must 
     * match the structure of the search matrix in the browser interface of LaBB-CAT.
     * <p>The PatternBuilder class is designed to make constructing valid patterns easier:
     * <pre> // words starting with 'ps...'
@@ -705,7 +712,8 @@ public class Labbcat
     * and <q>After Match</q> columns in the results.
     * @param maxMatches The maximum number of matches to return, or null to return all.
     * @return A list of IDs that can be used to identify utterances/tokens that were matched by
-    * {@link #search(JSONObject,String[],boolean)}, or null if the task was cancelled.
+    * {@link #search(JSONObject,String[],String[],boolean,boolean,Integer)}, or null if
+    * the task was cancelled. 
     * @throws IOException
     * @throws StoreException
     * @see #getMatches(String,int)}
