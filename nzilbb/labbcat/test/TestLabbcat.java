@@ -139,9 +139,9 @@ public class TestLabbcat
                  ids.length > 0);
       String participantId = ids[0];
 
-      ids = labbcat.getGraphIds();
+      ids = labbcat.getTranscriptIds();
       // for (String id : ids) System.out.println("graph " + id);
-      assertTrue("getGraphIds: Some IDs are returned",
+      assertTrue("getTranscriptIds: Some IDs are returned",
                  ids.length > 0);
 
       long count = labbcat.countMatchingParticipantIds("/.+/.test(id)");
@@ -162,30 +162,30 @@ public class TestLabbcat
                       2, ids.length);
       }
 
-      ids = labbcat.getGraphIdsInCorpus(corpus);
-      assertTrue("getGraphIdsInCorpus: Some IDs are returned for corpus " + corpus,
+      ids = labbcat.getTranscriptIdsInCorpus(corpus);
+      assertTrue("getTranscriptIdsInCorpus: Some IDs are returned for corpus " + corpus,
                  ids.length > 0);
 
-      ids = labbcat.getGraphIdsWithParticipant(participantId);
-      assertTrue("getGraphIdsWithParticipant: Some IDs are returned for participant " + participantId,
+      ids = labbcat.getTranscriptIdsWithParticipant(participantId);
+      assertTrue("getTranscriptIdsWithParticipant: Some IDs are returned for participant " + participantId,
                  ids.length > 0);
 
-      count = labbcat.countMatchingGraphIds("/.+/.test(id)");
-      assertTrue("countMatchingGraphIds: There are some matches",
+      count = labbcat.countMatchingTranscriptIds("/.+/.test(id)");
+      assertTrue("countMatchingTranscriptIds: There are some matches",
                  count > 0);
 
-      ids = labbcat.getMatchingGraphIds("/.+/.test(id)");
-      assertTrue("countMatchingGraphIds: Some IDs are returned",
+      ids = labbcat.getMatchingTranscriptIds("/.+/.test(id)");
+      assertTrue("countMatchingTranscriptIds: Some IDs are returned",
                  ids.length > 0);
       String graphId = ids[0];
       if (ids.length < 2)
       {
-         System.out.println("countMatchingGraphIds: Too few graphs to test pagination");
+         System.out.println("countMatchingTranscriptIds: Too few graphs to test pagination");
       }
       else
       {
-         ids = labbcat.getMatchingGraphIds("/.+/.test(id)", 2, 0, "id DESC");
-         assertEquals("getMatchingGraphIds: Two IDs are returned",
+         ids = labbcat.getMatchingTranscriptIds("/.+/.test(id)", 2, 0, "id DESC");
+         assertEquals("getMatchingTranscriptIds: Two IDs are returned",
                       2, ids.length);
       }         
       
@@ -303,7 +303,7 @@ public class TestLabbcat
       }
    }
 
-   @Test public void newTranscriptUpdateTranscriptAndDeleteGraph()
+   @Test public void newTranscriptUpdateTranscriptAndDeleteTranscript()
       throws Exception
    {
       // first get a corpus and transcript type
@@ -330,7 +330,7 @@ public class TestLabbcat
          
          // ensure the transcript exists
          assertEquals("Transcript is in the store",
-                      1, labbcat.countMatchingGraphIds("id = '"+transcript.getName()+"'"));
+                      1, labbcat.countMatchingTranscriptIds("id = '"+transcript.getName()+"'"));
 
          // re-upload it
          threadId = labbcat.updateTranscript(transcript);
@@ -343,16 +343,16 @@ public class TestLabbcat
          
          // ensure the transcript exists
          assertEquals("Transcript is still in the store",
-                      1, labbcat.countMatchingGraphIds("id = '"+transcript.getName()+"'"));
+                      1, labbcat.countMatchingTranscriptIds("id = '"+transcript.getName()+"'"));
       }
       finally
       {
          // delete it
-         labbcat.deleteGraph(transcript.getName());
+         labbcat.deleteTranscript(transcript.getName());
          
          // ensure the transcript no longer exists
          assertEquals("Transcript has been deleted from the store",
-                      0, labbcat.countMatchingGraphIds("id = '"+transcript.getName()+"'"));
+                      0, labbcat.countMatchingTranscriptIds("id = '"+transcript.getName()+"'"));
       }
 
    }
@@ -372,7 +372,7 @@ public class TestLabbcat
    @Test(expected = StoreException.class) public void searchInvalidPattern()
       throws Exception
    {
-      String threadId = labbcat.search(new JSONObject(), null, false);
+      String threadId = labbcat.search(new JSONObject(), null, null, false, false, null);
    }
 
    @Test public void searchAndCancelTask()
@@ -385,7 +385,7 @@ public class TestLabbcat
                    .put("layers", new JSONObject()
                         .put("orthography", new JSONObject()
                              .put("pattern", ".*")))));
-      String threadId = labbcat.search(pattern, null, false);
+      String threadId = labbcat.search(pattern, null, null, false, false, null);
       labbcat.cancelTask(threadId);
    }
 
@@ -400,7 +400,7 @@ public class TestLabbcat
 
       // all instances of "and"
       JSONObject pattern = new PatternBuilder().addMatchLayer("orthography", "and").build();
-      String threadId = labbcat.search(pattern, participantId, false);
+      String threadId = labbcat.search(pattern, participantId, null, false, false, null);
       try
       {
          TaskStatus task = labbcat.waitForTask(threadId, 30);
@@ -458,7 +458,7 @@ public class TestLabbcat
 
       // all instances of "and"
       JSONObject pattern = new PatternBuilder().addMatchLayer("orthography", "and").build();
-      String threadId = labbcat.search(pattern, participantId, false);
+      String threadId = labbcat.search(pattern, participantId, null, false, false, null);
       try
       {
          TaskStatus task = labbcat.waitForTask(threadId, 30);
@@ -512,7 +512,7 @@ public class TestLabbcat
 
       // all instances of "and"
       JSONObject pattern = new PatternBuilder().addMatchLayer("orthography", "and").build();
-      String threadId = labbcat.search(pattern, participantId, false);
+      String threadId = labbcat.search(pattern, participantId, null, false, false, null);
       try
       {
          TaskStatus task = labbcat.waitForTask(threadId, 30);

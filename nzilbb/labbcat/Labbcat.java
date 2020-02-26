@@ -848,26 +848,26 @@ public class Labbcat
       throws IOException, StoreException {
 
       // convert matches into three parallel arrays of IDs/offsets
-      String[] graphIds = new String[matches.length];
+      String[] transcriptIds = new String[matches.length];
       Double[] startOffsets = new Double[matches.length];
       Double[] endOffsets = new Double[matches.length];
 
       for (int i = 0; i < matches.length; i++) {
-         graphIds[i] = matches[i].getTranscript();
+         transcriptIds[i] = matches[i].getTranscript();
          startOffsets[i] = matches[i].getLine();
          endOffsets[i] = matches[i].getLineEnd();
       } // next match
       
-      return getSoundFragments(graphIds, startOffsets, endOffsets, sampleRate, dir);      
+      return getSoundFragments(transcriptIds, startOffsets, endOffsets, sampleRate, dir);      
    }
    
    /**
     * Downloads WAV sound fragments.
-    * @param graphIds A list of graph IDs (transcript names).
+    * @param transcriptIds A list of transcript IDs (transcript names).
     * @param startOffsets A list of start offsets, with one element for each element in
-    * <var>graphIds</var>. 
+    * <var>transcriptIds</var>. 
     * @param endOffsets A list of end offsets, with one element for each element in
-    * <var>graphIds</var>. 
+    * <var>transcriptIds</var>. 
     * @param sampleRate The desired sample rate, or null for no preference.
     * @param dir A directory in which the files should be stored, or null for a temporary
     * folder.  If specified, and the directory doesn't exist, it will be created. 
@@ -877,15 +877,15 @@ public class Labbcat
     * @throws IOException
     * @throws StoreException
     */
-   public File[] getSoundFragments(String[] graphIds, Double[] startOffsets, Double[] endOffsets, Integer sampleRate, File dir)
+   public File[] getSoundFragments(String[] transcriptIds, Double[] startOffsets, Double[] endOffsets, Integer sampleRate, File dir)
       throws IOException, StoreException {
       
-      if (graphIds.length != startOffsets.length || graphIds.length != endOffsets.length) {
+      if (transcriptIds.length != startOffsets.length || transcriptIds.length != endOffsets.length) {
          throw new StoreException(
-            "graphIds ("+graphIds.length +"), startOffsets ("+startOffsets.length
+            "transcriptIds ("+transcriptIds.length +"), startOffsets ("+startOffsets.length
             +"), and endOffsets ("+endOffsets.length+") must be arrays of equal size.");
       }
-      File[] fragments = new File[graphIds.length];
+      File[] fragments = new File[transcriptIds.length];
       
       boolean tempFiles = false;
       if (dir == null) {
@@ -899,14 +899,14 @@ public class Labbcat
       }
 
       // loop through each triple, getting fragments individually
-      for (int i = 0; i < graphIds.length; i++) {
+      for (int i = 0; i < transcriptIds.length; i++) {
          if (cancelling) break;
-         if (graphIds[i] == null || startOffsets[i] == null || endOffsets[i] == null) continue;
+         if (transcriptIds[i] == null || startOffsets[i] == null || endOffsets[i] == null) continue;
 
          URL url = makeUrl("soundfragment");
          HttpRequestGet request = new HttpRequestGet(url, getRequiredHttpAuthorization())
             .setHeader("Accept", "audio/wav")
-            .setParameter("id", graphIds[i])
+            .setParameter("id", transcriptIds[i])
             .setParameter("start", startOffsets[i])
             .setParameter("end", endOffsets[i]);
          if (sampleRate != null) request.setParameter("sampleRate", sampleRate);
@@ -933,7 +933,7 @@ public class Labbcat
             if (fragments[i] == null) { // no name was suggested
                // invent a name
                fragments[i] = new File(
-                  dir, Graph.FragmentId(graphIds[i], startOffsets[i], endOffsets[i]) + ".wav");
+                  dir, Graph.FragmentId(transcriptIds[i], startOffsets[i], endOffsets[i]) + ".wav");
             }
             if (tempFiles) fragments[i].deleteOnExit();
             IO.SaveUrlConnectionToFile(connection, fragments[i]);           
@@ -944,7 +944,7 @@ public class Labbcat
    } // end of getSoundFragments()
 
    /**
-    * Get graph fragments in a specified format.
+    * Get transcript fragments in a specified format.
     * <p> This utility method translates a {@link Match} array of the kind returned by 
     * {@link #getMatches(String,int)} to the parallel arrays required by
     * {@link #getFragments(String[],Double[],Double[],String[],String,File)}, 
@@ -966,26 +966,26 @@ public class Labbcat
     throws IOException, StoreException {
       
       // convert matches into three parallel arrays of IDs/offsets
-      String[] graphIds = new String[matches.length];
+      String[] transcriptIds = new String[matches.length];
       Double[] startOffsets = new Double[matches.length];
       Double[] endOffsets = new Double[matches.length];
       
       for (int i = 0; i < matches.length; i++) {
-         graphIds[i] = matches[i].getTranscript();
+         transcriptIds[i] = matches[i].getTranscript();
          startOffsets[i] = matches[i].getLine();
          endOffsets[i] = matches[i].getLineEnd();
       } // next match
             
-      return getFragments(graphIds, startOffsets, endOffsets, layerIds, mimeType, dir);      
+      return getFragments(transcriptIds, startOffsets, endOffsets, layerIds, mimeType, dir);      
    } // end of getFragments()
 
    /**
-    * Get graph fragments in a specified format.
-    * @param graphIds A list of graph IDs (transcript names).
+    * Get transcript fragments in a specified format.
+    * @param transcriptIds A list of transcript IDs (transcript names).
     * @param startOffsets A list of start offsets, with one element for each element in
-    * <var>graphIds</var>. 
+    * <var>transcriptIds</var>. 
     * @param endOffsets A list of end offsets, with one element for each element in
-    * <var>graphIds</var>. 
+    * <var>transcriptIds</var>. 
     * @param layerIds A list of IDs of annotation layers to include in the fragment.
     * @param mimeType The desired format, for example "text/praat-textgrid" for Praat
     * TextGrids, "text/plain" for plain text, etc.
@@ -997,15 +997,15 @@ public class Labbcat
     * @throws IOException
     * @throws StoreException
     */
-   public File[] getFragments(String[] graphIds, Double[] startOffsets, Double[] endOffsets, String[] layerIds, String mimeType, File dir)
+   public File[] getFragments(String[] transcriptIds, Double[] startOffsets, Double[] endOffsets, String[] layerIds, String mimeType, File dir)
     throws IOException, StoreException {
       
-      if (graphIds.length != startOffsets.length || graphIds.length != endOffsets.length) {
+      if (transcriptIds.length != startOffsets.length || transcriptIds.length != endOffsets.length) {
          throw new StoreException(
-            "graphIds ("+graphIds.length +"), startOffsets ("+startOffsets.length
+            "transcriptIds ("+transcriptIds.length +"), startOffsets ("+startOffsets.length
             +"), and endOffsets ("+endOffsets.length+") must be arrays of equal size.");
       }
-      File[] fragments = new File[graphIds.length];
+      File[] fragments = new File[transcriptIds.length];
       
       boolean tempFiles = false;
       if (dir == null) {
@@ -1019,14 +1019,14 @@ public class Labbcat
       }
 
       // loop through each triple, getting fragments individually
-      for (int i = 0; i < graphIds.length; i++) {
+      for (int i = 0; i < transcriptIds.length; i++) {
          if (cancelling) break;
-         if (graphIds[i] == null || startOffsets[i] == null || endOffsets[i] == null) continue;
+         if (transcriptIds[i] == null || startOffsets[i] == null || endOffsets[i] == null) continue;
 
          URL url = makeUrl("convertfragment");
          HttpRequestGet request = new HttpRequestGet(url, getRequiredHttpAuthorization())
             .setHeader("Accept", mimeType)
-            .setParameter("id", graphIds[i])
+            .setParameter("id", transcriptIds[i])
             .setParameter("start", startOffsets[i])
             .setParameter("end", endOffsets[i])
             .setParameter("mimeType", mimeType)
@@ -1054,7 +1054,7 @@ public class Labbcat
             if (fragments[i] == null) { // no suggested name
                // invent a name
                fragments[i] = new File(
-                  dir, Graph.FragmentId(graphIds[i], startOffsets[i], endOffsets[i]));
+                  dir, Graph.FragmentId(transcriptIds[i], startOffsets[i], endOffsets[i]));
             }
             if (tempFiles) fragments[i].deleteOnExit();
             IO.SaveUrlConnectionToFile(connection, fragments[i]);           

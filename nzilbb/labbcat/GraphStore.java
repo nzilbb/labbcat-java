@@ -122,33 +122,33 @@ public class GraphStore
    // IGraphStore methods:
    
    /**
-    * <em>NOT YET IMPLEMENTED</em> - Saves the given graph. The graph can be partial e.g. include only some of the layers
-    * that the stored version of the graph contains.
-    * @param graph The graph to save.
+    * <em>NOT YET IMPLEMENTED</em> - Saves the given transcript. The transcript can be partial e.g. include only some of the layers
+    * that the stored version of the transcript contains.
+    * @param transcript The transcript to save.
     * @return true if changes were saved, false if there were no changes to save.
-    * @throws StoreException If an error prevents the graph from being saved.
-    * @throws PermissionException If saving the graph is not permitted.
-    * @throws GraphNotFoundException If the graph doesn't exist.
+    * @throws StoreException If an error prevents the transcript from being saved.
+    * @throws PermissionException If saving the transcript is not permitted.
+    * @throws GraphNotFoundException If the transcript doesn't exist.
     */
-   public boolean saveGraph(Graph graph)
+   public boolean saveTranscript(Graph transcript)
       throws StoreException, PermissionException, GraphNotFoundException {
       throw new StoreException("Not implemented");
    }
 
    /**
     * Creates an annotation starting at <var>from</var> and ending at <var>to</var>.
-    * @param id The ID of the graph.
-    * @param fromId The start anchor's ID. TODO an expression identifying the start
+    * @param id The ID of the transcript.
+    * @param fromId The start anchor's ID. TODO: an expression identifying the start
     * anchor's ID. e.g. "'n_123'" or "start.id" or maybe something like
     * "first('segments').start.id)"
-    * @param toId The end anchor's ID. TODO an expression identifying the end anchor's
+    * @param toId The end anchor's ID. TODO: an expression identifying the end anchor's
     * ID. e.g. "'n_123'" or "end.id" or maybe something like "last('segments').end.id)"
     * @param layerId The layer ID of the resulting annotation.
     * @param label The label of the resulting annotation. TODO an expression identifying
     * the label. e.g. "'@gz#mpP'" or "my('orthography').label" or maybe something like
     * "SUM(list('segments').duration)"
     * @param confidence The confidence rating.
-    * @param parentId The new annotation's parent's ID. TODO an expression identifying the
+    * @param parentId The new annotation's parent's ID. TODO: an expression identifying the
     * parent. e.g. "'em_0_123'" or "layer.id = 'orthography' AND label = 'example'"
     * @return The ID of the new annotation.
     */
@@ -178,7 +178,7 @@ public class GraphStore
 
    /**
     * Destroys the annotation with the given ID.
-    * @param id The ID of the graph.
+    * @param id The ID of the transcript.
     * @param annotationId The annotation's ID.
     */
    public void destroyAnnotation(String id, String annotationId)
@@ -200,7 +200,7 @@ public class GraphStore
    
    /**
     * <em>NOT YET IMPLEMENTED</em> - Saves a participant, and all its tags, to the database.  The participant is
-    * represented by an Annotation that isn't assumed to be part of a graph.
+    * represented by an Annotation that isn't assumed to be part of a transcript.
     * @param participant
     * @return true if changes were saved, false if there were no changes to save.
     * @throws StoreException If an error prevents the participant from being saved.
@@ -213,14 +213,14 @@ public class GraphStore
    }
 
    /**
-    * <em>NOT YET IMPLEMENTED</em> - Saves the given media for the given graph
-    * @param id The graph ID
+    * <em>NOT YET IMPLEMENTED</em> - Saves the given media for the given transcript
+    * @param id The transcript ID
     * @param trackSuffix The track suffix of the media
     *  - see <a href="https://nzilbb.github.io/ag/javadoc/nzilbb/ag/MediaTrackDefinition.html#suffix">MediaTrackDefinition.suffix</a>}.
     * @param mediaUrl A URL to the media content.
     * @throws StoreException If an error prevents the media from being saved.
     * @throws PermissionException If saving the media is not permitted.
-    * @throws GraphNotFoundException If the graph doesn't exist.
+    * @throws GraphNotFoundException If the transcript doesn't exist.
     */
    public void saveMedia(String id, String trackSuffix, String mediaUrl)
       throws StoreException, PermissionException, GraphNotFoundException {
@@ -229,12 +229,12 @@ public class GraphStore
    }
 
    /**
-    * <em>NOT YET IMPLEMENTED</em> - Saves the given source file (transcript) for the given graph.
-    * @param id The graph ID
+    * <em>NOT YET IMPLEMENTED</em> - Saves the given source file for the given transcript.
+    * @param id The transcript ID
     * @param url A URL to the transcript.
     * @throws StoreException If an error prevents the media from being saved.
     * @throws PermissionException If saving the media is not permitted.
-    * @throws GraphNotFoundException If the graph doesn't exist.
+    * @throws GraphNotFoundException If the transcript doesn't exist.
     */
    public void saveSource(String id, String url)
       throws StoreException, PermissionException, GraphNotFoundException {
@@ -243,12 +243,12 @@ public class GraphStore
    }
 
    /**
-    * <em>NOT YET IMPLEMENTED</em> - Saves the given document for the episode of the given graph.
-    * @param id The graph ID
+    * <em>NOT YET IMPLEMENTED</em> - Saves the given document for the episode of the given transcript.
+    * @param id The transcript ID
     * @param url A URL to the document.
     * @throws StoreException If an error prevents the media from being saved.
     * @throws PermissionException If saving the media is not permitted.
-    * @throws GraphNotFoundException If the graph doesn't exist.
+    * @throws GraphNotFoundException If the transcript doesn't exist.
     */
    public void saveEpisodeDocument(String id, String url)
       throws StoreException, PermissionException, GraphNotFoundException {
@@ -257,21 +257,21 @@ public class GraphStore
    }
 
    /**
-    * Deletes the given graph, and all associated files.
-    * @param id The ID graph to save.
-    * @throws StoreException If an error prevents the graph from being saved.
-    * @throws PermissionException If saving the graph is not permitted.
-    * @throws GraphNotFoundException If the graph doesn't exist.
+    * Deletes the given transcript, and all associated files.
+    * @param id The ID transcript to save.
+    * @throws StoreException If an error prevents the transcript from being deleted.
+    * @throws PermissionException If deleting the transcript is not permitted.
+    * @throws GraphNotFoundException If the transcript doesn't exist.
     */
-   public void deleteGraph(String id)
+   public void deleteTranscript(String id)
       throws StoreException, PermissionException, GraphNotFoundException {
       
       try {
-         URL url = editUrl("deleteGraph");
+         URL url = editUrl("deleteTranscript");
          HttpRequestPost request = new HttpRequestPost(url, getRequiredHttpAuthorization())
             .setHeader("Accept", "application/json")
             .setParameter("id", id);
-         if (verbose) System.out.println("deleteGraph -> " + request);
+         if (verbose) System.out.println("deleteTranscript -> " + request);
          response = new Response(request.post(), verbose);
          response.checkForErrors(); // throws a StoreException on error
       } catch(IOException x) {

@@ -400,7 +400,8 @@ public class LoadTester extends CommandLineProgram {
                if (!verbose) System.out.print(".");
 
                timers.start("search");
-               TaskStatus searchTask = labbcat.waitForTask(labbcat.search(pattern, null, false), 0);
+               TaskStatus searchTask = labbcat.waitForTask(
+                  labbcat.search(pattern, null, null, false, false, null), 0);
                timers.end("search");
                if (!verbose) System.out.print(".");
 

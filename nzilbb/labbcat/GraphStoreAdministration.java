@@ -119,7 +119,7 @@ public class GraphStoreAdministration
    // IGraphStoreAdministration methods:
    
    /**
-    * <em>NOT YET IMPLEMENTED</em> - Registers a graph deserializer.
+    * <em>NOT YET IMPLEMENTED</em> - Registers a transcript deserializer.
     * @param deserializer The deserializer to register.
     * @throws StoreException If an error prevents the operation.
     * @throws PermissionException If the operation is not permitted.
@@ -131,7 +131,7 @@ public class GraphStoreAdministration
    }
 
    /**
-    * <em>NOT YET IMPLEMENTED</em> - De-registers a graph deserializer.
+    * <em>NOT YET IMPLEMENTED</em> - De-registers a transcript deserializer.
     * @param deserializer The deserializer to de-register.
     * @throws StoreException If an error prevents the operation.
     * @throws PermissionException If the operation is not permitted.
@@ -181,7 +181,7 @@ public class GraphStoreAdministration
    }
 
    /**
-    * <em>NOT YET IMPLEMENTED</em> - Registers a graph serializer.
+    * <em>NOT YET IMPLEMENTED</em> - Registers a transcript serializer.
     * @param serializer The serializer to register.
     * @throws StoreException If an error prevents the operation.
     * @throws PermissionException If the operation is not permitted.
@@ -193,7 +193,7 @@ public class GraphStoreAdministration
    }
 
    /**
-    * <em>NOT YET IMPLEMENTED</em> - De-registers a graph serializer.
+    * <em>NOT YET IMPLEMENTED</em> - De-registers a transcript serializer.
     * @param serializer The serializer to de-register.
     * @throws StoreException If an error prevents the operation.
     * @throws PermissionException If the operation is not permitted.

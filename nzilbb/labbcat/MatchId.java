@@ -66,15 +66,15 @@ public class MatchId {
    // Attributes:
    
    /**
-    * The graph identifier.
-    * @see #getGraphId()
+    * The transcript identifier.
+    * @see #getTranscriptId()
     */
-   protected String graphId;
+   protected String transcriptId;
    /**
-    * Getter for {@link #graphId}: The graph identifier.
-    * @return The graph identifier.
+    * Getter for {@link #transcriptId}: The transcript identifier.
+    * @return The transcript identifier.
     */
-   public String getGraphId() { return graphId; }
+   public String getTranscriptId() { return transcriptId; }
    
    /**
     * ID of the start anchor.
@@ -194,7 +194,7 @@ public class MatchId {
    public MatchId parseId(String matchId) {
       
       String[] parts = matchId.split(";");
-      graphId = parts[0];
+      transcriptId = parts[0];
       String intervalPart = null;
       for (int p = 1; p < parts.length; p++) {
          if (parts[p].indexOf("-") > 0) {

@@ -135,9 +135,9 @@ public class TestGraphStore
                  ids.length > 0);
       String participantId = ids[0];
 
-      ids = store.getGraphIds();
+      ids = store.getTranscriptIds();
       // for (String id : ids) System.out.println("graph " + id);
-      assertTrue("getGraphIds: Some IDs are returned",
+      assertTrue("getTranscriptIds: Some IDs are returned",
                  ids.length > 0);
 
       long count = store.countMatchingParticipantIds("/.+/.test(id)");
@@ -158,30 +158,30 @@ public class TestGraphStore
                       2, ids.length);
       }
 
-      ids = store.getGraphIdsInCorpus(corpus);
-      assertTrue("getGraphIdsInCorpus: Some IDs are returned for corpus " + corpus,
+      ids = store.getTranscriptIdsInCorpus(corpus);
+      assertTrue("getTranscriptIdsInCorpus: Some IDs are returned for corpus " + corpus,
                  ids.length > 0);
 
-      ids = store.getGraphIdsWithParticipant(participantId);
-      assertTrue("getGraphIdsWithParticipant: Some IDs are returned for participant " + participantId,
+      ids = store.getTranscriptIdsWithParticipant(participantId);
+      assertTrue("getTranscriptIdsWithParticipant: Some IDs are returned for participant " + participantId,
                  ids.length > 0);
 
-      count = store.countMatchingGraphIds("/.+/.test(id)");
-      assertTrue("countMatchingGraphIds: There are some matches",
+      count = store.countMatchingTranscriptIds("/.+/.test(id)");
+      assertTrue("countMatchingTranscriptIds: There are some matches",
                  count > 0);
 
-      ids = store.getMatchingGraphIds("/.+/.test(id)");
-      assertTrue("countMatchingGraphIds: Some IDs are returned",
+      ids = store.getMatchingTranscriptIds("/.+/.test(id)");
+      assertTrue("countMatchingTranscriptIds: Some IDs are returned",
                  ids.length > 0);
       String graphId = ids[0];
       if (ids.length < 2)
       {
-         System.out.println("countMatchingGraphIds: Too few graphs to test pagination");
+         System.out.println("countMatchingTranscriptIds: Too few graphs to test pagination");
       }
       else
       {
-         ids = store.getMatchingGraphIds("/.+/.test(id)", 2, 0, "id DESC");
-         assertEquals("getMatchingGraphIds: Two IDs are returned",
+         ids = store.getMatchingTranscriptIds("/.+/.test(id)", 2, 0, "id DESC");
+         assertEquals("getMatchingTranscriptIds: Two IDs are returned",
                       2, ids.length);
       }         
       
@@ -254,14 +254,14 @@ public class TestGraphStore
       }
    }
 
-   @Test public void deleteGraphNotExists()
+   @Test public void deleteTranscriptNotExists()
       throws Exception
    {
       try
       {
          // get some annotations so we have valid anchor IDs
-         store.deleteGraph("nonexistent graph ID");
-         fail("deleteGraph should fail for nonexistant graph ID");
+         store.deleteTranscript("nonexistent graph ID");
+         fail("deleteTranscript should fail for nonexistant graph ID");
       }
       catch(ResponseException exception)
       {

@@ -209,14 +209,14 @@ public class CommandLine extends CommandLineProgram {
                labbcat.getParticipant(arguments.get(1));
             } else if (function.equalsIgnoreCase("countMatchingParticipantIds")) {
                labbcat.countMatchingParticipantIds(arguments.get(1));
-            } else if (function.equalsIgnoreCase("getGraphIds")) {
-               labbcat.getGraphIds();
-            } else if (function.equalsIgnoreCase("getGraphIdsInCorpus")) {
-               labbcat.getGraphIdsInCorpus(arguments.get(1));
-            } else if (function.equalsIgnoreCase("getGraphIdsWithParticipant")) {
-               labbcat.getGraphIdsWithParticipant(arguments.get(1));
-            } else if (function.equalsIgnoreCase("countMatchingGraphIds")) {
-               labbcat.countMatchingGraphIds(arguments.get(1));
+            } else if (function.equalsIgnoreCase("getTranscriptIds")) {
+               labbcat.getTranscriptIds();
+            } else if (function.equalsIgnoreCase("getTranscriptIdsInCorpus")) {
+               labbcat.getTranscriptIdsInCorpus(arguments.get(1));
+            } else if (function.equalsIgnoreCase("getTranscriptIdsWithParticipant")) {
+               labbcat.getTranscriptIdsWithParticipant(arguments.get(1));
+            } else if (function.equalsIgnoreCase("countMatchingTranscriptIds")) {
+               labbcat.countMatchingTranscriptIds(arguments.get(1));
             } else if (function.equalsIgnoreCase("countMatchingAnnotations")) {
                labbcat.countMatchingAnnotations(arguments.get(1));
             } else if (function.equalsIgnoreCase("countAnnotations")) {
@@ -229,8 +229,8 @@ public class CommandLine extends CommandLineProgram {
                labbcat.getMedia(arguments.get(1), arguments.get(2), arguments.get(3));
             } else if (function.equalsIgnoreCase("getEpisodeDocuments")) {
                labbcat.getEpisodeDocuments(arguments.get(1));
-            } else if (function.equalsIgnoreCase("deleteGraph")) { // GraphStore...
-               labbcat.deleteGraph(arguments.get(1));
+            } else if (function.equalsIgnoreCase("deleteTranscript")) { // GraphStore...
+               labbcat.deleteTranscript(arguments.get(1));
             } else if (function.equalsIgnoreCase("taskStatus")) { // Labbcat...
                labbcat.taskStatus(arguments.get(1));
             } else if (function.equalsIgnoreCase("cancelTask")) {
