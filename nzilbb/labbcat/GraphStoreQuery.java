@@ -52,6 +52,7 @@ import org.json.JSONObject;
 /**
  * Client-side implementation of 
  * <a href="https://nzilbb.github.io/ag/javadoc/nzilbb/ag/IGraphStoreQuery.html">nzilbb.ag.IGraphStoreQuery</a>.
+ * <p>This class provides only <em>read-only</em> operations.
  * <p> e.g.
  * <pre> // create annotation store client
  * GraphStoreQuery store = new GraphStoreQuery("https://labbcat.canterbury.ac.nz", "demo", "demo");

@@ -47,6 +47,8 @@ import org.json.JSONObject;
 
 /**
  * Labbcat client, for accessing LaBB-CAT server functions programmatically.
+ * <p>This class inherits the <em>read-write</em> operations of {@link GraphStoreAdministration}
+ * and adds some extra operations, including transcript upload and task management. 
  * <p> e.g.
  * <pre> // create LaBB-CAT client
  * Labbcat labbcat = new {@link #Labbcat(String,String,String) Labbcat("https://labbcat.canterbury.ac.nz", "demo", "demo")};

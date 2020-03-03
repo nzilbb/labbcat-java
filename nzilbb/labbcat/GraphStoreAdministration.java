@@ -33,6 +33,9 @@ import nzilbb.ag.serialize.SerializationDescriptor;
 /**
  * Client-side implementation of 
  * <a href="https://nzilbb.github.io/ag/javadoc/nzilbb/ag/IGraphStoreAdministration.html">nzilbb.ag.IGraphStoreAdminitration</a>.
+ * <p>This class inherits the <em>read-write</em> operations of {@link GraphStore}
+ * and adds some administration operations, including definition of layers,
+ * registration of converters, etc.
  * <p> e.g.
  * <pre> // create annotation store client
  * GraphStoreAdministration store = new GraphStoreAdministration("https://labbcat.canterbury.ac.nz", "demo", "demo");

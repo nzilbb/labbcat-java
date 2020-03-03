@@ -35,6 +35,8 @@ import nzilbb.labbcat.http.*;
 /**
  * Client-side implementation of 
  * <a href="https://nzilbb.github.io/ag/javadoc/nzilbb/ag/IGraphStore.html">nzilbb.ag.IGraphStore</a>.
+ * <p>This class inherits the <em>read-only</em> operations of {@link GraphStoreQuery}
+ * and adds some <em>write</em> operations for updating data.
  * <p> e.g.
  * <pre> // create annotation store client
  * GraphStore store = new GraphStore("https://labbcat.canterbury.ac.nz", "demo", "demo");
