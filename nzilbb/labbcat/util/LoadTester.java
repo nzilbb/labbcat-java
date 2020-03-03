@@ -274,6 +274,60 @@ public class LoadTester extends CommandLineProgram {
    public LoadTester setMaxMatches(Integer newMaxMatches) { maxMatches = newMaxMatches; return this; }
    
    /**
+    * Call getMatchAnnotations as part of the test.
+    * @see #getMatchAnnotations()
+    * @see #setMatchAnnotations(Boolean)
+    */
+   protected Boolean matchAnnotations = Boolean.TRUE;
+   /**
+    * Getter for {@link #matchAnnotations}: Call getMatchAnnotations as part of the test.
+    * @return Call getMatchAnnotations as part of the test.
+    */
+   public Boolean getMatchAnnotations() { return matchAnnotations; }
+   /**
+    * Setter for {@link #matchAnnotations}: Call getMatchAnnotations as part of the test.
+    * @param newMatchAnnotations Call getMatchAnnotations as part of the test.
+    */
+   @Switch("Call getMatchAnnotations as part of the test (default is TRUE).")
+   public LoadTester setMatchAnnotations(Boolean newMatchAnnotations) { matchAnnotations = newMatchAnnotations; return this; }
+
+   /**
+    * Call getFragments as part of the test.
+    * @see #getFragments()
+    * @see #setFragments(Boolean)
+    */
+   protected Boolean fragments = Boolean.TRUE;
+   /**
+    * Getter for {@link #fragments}: Call getFragments as part of the test.
+    * @return Call getFragments as part of the test.
+    */
+   public Boolean getFragments() { return fragments; }
+   /**
+    * Setter for {@link #fragments}: Call getFragments as part of the test.
+    * @param newFragments Call getFragments as part of the test.
+    */
+   @Switch("Call getFragments as part of the test (default is TRUE).")
+   public LoadTester setFragments(Boolean newFragments) { fragments = newFragments; return this; }
+
+   /**
+    * Call getSoundFragments as part of the test.
+    * @see #getSoundFragments()
+    * @see #setSoundFragments(Boolean)
+    */
+   protected Boolean soundFragments = Boolean.TRUE;
+   /**
+    * Getter for {@link #soundFragments}: Call getSoundFragments as part of the test.
+    * @return Call getSoundFragments as part of the test.
+    */
+   public Boolean getSoundFragments() { return soundFragments; }
+   /**
+    * Setter for {@link #soundFragments}: Call getSoundFragments as part of the test.
+    * @param newSoundFragments Call getSoundFragments as part of the test.
+    */
+   @Switch("Call getSoundFragments as part of the test (default is TRUE).")
+   public LoadTester setSoundFragments(Boolean newSoundFragments) { soundFragments = newSoundFragments; return this; }
+
+   /**
     * Whether to produce verbose logging.
     * @see #getVerbose()
     * @see #setVerbose(Boolean)
@@ -416,35 +470,45 @@ public class LoadTester extends CommandLineProgram {
                      if (verbose) System.out.println("Matches list truncated to " + maxMatches);
                      matches = Arrays.copyOf(matches, maxMatches);
                   }
-                  
-                  if (matches.length == 0)
-                  {
+
+                  String[] layerIds = { "orthography", otherLayer };
+
+                  if (matches.length == 0) {
                      System.err.println(
                         "Client "+c+" No matches were returned, cannot call getMatchAnnotations");
-                  }
-                  else
-                  {
-                     String[] layerIds = { "orthography", otherLayer };
-                     timers.start("getMatchAnnotations");
-                     Annotation[][] annotations = labbcat.getMatchAnnotations(matches, layerIds, 0, 1);
-                     timers.end("getMatchAnnotations");
-                     if (verbose) System.out.println("Client "+c+" "+annotations.length+" annotations returned.");
-                     if (!verbose) System.out.print(".");
-                     
-                     timers.start("getFragments");
-                     File[] files = labbcat.getFragments(
-                        matches, layerIds, "text/praat-textgrid", null);
-                     timers.end("getFragments");
-                     if (verbose) System.out.println("Client "+c+" "+files.length+" TextGrids returned.");
-                     if (!verbose) System.out.print(".");
-                     for (File file : files) if (file != null) file.delete();
-                     
-                     timers.start("getSoundFragments");
-                     files = labbcat.getSoundFragments(matches, 16000, null);
-                     timers.end("getSoundFragments");
-                     if (verbose) System.out.println("Client "+c+" "+files.length+" recordings returned.");
-                     if (!verbose) System.out.print(".");
-                     for (File file : files) if (file != null) file.delete();
+                  } else {
+                     if (matchAnnotations) {
+                        timers.start("getMatchAnnotations");
+                        Annotation[][] annotations = labbcat.getMatchAnnotations(matches, layerIds, 0, 1);
+                        timers.end("getMatchAnnotations");
+                        if (verbose) System.out.println("Client "+c+" "+annotations.length+" annotations returned.");
+                        if (!verbose) System.out.print(".");
+                     } else {
+                        if (verbose) System.out.println("Skipping getMatchAnnotations.");
+                     }
+
+                     if (fragments) {
+                        timers.start("getFragments");
+                        File[] files = labbcat.getFragments(
+                           matches, layerIds, "text/praat-textgrid", null);
+                        timers.end("getFragments");
+                        if (verbose) System.out.println("Client "+c+" "+files.length+" TextGrids returned.");
+                        if (!verbose) System.out.print(".");
+                        for (File file : files) if (file != null) file.delete();
+                     } else {
+                        if (verbose) System.out.println("Skipping getFragments.");
+                     }
+
+                     if (soundFragments) {
+                        timers.start("getSoundFragments");
+                        File[] files = labbcat.getSoundFragments(matches, 16000, null);
+                        timers.end("getSoundFragments");
+                        if (verbose) System.out.println("Client "+c+" "+files.length+" recordings returned.");
+                        if (!verbose) System.out.print(".");
+                        for (File file : files) if (file != null) file.delete();
+                     } else {
+                        if (verbose) System.out.println("Skipping getSoundFragments.");
+                     }
                      
                   }
                } finally {
