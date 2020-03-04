@@ -37,7 +37,7 @@ The following example shows how to:
 Labbcat labbcat = new Labbcat("https://labbcat.canterbury.ac.nz", "demo", "demo");
 
 // get a corpus ID
-String[] corpora = labbcat.getCorpusIds()};
+String[] corpora = labbcat.getCorpusIds();
 String corpus = ids[0];
 
 // get a transcript type
