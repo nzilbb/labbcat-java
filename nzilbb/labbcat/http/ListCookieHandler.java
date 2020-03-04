@@ -41,20 +41,21 @@ public class ListCookieHandler extends CookieHandler {
   private List<Cookie> cookieJar = new LinkedList<Cookie>();
 
   public synchronized void put(URI uri, Map<String, List<String>> responseHeaders) throws IOException {
-    List<String> setCookieList = responseHeaders.get("Set-Cookie");
-    if (setCookieList != null) {
-      for (String item : setCookieList) {
-        Cookie cookie = new Cookie(uri, item);
-        for (Cookie existingCookie : cookieJar) {
-          if ((cookie.getURI().equals(existingCookie.getURI()))
-              && (cookie.getName().equals(existingCookie.getName()))) {
-            cookieJar.remove(existingCookie);
-            break;
-          }
-        }
-        cookieJar.add(cookie);
-      }
-    }
+     // ignore all Cookies
+     // List<String> setCookieList = responseHeaders.get("Set-Cookie");
+     // if (setCookieList != null) {
+     //   for (String item : setCookieList) {
+     //     Cookie cookie = new Cookie(uri, item);
+     //     for (Cookie existingCookie : cookieJar) {
+     //       if ((cookie.getURI().equals(existingCookie.getURI()))
+     //           && (cookie.getName().equals(existingCookie.getName()))) {
+     //         cookieJar.remove(existingCookie);
+     //         break;
+     //       }
+     //     }
+     //     cookieJar.add(cookie);
+     //   }
+     // }
   }
 
   public synchronized Map<String, List<String>> get(URI uri, Map<String, List<String>> requestHeaders)
