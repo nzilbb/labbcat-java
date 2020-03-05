@@ -776,7 +776,7 @@ public class GraphStoreQuery
     * <p> The expression language is loosely based on JavaScript; expressions such as
     * the following can be used: 
     *  <li><code>/Ada.+/.test(id)</code></li>
-    *  <li><code>labels('who').includes('Robert')</code></li>
+    *  <li><code>labels('participant').includes('Robert')</code></li>
     *  <li><code>('CC', 'IA', 'MU').includes(my('corpus').label)</code></li>
     *  <li><code>my('episode').label == 'Ada Aitcheson'</code></li>
     *  <li><code>my('transcript_scribe').label == 'Robert'</code></li>
@@ -790,7 +790,7 @@ public class GraphStoreQuery
     *  <li><code>list('transcript').length gt; 100</code></li>
     *  <li><code>annotators('transcript_rating').includes('Robert')</code></li>
     *  <li><code>!/Ada.+/.test(id) &amp;&amp; my('corpus').label == 'CC' &amp;&amp;
-    * labels('who').includes('Robert')</code></li> 
+    * labels('participant').includes('Robert')</code></li> 
     * </ul>
     * @return The number of matching transcripts.
     * @throws StoreException If an error occurs.
@@ -823,7 +823,7 @@ public class GraphStoreQuery
     * <p> The expression language is loosely based on JavaScript; expressions such as
     * the following can be used:
     *  <li><code>/Ada.+/.test(id)</code></li>
-    *  <li><code>labels('who').includes('Robert')</code></li>
+    *  <li><code>labels('participant').includes('Robert')</code></li>
     *  <li><code>('CC', 'IA', 'MU').includes(my('corpus').label)</code></li>
     *  <li><code>my('episode').label == 'Ada Aitcheson'</code></li>
     *  <li><code>my('transcript_scribe').label == 'Robert'</code></li>
@@ -837,7 +837,7 @@ public class GraphStoreQuery
     *  <li><code>list('transcript').length gt; 100</code></li>
     *  <li><code>annotators('transcript_rating').includes('Robert')</code></li>
     *  <li><code>!/Ada.+/.test(id) &amp;&amp; my('corpus').label == 'CC' &amp;&amp;
-    * labels('who').includes('Robert')</code></li> 
+    * labels('participant').includes('Robert')</code></li> 
     * </ul>
     * @param pageLength The maximum number of IDs to return, or null to return all.
     * @param pageNumber The zero-based page number to return, or null to return the first page.
@@ -882,7 +882,7 @@ public class GraphStoreQuery
     * <ul>
     *  <li><code>id == 'ew_0_456'</code></li>
     *  <li><code>!/th[aeiou].&#47;/.test(label)</code></li>
-    *  <li><code>my('who').label == 'Robert' &amp;&amp; my('utterances').start.offset ==
+    *  <li><code>my('participant').label == 'Robert' &amp;&amp; my('utterances').start.offset ==
     * 12.345</code></li> 
     *  <li><code>graph.id == 'AdaAicheson-01.trs' &amp;&amp; layer.id == 'orthography'
     * &amp;&amp; start.offset &gt; 10.5</code></li> 
@@ -918,7 +918,7 @@ public class GraphStoreQuery
     * <ul>
     *  <li><code>id == 'ew_0_456'</code></li>
     *  <li><code>!/th[aeiou].&#47;/.test(label)</code></li>
-    *  <li><code>my('who').label == 'Robert' &amp;&amp; my('utterances').start.offset ==
+    *  <li><code>my('participant').label == 'Robert' &amp;&amp; my('utterances').start.offset ==
     * 12.345</code></li> 
     *  <li><code>graph.id == 'AdaAicheson-01.trs' &amp;&amp; layer.id == 'orthography'
     * &amp;&amp; start.offset 
