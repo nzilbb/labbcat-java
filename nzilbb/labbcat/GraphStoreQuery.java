@@ -168,13 +168,12 @@ public class GraphStoreQuery
     * @see #getMinLabbcatVersion()
     * @see #setMinLabbcatVersion(String)
     */
-   protected String minLabbcatVersion = "20200129.1901";
+   protected String minLabbcatVersion = "20200603.1837";
    /**
     * Getter for {@link #minLabbcatVersion}: Minimum server version required for this API to work properly.
     * @return Minimum server version required for this API to work properly.
     */
    public String getMinLabbcatVersion() { return minLabbcatVersion; }
-
 
    /**
     * The last response received from the server.
@@ -371,7 +370,7 @@ public class GraphStoreQuery
       throws StoreException {
       
       try {
-         return new URL(new URL(labbcatUrl, "store/"), resource);
+         return new URL(new URL(labbcatUrl, "api/store/"), resource);
       } catch(Throwable t) {
          throw new StoreException("Could not construct request URL.", t);
       }

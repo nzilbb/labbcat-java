@@ -91,8 +91,8 @@
 	   includes="${testsrcfiles}"
 	   classpath=".;${config.junitjar};${dist}/${ant.project.name}.jar;${lib}/nzilbb.ag.jar;${lib}/antlr-runtime-4.7.2.jar"
 	   listfiles="yes"
-	   target="8"
-	   source="8"
+	   target="${config.classversion}"
+	   source="${config.classversion}"
 	   debug="on"
 	   includeAntRuntime="false"
 	   >

@@ -115,7 +115,7 @@ public class GraphStore
    public URL editUrl(String resource) throws StoreException {
       
       try {
-         return new URL(new URL(labbcatUrl, "edit/store/"), resource);
+         return new URL(new URL(labbcatUrl, "api/edit/store/"), resource);
       } catch(Throwable t) {
          throw new StoreException("Could not construct request URL.", t);
       }

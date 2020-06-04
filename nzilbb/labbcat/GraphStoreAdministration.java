@@ -113,7 +113,7 @@ public class GraphStoreAdministration
     */
    public URL adminUrl(String resource) throws StoreException {
       try {
-         return new URL(new URL(labbcatUrl, "admin/store/"), resource);
+         return new URL(new URL(labbcatUrl, "api/admin/store/"), resource);
       } catch(Throwable t) {
          throw new StoreException("Could not construct request URL.", t);
       }
