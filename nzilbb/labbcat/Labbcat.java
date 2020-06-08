@@ -1073,6 +1073,81 @@ public class Labbcat
 
       return fragments;
    } // end of getFragments()
+   
+   /**
+    * Gets transcript attribute values for given transcript IDs.
+    * @param transcriptIds A list of transcript IDs (transcript names).
+    * @param layerIds A list of layer IDs corresponding to transcript attributes. In
+    * general, these are layers whose ID is prefixed 'transcript_', however formally it's
+    * any layer where 
+    *  layer.getParentId().equals("graph") &amp;&amp; layer.getAlignment() == 0, 
+    * which includes "corpus" as well as transcript attribute layers. 
+    * @return A CSV file with the attribute values, which it is the caller's
+    * responsibility to delete once processing is finished.
+    * @throws IOException
+    * @throws StoreException
+    */
+   public File getTranscriptAttributes(String[] transcriptIds, String[] layerIds) 
+      throws IOException, StoreException {
+      
+      URL url = makeUrl("transcripts");
+      HttpRequestPost request = new HttpRequestPost(url, getRequiredHttpAuthorization())
+         .setHeader("Accept", "text/csv")
+         .setParameter("todo", "export")
+         .setParameter("exportType", "csv")
+         .setParameter("layer", "graph")
+         .setParameter("id", transcriptIds)
+         .setParameter("layer", layerIds);
+      if (verbose) System.out.println("getTranscriptAttributes -> " + request);
+      HttpURLConnection connection = request.post();
+      if (connection.getResponseCode() != HttpURLConnection.HTTP_OK) {
+         response = new Response(connection, verbose);
+         response.checkForErrors(); // throws a ResponseException on error
+      }
+      
+      // use the name given by the server, if any
+      File csv = File.createTempFile("getTranscriptAttributes_",".csv");
+      csv.deleteOnExit();
+      IO.SaveUrlConnectionToFile(connection, csv);
+      return csv;
+   }
+   
+   /**
+    * Gets participant attribute values for given participant IDs.
+    * @param participantIds A list of participant IDs (participant names).
+    * @param layerIds A list of layer IDs corresponding to participant attributes. In
+    * general, these are layers whose ID is prefixed 'participant_', however formally it's
+    * any layer where 
+    *  layer.getParentId().equals("parent") &amp;&amp; layer.getAlignment() == 0. 
+    * @return A CSV file with the attribute values, which it is the caller's
+    * responsibility to delete once processing is finished.
+    * @throws IOException
+    * @throws StoreException
+    */
+   public File getParticipantAttributes(String[] participantIds, String[] layerIds) 
+      throws IOException, StoreException {
+      
+      URL url = makeUrl("participants");
+      HttpRequestPost request = new HttpRequestPost(url, getRequiredHttpAuthorization())
+         .setHeader("Accept", "text/csv")
+         .setParameter("type", "participant")
+         .setParameter("content-type", "text/csv")
+         .setParameter("csvFieldDelimiter", ",")
+         .setParameter("participantId", participantIds)
+         .setParameter("layer", layerIds);
+      if (verbose) System.out.println("getParticipantAttributes -> " + request);
+      HttpURLConnection connection = request.post();
+      if (connection.getResponseCode() != HttpURLConnection.HTTP_OK) {
+         response = new Response(connection, verbose);
+         response.checkForErrors(); // throws a ResponseException on error
+      }
+      
+      // use the name given by the server, if any
+      File csv = File.createTempFile("getParticipantAttributes_",".csv");
+      csv.deleteOnExit();
+      IO.SaveUrlConnectionToFile(connection, csv);
+      return csv;
+   }
 
    // TODO clearLayer(id)
    

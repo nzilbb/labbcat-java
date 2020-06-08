@@ -558,6 +558,36 @@ public class TestLabbcat
       }
    }
 
+   @Test public void getTranscriptAttributes()
+      throws Exception
+   {
+      // get a participant ID to use
+      String[] ids = labbcat.getMatchingTranscriptIds("/BR.+/.test(id)");
+      assertTrue("Some IDs are returned",
+                 ids.length > 0);
+      String[] layerIds = { "transcript_type", "corpus" };      
+
+      File csv = labbcat.getTranscriptAttributes(ids, layerIds);
+      assertNotNull("File returned", csv);
+      assertTrue("File exists", csv.exists());
+      csv.delete();
+   }
+
+   @Test public void getParticipantAttributes()
+      throws Exception
+   {
+      // get a participant ID to use
+      String[] ids = labbcat.getMatchingParticipantIds("/BR.+/.test(id)");
+      assertTrue("Some IDs are returned",
+                 ids.length > 0);
+      String[] layerIds = { "participant_gender", "participant_nodes" };      
+
+      File csv = labbcat.getParticipantAttributes(ids, layerIds);
+      assertNotNull("File returned", csv);
+      assertTrue("File exists", csv.exists());
+      csv.delete();
+   }
+
    public static void main(String args[]) 
    {
       org.junit.runner.JUnitCore.main("nzilbb.labbcat.test.TestLabbcat");
