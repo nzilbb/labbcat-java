@@ -22,19 +22,21 @@
 
 package nzilbb.labbcat.http;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.HttpURLConnection;
+import java.net.URI;
 import java.net.URL;
 import java.net.URLEncoder;
-import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.Map;
-import java.io.File;
-import java.io.InputStream;
-import java.util.Random;
-import java.io.OutputStream;
-import java.io.FileInputStream;
 import java.util.Iterator;
+import java.util.Map;
+import java.util.Random;
+import java.util.jar.JarFile;
 
 /**
  * POST HTTP request.
@@ -43,6 +45,8 @@ import java.util.Iterator;
  */
 public class HttpRequestPost {
    
+   static String UserAgent = null;
+
    protected HttpURLConnection connection;
    protected OutputStream os = null;
    protected Map<String,String> cookies = new HashMap<String,String>();
@@ -142,6 +146,27 @@ public class HttpRequestPost {
       url = urlString;
    }
       
+   /**
+    * Sets the user-agent header to indicate the name/version of the library.
+    */
+   public HttpRequestPost setUserAgent() {
+      if (HttpRequestGet.UserAgent == null) {
+         // get our version info from the comment of the jar file we're built into
+         try {
+            URL thisClassUrl = getClass().getResource(getClass().getSimpleName() + ".class");
+            if (thisClassUrl.toString().startsWith("jar:")) {
+               URI thisJarUri = new URI(thisClassUrl.toString().replaceAll("jar:(.*)!.*","$1"));
+               JarFile thisJarFile = new JarFile(new File(thisJarUri));
+               HttpRequestGet.UserAgent = thisJarFile.getComment();
+            }
+         } catch (Throwable t) {
+         }
+      }
+
+      setHeader("user-agent", HttpRequestGet.UserAgent);
+      return this;
+   } // end of setUserAgent()
+
    @SuppressWarnings("rawtypes")
    private void postCookies() {
       

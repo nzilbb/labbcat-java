@@ -22,18 +22,20 @@
 
 package nzilbb.labbcat.http;
 
-import java.net.HttpURLConnection;
-import java.net.URL;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.URI;
+import java.net.URL;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.Map;
-import java.io.File;
-import java.io.InputStream;
-import java.util.Random;
-import java.io.OutputStream;
-import java.io.FileInputStream;
 import java.util.Iterator;
+import java.util.Map;
+import java.util.Random;
+import java.util.jar.JarFile;
 
 /**
  * Multpart POST HTTP Request class
@@ -174,6 +176,26 @@ public class HttpRequestPostMultipart {
       this(new URL(urlString), sAuthorization);
    }
    
+   /**
+    * Sets the user-agent header to indicate the name/version of the library.
+    */
+   public HttpRequestPostMultipart setUserAgent() {
+      if (HttpRequestGet.UserAgent == null) {
+         // get our version info from the comment of the jar file we're built into
+         try {
+            URL thisClassUrl = getClass().getResource(getClass().getSimpleName() + ".class");
+            if (thisClassUrl.toString().startsWith("jar:")) {
+               URI thisJarUri = new URI(thisClassUrl.toString().replaceAll("jar:(.*)!.*","$1"));
+               JarFile thisJarFile = new JarFile(new File(thisJarUri));
+               HttpRequestGet.UserAgent = thisJarFile.getComment();
+            }
+         } catch (Throwable t) {
+         }
+      }
+      setHeader("user-agent", HttpRequestGet.UserAgent);
+      return this;
+   } // end of setUserAgent()
+
    @SuppressWarnings("rawtypes")
    private void postCookies() {
       

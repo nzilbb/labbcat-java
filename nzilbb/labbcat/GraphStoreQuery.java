@@ -390,7 +390,7 @@ public class GraphStoreQuery
       try {
          URL url = url("getId");
          HttpRequestGet request = new HttpRequestGet(url, getRequiredHttpAuthorization())
-            .setHeader("Accept", "application/json");
+            .setUserAgent().setHeader("Accept", "application/json");
          if (verbose) System.out.println("getId -> " + request);
          response = new Response(request.get(), verbose);
          response.checkForErrors(); // throws a StoreException on error
@@ -413,7 +413,7 @@ public class GraphStoreQuery
       try {
          URL url = url("getLayerIds");
          HttpRequestGet request = new HttpRequestGet(url, getRequiredHttpAuthorization())
-            .setHeader("Accept", "application/json");
+            .setUserAgent().setHeader("Accept", "application/json");
          if (verbose) System.out.println("getLayerIds -> " + request);
          response = new Response(request.get(), verbose);
          response.checkForErrors(); // throws a StoreException on error
@@ -443,7 +443,7 @@ public class GraphStoreQuery
       try {
          URL url = url("getLayers");
          HttpRequestGet request = new HttpRequestGet(url, getRequiredHttpAuthorization()) 
-            .setHeader("Accept", "application/json");
+            .setUserAgent().setHeader("Accept", "application/json");
          if (verbose) System.out.println("getLayers -> " + request);
          response = new Response(request.get(), verbose);
          response.checkForErrors(); // throws a StoreException on error
@@ -485,7 +485,7 @@ public class GraphStoreQuery
       try {
          URL url = url("getLayer");
          HttpRequestGet request = new HttpRequestGet(url, getRequiredHttpAuthorization()) 
-            .setHeader("Accept", "application/json")
+            .setUserAgent().setHeader("Accept", "application/json")
             .setParameter("id", id);
          if (verbose) System.out.println("getLayer -> " + request);
          response = new Response(request.get(), verbose);
@@ -509,7 +509,7 @@ public class GraphStoreQuery
       try {
          URL url = url("getCorpusIds");
          HttpRequestGet request = new HttpRequestGet(url, getRequiredHttpAuthorization())
-            .setHeader("Accept", "application/json");
+            .setUserAgent().setHeader("Accept", "application/json");
          if (verbose) System.out.println("getCorpusIds -> " + request);
          response = new Response(request.get(), verbose);
          response.checkForErrors(); // throws a StoreException on error
@@ -541,7 +541,7 @@ public class GraphStoreQuery
       try {
          URL url = url("getParticipantIds");
          HttpRequestGet request = new HttpRequestGet(url, getRequiredHttpAuthorization())
-            .setHeader("Accept", "application/json");
+            .setUserAgent().setHeader("Accept", "application/json");
          if (verbose) System.out.println("getParticipantIds -> " + request);
          response = new Response(request.get(), verbose);
          response.checkForErrors(); // throws a StoreException on error
@@ -573,7 +573,7 @@ public class GraphStoreQuery
       try {
          URL url = url("getParticipant");
          HttpRequestGet request = new HttpRequestGet(url, getRequiredHttpAuthorization()) 
-            .setHeader("Accept", "application/json")
+            .setUserAgent().setHeader("Accept", "application/json")
             .setParameter("id", id);
          if (verbose) System.out.println("getParticipant -> " + request);
          response = new Response(request.get(), verbose);
@@ -612,8 +612,8 @@ public class GraphStoreQuery
          URL url = url("countMatchingParticipantIds");
          if (verbose) System.out.println("countMatchingParticipantIds -> " + url);
          HttpRequestGet request = new HttpRequestGet(url, getRequiredHttpAuthorization())
-            .setParameter("expression", expression)
-            .setHeader("Accept", "application/json");
+            .setUserAgent().setHeader("Accept", "application/json")
+            .setParameter("expression", expression);
          response = new Response(request.get(), verbose);
          response.checkForErrors(); // throws a StoreException on error
          return (Integer)response.getModel();
@@ -650,7 +650,7 @@ public class GraphStoreQuery
       try {
          URL url = url("getMatchingParticipantIds");
          HttpRequestGet request = new HttpRequestGet(url, getRequiredHttpAuthorization())
-            .setHeader("Accept", "application/json")
+            .setUserAgent().setHeader("Accept", "application/json")
             .setParameter("expression", expression);
          if (pageLength != null) request.setParameter("pageLength", pageLength);
          if (pageNumber != null) request.setParameter("pageNumber", pageNumber);
@@ -685,7 +685,7 @@ public class GraphStoreQuery
       try {
          URL url = url("getTranscriptIds");
          HttpRequestGet request = new HttpRequestGet(url, getRequiredHttpAuthorization())
-            .setHeader("Accept", "application/json");
+            .setUserAgent().setHeader("Accept", "application/json");
          if (verbose) System.out.println("getTranscriptIds -> " + request);
          response = new Response(request.get(), verbose);
          response.checkForErrors(); // throws a StoreException on error
@@ -718,8 +718,8 @@ public class GraphStoreQuery
       try {
          URL url = url("getTranscriptIdsInCorpus");
          HttpRequestGet request = new HttpRequestGet(url, getRequiredHttpAuthorization())
-            .setParameter("id", id)
-            .setHeader("Accept", "application/json");
+            .setUserAgent().setHeader("Accept", "application/json")
+            .setParameter("id", id);
          if (verbose) System.out.println("getTranscriptIdsInCorpus -> " + request);
          response = new Response(request.get(), verbose);
          response.checkForErrors(); // throws a StoreException on error
@@ -750,8 +750,8 @@ public class GraphStoreQuery
       try {
          URL url = url("getTranscriptIdsWithParticipant");
          HttpRequestGet request = new HttpRequestGet(url, getRequiredHttpAuthorization())
-            .setParameter("id", id)
-            .setHeader("Accept", "application/json");
+            .setUserAgent().setHeader("Accept", "application/json")
+            .setParameter("id", id);
          if (verbose) System.out.println("getTranscriptIdsWithParticipant -> " + request);
          response = new Response(request.get(), verbose);
          response.checkForErrors(); // throws a StoreException on error
@@ -802,8 +802,8 @@ public class GraphStoreQuery
          URL url = url("countMatchingTranscriptIds");
          if (verbose) System.out.println("countMatchingTranscriptIds -> " + url);
          HttpRequestGet request = new HttpRequestGet(url, getRequiredHttpAuthorization())
-            .setParameter("expression", expression)
-            .setHeader("Accept", "application/json");
+            .setUserAgent().setHeader("Accept", "application/json")
+            .setParameter("expression", expression);
          response = new Response(request.get(), verbose);
          response.checkForErrors(); // throws a StoreException on error
          return (Integer)response.getModel();
@@ -852,7 +852,7 @@ public class GraphStoreQuery
       try {
          URL url = url("getMatchingTranscriptIds");
          HttpRequestGet request = new HttpRequestGet(url, getRequiredHttpAuthorization()) 
-            .setHeader("Accept", "application/json")
+            .setUserAgent().setHeader("Accept", "application/json")
             .setParameter("expression", expression);
          if (pageLength != null) request.setParameter("pageLength", pageLength);
          if (pageNumber != null) request.setParameter("pageNumber", pageNumber);
@@ -899,8 +899,8 @@ public class GraphStoreQuery
          URL url = url("countMatchingAnnotations");
          if (verbose) System.out.println("countMatchingAnnotations -> " + url);
          HttpRequestGet request = new HttpRequestGet(url, getRequiredHttpAuthorization())
-            .setParameter("expression", expression)
-            .setHeader("Accept", "application/json");
+            .setUserAgent().setHeader("Accept", "application/json")
+            .setParameter("expression", expression);
          response = new Response(request.get(), verbose);
          response.checkForErrors(); // throws a StoreException on error
          return (Integer)response.getModel();
@@ -937,7 +937,7 @@ public class GraphStoreQuery
       try {
          URL url = url("getMatchingAnnotations");
          HttpRequestGet request = new HttpRequestGet(url, getRequiredHttpAuthorization()) 
-            .setHeader("Accept", "application/json")
+            .setUserAgent().setHeader("Accept", "application/json")
             .setParameter("expression", expression);
          if (pageLength != null) request.setParameter("pageLength", pageLength);
          if (pageNumber != null) request.setParameter("pageNumber", pageNumber);
@@ -974,9 +974,9 @@ public class GraphStoreQuery
          URL url = url("countAnnotations");
          if (verbose) System.out.println("countAnnotations -> " + url);
          HttpRequestGet request = new HttpRequestGet(url, getRequiredHttpAuthorization())
+            .setUserAgent().setHeader("Accept", "application/json")
             .setParameter("id", id)
-            .setParameter("layerId", layerId)
-            .setHeader("Accept", "application/json");
+            .setParameter("layerId", layerId);
          response = new Response(request.get(), verbose);
          response.checkForErrors(); // throws a StoreException on error
          if (response.getModel() instanceof Integer) return (Integer)response.getModel();
@@ -1003,7 +1003,7 @@ public class GraphStoreQuery
       try {
          URL url = url("getAnnotations");
          HttpRequestGet request = new HttpRequestGet(url, getRequiredHttpAuthorization()) 
-            .setHeader("Accept", "application/json")
+            .setUserAgent().setHeader("Accept", "application/json")
             .setParameter("id", id)
             .setParameter("layerId", layerId);
          if (pageLength != null) request.setParameter("pageLength", pageLength);
@@ -1064,7 +1064,7 @@ public class GraphStoreQuery
       try {
          URL url = url("getAnchors");
          HttpRequestGet request = new HttpRequestGet(url, getRequiredHttpAuthorization()) 
-            .setHeader("Accept", "application/json")
+            .setUserAgent().setHeader("Accept", "application/json")
             .setParameter("id", id)
             .setParameter("anchorIds", anchorIds);
          if (verbose) System.out.println("getAnchors -> " + request);
@@ -1184,7 +1184,7 @@ public class GraphStoreQuery
       try {
          URL url = url("getMediaTracks");
          HttpRequestGet request = new HttpRequestGet(url, getRequiredHttpAuthorization()) 
-            .setHeader("Accept", "application/json");
+            .setUserAgent().setHeader("Accept", "application/json");
          if (verbose) System.out.println("getMediaTracks -> " + request);
          response = new Response(request.get(), verbose);
          response.checkForErrors(); // throws a StoreException on error
@@ -1216,7 +1216,7 @@ public class GraphStoreQuery
       try {
          URL url = url("getAvailableMedia");
          HttpRequestGet request = new HttpRequestGet(url, getRequiredHttpAuthorization()) 
-            .setHeader("Accept", "application/json")
+            .setUserAgent().setHeader("Accept", "application/json")
             .setParameter("id", id);
          if (verbose) System.out.println("getAvailableMedia -> " + request);
          response = new Response(request.get(), verbose);
@@ -1253,7 +1253,7 @@ public class GraphStoreQuery
       try {
          URL url = url("getMedia");
          HttpRequestGet request = new HttpRequestGet(url, getRequiredHttpAuthorization())
-            .setHeader("Accept", "application/json")
+            .setUserAgent().setHeader("Accept", "application/json")
             .setParameter("id", id)
             .setParameter("trackSuffix", trackSuffix)
             .setParameter("mimeType", mimeType);
@@ -1289,7 +1289,7 @@ public class GraphStoreQuery
       try {
          URL url = url("getMedia");
          HttpRequestGet request = new HttpRequestGet(url, getRequiredHttpAuthorization())
-            .setHeader("Accept", "application/json")
+            .setUserAgent().setHeader("Accept", "application/json")
             .setParameter("id", id)
             .setParameter("trackSuffix", trackSuffix)
             .setParameter("mimeType", mimeType)
@@ -1319,7 +1319,7 @@ public class GraphStoreQuery
       try {
          URL url = url("getEpisodeDocuments");
          HttpRequestGet request = new HttpRequestGet(url, getRequiredHttpAuthorization()) 
-            .setHeader("Accept", "application/json")
+            .setUserAgent().setHeader("Accept", "application/json")
             .setParameter("id", id);
          if (verbose) System.out.println("getEpisodeDocuments -> " + request);
          response = new Response(request.get(), verbose);

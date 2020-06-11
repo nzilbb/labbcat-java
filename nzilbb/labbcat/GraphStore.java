@@ -160,6 +160,7 @@ public class GraphStore
       try {
          URL url = editUrl("createAnnotation");
          HttpRequestPost request = new HttpRequestPost(url, getRequiredHttpAuthorization())
+            .setUserAgent()
             .setHeader("Accept", "application/json")
             .setParameter("id", id)
             .setParameter("fromId", fromId)
@@ -189,6 +190,7 @@ public class GraphStore
       try {
          URL url = editUrl("destroyAnnotation");
          HttpRequestPost request = new HttpRequestPost(url, getRequiredHttpAuthorization())
+            .setUserAgent()
             .setHeader("Accept", "application/json")
             .setParameter("id", id)
             .setParameter("annotationId", annotationId);
@@ -271,6 +273,7 @@ public class GraphStore
       try {
          URL url = editUrl("deleteTranscript");
          HttpRequestPost request = new HttpRequestPost(url, getRequiredHttpAuthorization())
+            .setUserAgent()
             .setHeader("Accept", "application/json")
             .setParameter("id", id);
          if (verbose) System.out.println("deleteTranscript -> " + request);

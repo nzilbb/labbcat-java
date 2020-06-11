@@ -54,7 +54,7 @@
     <!-- Put everything in ${build} into the ${ant.project.name}.jar file -->
     <jar jarfile="${dist}/${ant.project.name}.jar" 
          basedir="${build}"
-         comment="version ${DSTAMP}.${TSTAMP}">
+         comment="${ant.project.name}/${DSTAMP}.${TSTAMP}">
       <manifest>
 	<attribute name="Application-Name" value="LaBB-CAT Command Line Utility"/>
 	<attribute name="Permissions" value="all-permissions"/>

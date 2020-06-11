@@ -164,7 +164,8 @@ public class Labbcat
     * @throws ResponseException
     */
    public HttpRequestGet get(String resource) throws IOException, StoreException {
-      return new HttpRequestGet(makeUrl(resource), getRequiredHttpAuthorization());
+      return new HttpRequestGet(makeUrl(resource), getRequiredHttpAuthorization())
+         .setUserAgent();
    } // end of get()
 
    /**
@@ -178,7 +179,8 @@ public class Labbcat
     * @throws ResponseException
     */
    public HttpRequestPost post(String resource) throws IOException, StoreException {
-      return new HttpRequestPost(makeUrl(resource), getRequiredHttpAuthorization());
+      return new HttpRequestPost(makeUrl(resource), getRequiredHttpAuthorization())
+         .setUserAgent();
    } // end of post()
 
    /**
@@ -193,7 +195,8 @@ public class Labbcat
       throws IOException, StoreException {
       
       postRequest = new HttpRequestPostMultipart(
-         makeUrl(resource), getRequiredHttpAuthorization());
+         makeUrl(resource), getRequiredHttpAuthorization())
+         .setUserAgent();
       return postRequest;
    } // end of postMultipart()
 
@@ -217,6 +220,7 @@ public class Labbcat
       cancelling = false;
       URL url = makeUrl("edit/transcript/new");
       postRequest = new HttpRequestPostMultipart(url, getRequiredHttpAuthorization())
+         .setUserAgent()
          .setHeader("Accept", "application/json")
          .setParameter("todo", "new")
          .setParameter("auto", true)
@@ -253,6 +257,7 @@ public class Labbcat
       cancelling = false;
       URL url = makeUrl("edit/transcript/new");
       postRequest = new HttpRequestPostMultipart(url, getRequiredHttpAuthorization())
+         .setUserAgent()
          .setHeader("Accept", "application/json")
          .setParameter("todo", "update")
          .setParameter("auto", true)
@@ -280,6 +285,7 @@ public class Labbcat
       cancelling = false;
       URL url = makeUrl("thread");
       HttpRequestGet request = new HttpRequestGet(url, getRequiredHttpAuthorization())
+         .setUserAgent()
          .setHeader("Accept", "application/json")
          .setParameter("threadId", threadId);
       if (verbose) System.out.println("taskStatus -> " + request);
@@ -333,6 +339,7 @@ public class Labbcat
       cancelling = false;
       URL url = makeUrl("threads");
       HttpRequestGet request = new HttpRequestGet(url, getRequiredHttpAuthorization())
+         .setUserAgent()
          .setHeader("Accept", "application/json")
          .setParameter("threadId", threadId)
          .setParameter("command", "cancel");
@@ -352,6 +359,7 @@ public class Labbcat
       cancelling = false;
       URL url = makeUrl("threads");
       HttpRequestGet request = new HttpRequestGet(url, getRequiredHttpAuthorization())
+         .setUserAgent()
          .setHeader("Accept", "application/json")
          .setParameter("threadId", threadId)
          .setParameter("command", "release");
@@ -371,6 +379,7 @@ public class Labbcat
       cancelling = false;
       URL url = makeUrl("threads");
       HttpRequestGet request = new HttpRequestGet(url, getRequiredHttpAuthorization())
+         .setUserAgent()
          .setHeader("Accept", "application/json");
       if (verbose) System.out.println("getTasks -> " + request);
       response = new Response(request.get(), verbose);
@@ -419,7 +428,7 @@ public class Labbcat
     * <p> The <var>pattern</var> must match the structure of the search matrix in the
     * browser interface of LaBB-CAT. This is a JSON object with one attribute called
     * <q>columns</q>, which is an array of JSON objects.
-    * <p>Each element in the <q>columns</q> array contains am JSON object named
+    * <p>Each element in the <q>columns</q> array contains a JSON object named
     * <q>layers</q>, whose value is a JSON object for patterns to match on each layer, and
     * optionally an element named <q>adj</q>, whose value is a number representing the
     * maximum distance, in tokens, between this column and the next column - if <q>adj</q>
@@ -508,6 +517,7 @@ public class Labbcat
       if (pattern == null) throw new StoreException("No pattern specified.");
       URL url = makeUrl("search");
       HttpRequestGet request = new HttpRequestGet(url, getRequiredHttpAuthorization())
+         .setUserAgent()
          .setHeader("Accept", "application/json")
          .setParameter("command", "search")
          .setParameter("searchJson", pattern.toString())
@@ -594,6 +604,7 @@ public class Labbcat
       cancelling = false;
       URL url = makeUrl("resultsStream");
       HttpRequestGet request = new HttpRequestGet(url, getRequiredHttpAuthorization())
+         .setUserAgent()
          .setHeader("Accept", "application/json")
          .setParameter("threadId", threadId)
          .setParameter("words_context", wordsContext);
@@ -734,7 +745,7 @@ public class Labbcat
 
    /**
     * Gets annotations on selected layers related to search results returned by a previous
-    * call to {@link #getMatches(String,int)}, {@link #taskStatus(String)}.
+    * call to {@link #getMatches(String,int)}.
     * @param matches A list of {@link Match}es. 
     * @param layerIds A vector of layer IDs.
     * @param targetOffset The distance from the original target of the match, e.g.
@@ -803,6 +814,7 @@ public class Labbcat
          
          URL url = makeUrl("api/getMatchAnnotations");
          postRequest = new HttpRequestPostMultipart(url, getRequiredHttpAuthorization())
+            .setUserAgent()
             .setHeader("Accept", "application/json")
             .setParameter("layer", layerIds)
             .setParameter("targetOffset", targetOffset)
@@ -915,6 +927,7 @@ public class Labbcat
 
          URL url = makeUrl("soundfragment");
          HttpRequestGet request = new HttpRequestGet(url, getRequiredHttpAuthorization())
+            .setUserAgent()
             .setHeader("Accept", "audio/wav")
             .setParameter("id", transcriptIds[i])
             .setParameter("start", startOffsets[i])
@@ -1035,6 +1048,7 @@ public class Labbcat
 
          URL url = makeUrl("convertfragment");
          HttpRequestGet request = new HttpRequestGet(url, getRequiredHttpAuthorization())
+            .setUserAgent()
             .setHeader("Accept", mimeType)
             .setParameter("id", transcriptIds[i])
             .setParameter("start", startOffsets[i])
@@ -1092,6 +1106,7 @@ public class Labbcat
       
       URL url = makeUrl("transcripts");
       HttpRequestPost request = new HttpRequestPost(url, getRequiredHttpAuthorization())
+         .setUserAgent()
          .setHeader("Accept", "text/csv")
          .setParameter("todo", "export")
          .setParameter("exportType", "csv")
@@ -1129,6 +1144,7 @@ public class Labbcat
       
       URL url = makeUrl("participants");
       HttpRequestPost request = new HttpRequestPost(url, getRequiredHttpAuthorization())
+         .setUserAgent()
          .setHeader("Accept", "text/csv")
          .setParameter("type", "participant")
          .setParameter("content-type", "text/csv")

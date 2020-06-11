@@ -25,6 +25,7 @@ package nzilbb.labbcat.http;
 import java.net.*;
 import java.io.*;
 import java.util.*;
+import java.util.jar.JarFile;
 
 /**
  * GET HTTP request, using ordinary default request encoding, and encoding all arguments
@@ -35,6 +36,7 @@ import java.util.*;
 public class HttpRequestGet {
 
    static Object cookieHandlerSynchronizer = new Object();
+   static String UserAgent = null;
    
    // Attributes:
    
@@ -152,6 +154,26 @@ public class HttpRequestGet {
    } // end of constructor
    
    /**
+    * Sets the user-agent header to indicate the name/version of the library.
+    */
+   public HttpRequestGet setUserAgent() {
+      if (UserAgent == null) {
+         // get our version info from the comment of the jar file we're built into
+         try {
+            URL thisClassUrl = getClass().getResource(getClass().getSimpleName() + ".class");
+            if (thisClassUrl.toString().startsWith("jar:")) {
+               URI thisJarUri = new URI(thisClassUrl.toString().replaceAll("jar:(.*)!.*","$1"));
+               JarFile thisJarFile = new JarFile(new File(thisJarUri));
+               UserAgent = thisJarFile.getComment();
+            }
+         } catch (Throwable t) {
+         }
+      }
+      setHeader("user-agent", UserAgent);
+      return this;
+   } // end of setUserAgent()
+   
+   /**
     * Sets a request parameter value
     * @param sParameter
     * @param oValue
@@ -194,7 +216,6 @@ public class HttpRequestGet {
       }
       return (HttpURLConnection)connection;
    } // end of getConnection()
-
    
    /**
     * Generates the query string.
