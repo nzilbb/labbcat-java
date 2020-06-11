@@ -57,21 +57,21 @@ public class Match {
    public Match setMatchId(String newMatchId) { MatchId = newMatchId; return this; }
 
    /**
-    * The name of the transcript document that the match appearsis from.
+    * The name of the transcript document that the match is from.
     * @see #getTranscript()
     * @see #setTranscript(String)
     */
    protected String Transcript;
    /**
     * Getter for {@link #Transcript}: The name of the transcript document that the match
-    * appearsis from. 
-    * @return The name of the transcript document that the match appearsis from.
+    * is from. 
+    * @return The name of the transcript document that the match is from.
     */
    public String getTranscript() { return Transcript; }
    /**
     * Setter for {@link #Transcript}: The name of the transcript document that the match
-    * appearsis from. 
-    * @param newTranscript The name of the transcript document that the match appearsis from.
+    * is from. 
+    * @param newTranscript The name of the transcript document that the match is from.
     */
    public Match setTranscript(String newTranscript) { Transcript = newTranscript; return this; }
 
@@ -93,7 +93,7 @@ public class Match {
    public Match setParticipant(String newParticipant) { Participant = newParticipant; return this; }
 
    /**
-    * The corpus the match comes from
+    * The corpus the match comes from.
     * @see #getCorpus()
     * @see #setCorpus(String)
     */
