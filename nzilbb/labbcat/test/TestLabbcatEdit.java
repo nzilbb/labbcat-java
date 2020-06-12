@@ -46,67 +46,52 @@ import nzilbb.labbcat.*;
  * and the first participant listed must have some transcripts.
  *
  */
-public class TestLabbcatEdit 
-{
+public class TestLabbcatEdit {
+   
    // YOU MUST ENSURE THE FOLLOWING SETTINGS ARE VALID FOR YOU TEST LABBCAT SERVER:
    static String labbcatUrl = "http://localhost:8080/labbcat/";
    static String username = "labbcat";
    static String password = "labbcat";
    static LabbcatEdit labbcat;
 
-   @BeforeClass public static void createStore()
-   {
-      try
-      {
+   @BeforeClass public static void createStore() {
+      try {
          labbcat = new LabbcatEdit(labbcatUrl, username, password);
          labbcat.setBatchMode(true);
-      }
-      catch(MalformedURLException exception)
-      {
+      } catch(MalformedURLException exception) {
          fail("Could not create LabbcatEdit object");
       }
    }
 
-   @After public void notVerbose()
-   {
+   @After public void notVerbose() {
       labbcat.setVerbose(false);
    }
    
-   @Test(expected = StoreException.class) public void invalidCredentials()
-      throws Exception
-   {
+   @Test(expected = StoreException.class) public void invalidCredentials() throws Exception {
       LabbcatEdit labbcat = new LabbcatEdit(labbcatUrl, "xxx", "xxx");
       labbcat.setBatchMode(true);
       labbcat.getId();
    }
 
-   @Test(expected = StoreException.class) public void credentialsRequired()
-      throws Exception
-   {
+   @Test(expected = StoreException.class) public void credentialsRequired() throws Exception {
       LabbcatEdit labbcat = new LabbcatEdit(labbcatUrl);
       labbcat.setBatchMode(true);
       labbcat.getId();
    }
    
-   @Test(expected = MalformedURLException.class) public void malformedURLException()
-      throws Exception
-   {
+   @Test(expected = MalformedURLException.class) public void malformedURLException() throws Exception {
       LabbcatEdit labbcat = new LabbcatEdit("xxx", username, password);
       labbcat.setBatchMode(true);
       labbcat.getId();
    }
 
-   @Test(expected = StoreException.class) public void nonLabbcatUrl()
-      throws Exception
-   {
+   @Test(expected = StoreException.class) public void nonLabbcatUrl() throws Exception {
       LabbcatEdit labbcat = new LabbcatEdit("http://tld/", username, password);
       labbcat.setBatchMode(true);
       labbcat.getId();
    }
 
-   @Test public void inheritedLabbcatViewFunctions()
-      throws Exception
-   {
+   @Test public void inheritedLabbcatViewFunctions() throws Exception {
       String id = labbcat.getId();
       assertEquals("getId: ID matches the url",
                    labbcatUrl, id);
@@ -148,12 +133,9 @@ public class TestLabbcatEdit
       ids = labbcat.getMatchingParticipantIds("/.+/.test(id)");
       assertTrue("getMatchingParticipantIds: Some IDs are returned",
                  ids.length > 0);
-      if (ids.length < 2)
-      {
+      if (ids.length < 2) {
          System.out.println("getMatchingParticipantIds: Too few participants to test pagination");
-      }
-      else
-      {
+      } else {
          ids = labbcat.getMatchingParticipantIds("/.+/.test(id)", 2, 0);
          assertEquals("getMatchingParticipantIds: Two IDs are returned",
                       2, ids.length);
@@ -175,12 +157,9 @@ public class TestLabbcatEdit
       assertTrue("countMatchingTranscriptIds: Some IDs are returned",
                  ids.length > 0);
       String graphId = ids[0];
-      if (ids.length < 2)
-      {
+      if (ids.length < 2) {
          System.out.println("countMatchingTranscriptIds: Too few graphs to test pagination");
-      }
-      else
-      {
+      } else {
          ids = labbcat.getMatchingTranscriptIds("/.+/.test(id)", 2, 0, "id DESC");
          assertEquals("getMatchingTranscriptIds: Two IDs are returned",
                       2, ids.length);
@@ -191,21 +170,15 @@ public class TestLabbcatEdit
                  count > 0);
       
       Annotation[] annotations = labbcat.getAnnotations(graphId, "orthography", 2, 0);
-      if (count < 2)
-      {
+      if (count < 2) {
          System.out.println("getAnnotations: Too few annotations to test pagination");
-      }
-      else
-      {
+      } else {
          assertEquals("getAnnotations: Two annotations are returned",
                       2, annotations.length);
       }
-      if (annotations.length == 0)
-      {
+      if (annotations.length == 0) {
          System.out.println("getAnchors: Can't test getAnchors() - no annotations in " + graphId);
-      }
-      else
-      {
+      } else {
          // create an array of anchorIds
          String[] anchorIds = new String[annotations.length];
          for (int i = 0; i < annotations.length; i++) anchorIds[i] = annotations[i].getStartId();
@@ -249,23 +222,17 @@ public class TestLabbcatEdit
 
       // get some annotations so we have valid anchor IDs
       MediaFile[] docs = labbcat.getEpisodeDocuments(graphId);
-      if (docs.length == 0)
-      {
+      if (docs.length == 0) {
          System.out.println("getEpisodeDocuments: " + graphId + " has no documents");
       }
    }
 
-   @Test public void deleteTranscriptNotExists()
-      throws Exception
-   {
-      try
-      {
+   @Test public void deleteTranscriptNotExists() throws Exception {
+      try {
          // get some annotations so we have valid anchor IDs
          labbcat.deleteTranscript("nonexistent graph ID");
          fail("deleteTranscript should fail for nonexistant graph ID");
-      }
-      catch(ResponseException exception)
-      {
+      } catch(ResponseException exception) {
          assertEquals("404 not found",
                       404, exception.getResponse().getHttpStatus());
          assertEquals("Failure code",
@@ -273,9 +240,7 @@ public class TestLabbcatEdit
       }
    }
 
-   @Test public void newTranscriptUpdateTranscriptAndDeleteTranscript()
-      throws Exception
-   {
+   @Test public void newTranscriptUpdateTranscriptAndDeleteTranscript() throws Exception {
       // first get a corpus and transcript type
       String[] ids = labbcat.getCorpusIds();
       // for (String id : ids) System.out.println("corpus " + id);
@@ -287,8 +252,7 @@ public class TestLabbcatEdit
 
       File transcript = new File("nzilbb/labbcat/test/nzilbb.labbcat.test.txt");
       assertTrue("Test transcript exists", transcript.exists());
-      try
-      {
+      try {
          String threadId = labbcat.newTranscript(
             transcript, null, null, transcriptType, corpus, "test");
          
@@ -314,9 +278,7 @@ public class TestLabbcatEdit
          // ensure the transcript exists
          assertEquals("Transcript is still in the store",
                       1, labbcat.countMatchingTranscriptIds("id = '"+transcript.getName()+"'"));
-      }
-      finally
-      {
+      } finally {
          // delete it
          labbcat.deleteTranscript(transcript.getName());
          
@@ -324,11 +286,9 @@ public class TestLabbcatEdit
          assertEquals("Transcript has been deleted from the store",
                       0, labbcat.countMatchingTranscriptIds("id = '"+transcript.getName()+"'"));
       }
-
    }
 
-   public static void main(String args[]) 
-   {
+   public static void main(String args[]) {
       org.junit.runner.JUnitCore.main("nzilbb.labbcat.test.TestLabbcatEdit");
    }
 }

@@ -31,19 +31,17 @@ import org.json.JSONObject;
 /**
  * Unit tests for PatternBuilder.
  */
-public class TestPatternBuilder 
-{
+public class TestPatternBuilder {
+   
    @Test public void basicPattern()
-      throws Exception
-   {
+      throws Exception {
       JSONObject pattern = new PatternBuilder().addMatchLayer("orthography", "and").build();
       assertEquals("{\"columns\":[{\"layers\":{\"orthography\":{\"pattern\":\"and\"}}}]}",
                    pattern.toString());
    } 
 
    @Test public void multiLayerPattern()
-      throws Exception
-   {
+      throws Exception {
       JSONObject pattern = new PatternBuilder()
          .addColumn()
          .addMatchLayer("orthography", "the")
@@ -62,8 +60,7 @@ public class TestPatternBuilder
                    pattern.toString());
    }
 
-   public static void main(String args[]) 
-   {
+   public static void main(String args[]) {
       org.junit.runner.JUnitCore.main("nzilbb.labbcat.test.TestPatternBuilder");
    }
 }

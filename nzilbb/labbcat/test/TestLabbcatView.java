@@ -357,26 +357,17 @@ public class TestLabbcatView {
    }
    
    @Test(expected = StoreException.class) public void getTaskInvalidNumericId()
-      throws Exception
-   {
+      throws Exception {
       TaskStatus task = labbcat.taskStatus("99999");
    }
 
    @Test(expected = StoreException.class) public void getTaskInvalidAlphaId()
-      throws Exception
-   {
+      throws Exception {
       TaskStatus task = labbcat.taskStatus("invalid taskId");
    }
 
-   @Test(expected = StoreException.class) public void searchInvalidPattern()
-      throws Exception
-   {
-      String threadId = labbcat.search(new JSONObject(), null, null, false, false, null);
-   }
-
    @Test public void getTasks()
-      throws Exception
-   {
+      throws Exception {
       Map<String,TaskStatus> tasks = labbcat.getTasks();
       // not sure what we expect, but let's just print out what we got
       System.out.println("Some tasks:");
@@ -384,16 +375,12 @@ public class TestLabbcatView {
    }
 
    @Test public void taskStatus()
-      throws Exception
-   {
+      throws Exception {
       // first get a list of tasks
       Map<String,TaskStatus> tasks = labbcat.getTasks();
-      if (tasks.size() == 0)
-      {
+      if (tasks.size() == 0) {
          System.out.println("There are no tasks, so can't test getTask");
-      }
-      else
-      {
+      } else {
          String threadId = tasks.keySet().iterator().next();
          TaskStatus task = labbcat.taskStatus(threadId);
          assertEquals("Correct task",
@@ -402,16 +389,12 @@ public class TestLabbcatView {
    }
 
    @Test public void waitForTask()
-      throws Exception
-   {
+      throws Exception {
       // first get a list of tasks
       Map<String,TaskStatus> tasks = labbcat.getTasks();
-      if (tasks.size() == 0)
-      {
+      if (tasks.size() == 0) {
          System.out.println("There are no tasks, so can't test waitForTask");
-      }
-      else
-      {
+      } else {
          String threadId = tasks.keySet().iterator().next();
          TaskStatus task = labbcat.waitForTask(threadId, 1);
          assertEquals("Correct task",
@@ -419,9 +402,13 @@ public class TestLabbcatView {
       }
    }
 
+   @Test(expected = StoreException.class) public void searchInvalidPattern()
+      throws Exception {
+      String threadId = labbcat.search(new JSONObject(), null, null, false, false, null);
+   }
+
    @Test public void searchAndCancelTask()
-      throws Exception
-   {
+      throws Exception {
       // start a long-running search - all words
       JSONObject pattern = new JSONObject()
          .put("columns", new JSONArray()
@@ -434,8 +421,7 @@ public class TestLabbcatView {
    }
 
    @Test public void searchAndGetMatchesAndGetMatchAnnotations()
-      throws Exception
-   {
+      throws Exception {
       // get a participant ID to use
       String[] ids = labbcat.getParticipantIds();
       assertTrue("getParticipantIds: Some IDs are returned",
@@ -445,8 +431,7 @@ public class TestLabbcatView {
       // all instances of "and"
       JSONObject pattern = new PatternBuilder().addMatchLayer("orthography", "and").build();
       String threadId = labbcat.search(pattern, participantId, null, false, false, null);
-      try
-      {
+      try {
          TaskStatus task = labbcat.waitForTask(threadId, 30);
          // if the task is still running, it's taking too long, so cancel it
          if (task.getRunning()) try { labbcat.cancelTask(threadId); } catch(Exception exception) {}
@@ -454,13 +439,10 @@ public class TestLabbcatView {
                      task.getRunning());
          
          Match[] matches = labbcat.getMatches(threadId, 2);
-         if (matches.length == 0)
-         {
+         if (matches.length == 0) {
             System.out.println(
                "getMatches: No matches were returned, cannot test getMatchAnnotations");
-         }
-         else
-         {
+         } else {
             int upTo = Math.min(10, matches.length);
             // for (int m = 0; m < upTo; m++) System.out.println("Match: " + matches[m]);
 
@@ -476,24 +458,18 @@ public class TestLabbcatView {
                          1, annotations[0].length);
 
             layerIds[0] = "invalid layer ID";
-            try
-            {
+            try {
                labbcat.getMatchAnnotations(matches, layerIds, 0, 1);
                fail("getMatchAnnotations with invalid layerId should fail");
-            }
-            catch(StoreException exception)
-            {}
+            } catch(StoreException exception) {}
          }
-      }
-      finally
-      {
+      } finally {
          labbcat.releaseTask(threadId);
       }
    }
 
    @Test public void getSoundFragments()
-      throws Exception
-   {
+      throws Exception {
       // get a participant ID to use
       String[] ids = labbcat.getParticipantIds();
       assertTrue("getParticipantIds: Some IDs are returned",
@@ -503,8 +479,7 @@ public class TestLabbcatView {
       // all instances of "and"
       JSONObject pattern = new PatternBuilder().addMatchLayer("orthography", "and").build();
       String threadId = labbcat.search(pattern, participantId, null, false, false, null);
-      try
-      {
+      try {
          TaskStatus task = labbcat.waitForTask(threadId, 30);
          // if the task is still running, it's taking too long, so cancel it
          if (task.getRunning()) try { labbcat.cancelTask(threadId); } catch(Exception exception) {}
@@ -512,13 +487,10 @@ public class TestLabbcatView {
                      task.getRunning());
          
          Match[] matches = labbcat.getMatches(threadId, 2);
-         if (matches.length == 0)
-         {
+         if (matches.length == 0) {
             System.out.println(
                "getMatches: No matches were returned, cannot test getSoundFragments");
-         }
-         else
-         {
+         } else {
             int upTo = Math.min(5, matches.length);
             Match[] subset = Arrays.copyOfRange(matches, 0, upTo);
 
@@ -538,16 +510,13 @@ public class TestLabbcatView {
                for (File wav : wavs) if (wav != null) wav.delete(); 
             }
          }
-      }
-      finally
-      {
+      } finally {
          labbcat.releaseTask(threadId);
       }
    }
 
    @Test public void getFragments()
-      throws Exception
-   {
+      throws Exception {
       // get a participant ID to use
       String[] ids = labbcat.getParticipantIds();
       assertTrue("getParticipantIds: Some IDs are returned",
@@ -557,8 +526,7 @@ public class TestLabbcatView {
       // all instances of "and"
       JSONObject pattern = new PatternBuilder().addMatchLayer("orthography", "and").build();
       String threadId = labbcat.search(pattern, participantId, null, false, false, null);
-      try
-      {
+      try {
          TaskStatus task = labbcat.waitForTask(threadId, 30);
          // if the task is still running, it's taking too long, so cancel it
          if (task.getRunning()) try { labbcat.cancelTask(threadId); } catch(Exception exception) {}
@@ -566,13 +534,10 @@ public class TestLabbcatView {
                      task.getRunning());
          
          Match[] matches = labbcat.getMatches(threadId, 2);
-         if (matches.length == 0)
-         {
+         if (matches.length == 0) {
             System.out.println(
                "getMatches: No matches were returned, cannot test getFragments");
-         }
-         else
-         {
+         } else {
             int upTo = Math.min(5, matches.length);
             Match[] subset = Arrays.copyOfRange(matches, 0, upTo);
 
@@ -595,16 +560,13 @@ public class TestLabbcatView {
                dir.delete();
             }
          }
-      }
-      finally
-      {
+      } finally {
          labbcat.releaseTask(threadId);
       }
    }
 
    @Test public void getTranscriptAttributes()
-      throws Exception
-   {
+      throws Exception {
       // get a participant ID to use
       String[] ids = labbcat.getMatchingTranscriptIds("/BR.+/.test(id)");
       assertTrue("Some IDs are returned",
@@ -618,8 +580,7 @@ public class TestLabbcatView {
    }
 
    @Test public void getParticipantAttributes()
-      throws Exception
-   {
+      throws Exception {
       // get a participant ID to use
       String[] ids = labbcat.getMatchingParticipantIds("/BR.+/.test(id)");
       assertTrue("Some IDs are returned",
