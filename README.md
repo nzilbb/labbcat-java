@@ -34,7 +34,7 @@ The following example shows how to:
     
 ```Java
 // create LaBB-CAT client
-Labbcat labbcat = new Labbcat("https://labbcat.canterbury.ac.nz", "demo", "demo");
+LabbcatView labbcat = new LabbcatView("https://labbcat.canterbury.ac.nz", "demo", "demo");
 
 // get a corpus ID
 String[] corpora = labbcat.getCorpusIds();
