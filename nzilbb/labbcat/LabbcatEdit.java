@@ -22,6 +22,7 @@
 package nzilbb.labbcat;
 
 import java.io.IOException;
+import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
 import nzilbb.ag.Annotation;
@@ -31,29 +32,50 @@ import nzilbb.ag.IGraphStore;
 import nzilbb.ag.PermissionException;
 import nzilbb.ag.StoreException;
 import nzilbb.labbcat.http.*;
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 /**
  * Client-side implementation of 
  * <a href="https://nzilbb.github.io/ag/javadoc/nzilbb/ag/IGraphStore.html">nzilbb.ag.IGraphStore</a>.
- * <p>This class inherits the <em>read-only</em> operations of {@link GraphStoreQuery}
- * and adds some <em>write</em> operations for updating data.
+ * <p>This class inherits the <em>read-only</em> operations of {@link LabbcatView}
+ * and adds some <em>write</em> operations for updating data, i.e. those that can be
+ * performed by users with <q>edit</q> permission.
  * <p> e.g.
  * <pre> // create annotation store client
- * GraphStore store = new GraphStore("https://labbcat.canterbury.ac.nz", "demo", "demo");
- * // get some basic information
- * String id = store.getId();
- * String[] layers = store.getLayerIds();
- * String[] corpora = store.getCorpusIds();
- * String[] documents = store.getGraphIdsInCorpus(corpora[0]);
- * // delete a document
- * store.deleteGraph(documents[0]);
+ * LabbcatEdit store = new {@link #LabbcatEdit(String,String,String) LabbcatEdit}("https://labbcat.canterbury.ac.nz", "demo", "demo");
+ *
+ * // get a corpus ID
+ * String[] corpora = labbcat.{@link LabbcatView#getCorpusIds() getCorpusIds()};
+ * String corpus = ids[0];
+ *
+ * // get a transcript type
+ * Layer typeLayer = labbcat.{@link LabbcatView#getLayer(String) getLayer("transcript_type")};
+ * String transcriptType = typeLayer.getValidLabels().keySet().iterator().next();
+ *
+ * // upload a transcript
+ * File transcript = new File("/some/transcript.txt");
+ * String taskId = labbcat.{@link #newTranscript(File,File[],String,String,String,String) newTranscript(transcript, null, null, transcriptType, corpus, "test")};
+ *
+ * // wait until all automatic annotations have been generated
+ * TaskStatus layerGenerationTask = labbcat.{@link #waitForTask(String,int) waitForTask(taskId, 30)};
+ *
+ * // get all the POS annotations
+ * Annotation[] pos = labbcat.{@link LabbcatView#getAnnotations(String,String,Integer,Integer) getAnnotations(transcript.getName(), "pos")};
+ *
+ * // search for tokens of "and"
+ * Matches[] matches = labbcat.{@link LabbcatView#getMatches(String,int) getMatches}(
+ *     labbcat.{@link LabbcatView#search(JSONObject,String[],String[],boolean,boolean,Integer) search}(
+ *        new {@link PatternBuilder}().addMatchLayer("orthography", "and").build(),
+ *        participantIds, null, true, false, null), 1);
+ *
+ * // delete the transcript
+ * store.{@link #deleteGraph(String) deleteGraph}(transcript.getName());
  * </pre>
  * @author Robert Fromont robert@fromont.net.nz
  */
 
-public class GraphStore
-   extends GraphStoreQuery
-   implements IGraphStore
+public class LabbcatEdit extends LabbcatView implements IGraphStore
 {
    // Attributes:
   
@@ -62,7 +84,7 @@ public class GraphStore
    /**
     * Default constructor.
     */
-   public GraphStore() {
+   public LabbcatEdit() {
    } // end of constructor
    
    /**
@@ -70,7 +92,7 @@ public class GraphStore
     * @param labbcatUrl The base URL of the LaBB-CAT server -
     * e.g. https://labbcat.canterbury.ac.nz/demo/
     */
-   public GraphStore(String labbcatUrl) throws MalformedURLException {
+   public LabbcatEdit(String labbcatUrl) throws MalformedURLException {
       super(labbcatUrl);
    } // end of constructor
    
@@ -81,7 +103,7 @@ public class GraphStore
     * @param username LaBB-CAT username.
     * @param password LaBB-CAT password.
     */
-   public GraphStore(String labbcatUrl, String username, String password)
+   public LabbcatEdit(String labbcatUrl, String username, String password)
       throws MalformedURLException {
       super(labbcatUrl, username, password);
    } // end of constructor
@@ -91,7 +113,7 @@ public class GraphStore
     * @param labbcatUrl The base URL of the LaBB-CAT server -
     * e.g. https://labbcat.canterbury.ac.nz/demo/
     */
-   public GraphStore(URL labbcatUrl) {
+   public LabbcatEdit(URL labbcatUrl) {
       super(labbcatUrl);
    } // end of constructor
    
@@ -102,7 +124,7 @@ public class GraphStore
     * @param username LaBB-CAT username.
     * @param password LaBB-CAT password.
     */
-   public GraphStore(URL labbcatUrl, String username, String password) {
+   public LabbcatEdit(URL labbcatUrl, String username, String password) {
       super(labbcatUrl, username, password);
    } // end of constructor
 
@@ -284,4 +306,76 @@ public class GraphStore
       }
    }
 
-} // end of class GraphStore
+   // Other methods:
+   
+   /**
+    * Upload a new transcript.
+    * @param transcript The transcript to upload.
+    * @param media The media to upload, if any.
+    * @param mediaSuffix The media suffix for the media.
+    * @param transcriptType The transcript type.
+    * @param corpus The corpus for the transcript.
+    * @param episode The episode the transcript belongs to.
+    * @return The taskId of the server task processing the upload. 
+    * @throws IOException
+    * @throws ResponseException
+    */
+   public String newTranscript(File transcript, File[] media, String mediaSuffix, String transcriptType, String corpus, String episode)
+      throws IOException, StoreException {
+      
+      cancelling = false;
+      URL url = makeUrl("edit/transcript/new");
+      postRequest = new HttpRequestPostMultipart(url, getRequiredHttpAuthorization())
+         .setUserAgent()
+         .setHeader("Accept", "application/json")
+         .setParameter("todo", "new")
+         .setParameter("auto", true)
+         .setParameter("transcriptType", transcriptType)
+         .setParameter("corpus", corpus)
+         .setParameter("episode", episode)
+         .setParameter("uploadfile1_0", transcript);
+      if (media != null && media.length > 0) {
+         if (mediaSuffix == null) mediaSuffix = "";
+         for (int f = 0; f < media.length; f++) {
+            postRequest.setParameter("uploadmedia"+mediaSuffix+"1", media[f]);
+         } // next file
+      }
+      if (verbose) System.out.println("taskStatus -> " + postRequest);
+      response = new Response(postRequest.post(), verbose);
+      response.checkForErrors(); // throws a ResponseException on error
+
+      // extract the threadId from model.result.id
+      JSONObject model = (JSONObject)response.getModel();
+      JSONObject result = model.getJSONObject("result");
+      return result.getString(transcript.getName());
+   } // end of newTranscript()
+
+   /**
+    * Uploads a new version of an existing transcript.
+    * @param transcript
+    * @return The taskId of the server task processing the upload. 
+    * @throws IOException
+    * @throws ResponseException
+    */
+   public String updateTranscript(File transcript)
+      throws IOException, StoreException {
+      
+      cancelling = false;
+      URL url = makeUrl("edit/transcript/new");
+      postRequest = new HttpRequestPostMultipart(url, getRequiredHttpAuthorization())
+         .setUserAgent()
+         .setHeader("Accept", "application/json")
+         .setParameter("todo", "update")
+         .setParameter("auto", true)
+         .setParameter("uploadfile1_0", transcript);
+      if (verbose) System.out.println("taskStatus -> " + postRequest);
+      response = new Response(postRequest.post(), verbose);
+      response.checkForErrors(); // throws a ResponseException on error
+      
+      // extract the threadId from model.result.id
+      JSONObject model = (JSONObject)response.getModel();
+      JSONObject result = model.getJSONObject("result");
+      return result.getString(transcript.getName());
+   } // end of updateTranscript()
+   
+} // end of class LabbcatEdit

@@ -30,7 +30,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import nzilbb.ag.Annotation;
-import nzilbb.labbcat.Labbcat;
+import nzilbb.labbcat.LabbcatAdmin;
 import nzilbb.labbcat.Match;
 import nzilbb.labbcat.PatternBuilder;
 import nzilbb.labbcat.TaskStatus;
@@ -446,7 +446,7 @@ public class LoadTester extends CommandLineProgram {
       public void run() {
          if (verbose) System.out.println("Starting client "+c+"...");
          try {
-            Labbcat labbcat = new Labbcat(labbcatUrl, username, password);
+            LabbcatAdmin labbcat = new LabbcatAdmin(labbcatUrl, username, password);
             //labbcat.setVerbose(verbose);
             JSONObject pattern = new PatternBuilder().addMatchLayer("orthography", searchFor).build();
             for (int r = 0; r < repetitions; r++) {

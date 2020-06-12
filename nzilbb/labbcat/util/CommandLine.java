@@ -23,7 +23,7 @@ package nzilbb.labbcat.util;
 
 import java.lang.reflect.Method;
 import java.util.Vector;
-import nzilbb.labbcat.Labbcat;
+import nzilbb.labbcat.LabbcatAdmin;
 import nzilbb.labbcat.Response;
 import nzilbb.labbcat.ResponseException;
 import nzilbb.util.CommandLineProgram;
@@ -182,7 +182,7 @@ public class CommandLine extends CommandLineProgram {
    public void start() {
       
       try {
-         Labbcat labbcat = new Labbcat(labbcatUrl, username, password);
+         LabbcatAdmin labbcat = new LabbcatAdmin(labbcatUrl, username, password);
          labbcat.setVerbose(verbose);
 
          if (arguments.size() == 0) {

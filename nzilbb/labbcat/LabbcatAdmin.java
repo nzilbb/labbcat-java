@@ -35,10 +35,11 @@ import nzilbb.ag.serialize.SerializationDescriptor;
  * <a href="https://nzilbb.github.io/ag/javadoc/nzilbb/ag/IGraphStoreAdministration.html">nzilbb.ag.IGraphStoreAdminitration</a>.
  * <p>This class inherits the <em>read-write</em> operations of {@link GraphStore}
  * and adds some administration operations, including definition of layers,
- * registration of converters, etc.
+ * registration of converters, etc., i.e. those that can be performed by users with
+ * <q>admin</q> permission. 
  * <p> e.g.
  * <pre> // create annotation store client
- * GraphStoreAdministration store = new GraphStoreAdministration("https://labbcat.canterbury.ac.nz", "demo", "demo");
+ * LabbcatAdmin store = new LabbcatAdmin("https://labbcat.canterbury.ac.nz", "demo", "demo");
  * // get some basic information
  * String id = store.getId();
  * String[] layers = store.getLayerIds();
@@ -50,9 +51,7 @@ import nzilbb.ag.serialize.SerializationDescriptor;
  * @author Robert Fromont robert@fromont.net.nz
  */
 
-public class GraphStoreAdministration
-   extends GraphStore
-   implements IGraphStoreAdministration {
+public class LabbcatAdmin extends LabbcatEdit implements IGraphStoreAdministration {
    
    // Attributes:
   
@@ -61,7 +60,7 @@ public class GraphStoreAdministration
    /**
     * Default constructor.
     */
-   public GraphStoreAdministration() {
+   public LabbcatAdmin() {
    } // end of constructor
    
    /**
@@ -69,7 +68,7 @@ public class GraphStoreAdministration
     * @param labbcatUrl The base URL of the LaBB-CAT server -
     * e.g. https://labbcat.canterbury.ac.nz/demo/
     */
-   public GraphStoreAdministration(String labbcatUrl) throws MalformedURLException {
+   public LabbcatAdmin(String labbcatUrl) throws MalformedURLException {
       super(labbcatUrl);
    } // end of constructor
    
@@ -80,7 +79,7 @@ public class GraphStoreAdministration
     * @param username LaBB-CAT username.
     * @param password LaBB-CAT password.
     */
-   public GraphStoreAdministration(String labbcatUrl, String username, String password)
+   public LabbcatAdmin(String labbcatUrl, String username, String password)
       throws MalformedURLException {
       super(labbcatUrl, username, password);
    } // end of constructor
@@ -90,7 +89,7 @@ public class GraphStoreAdministration
     * @param labbcatUrl The base URL of the LaBB-CAT server -
     * e.g. https://labbcat.canterbury.ac.nz/demo/
     */
-   public GraphStoreAdministration(URL labbcatUrl) {
+   public LabbcatAdmin(URL labbcatUrl) {
       super(labbcatUrl);
    } // end of constructor
    
@@ -101,7 +100,7 @@ public class GraphStoreAdministration
     * @param username LaBB-CAT username.
     * @param password LaBB-CAT password.
     */
-   public GraphStoreAdministration(URL labbcatUrl, String username, String password) {
+   public LabbcatAdmin(URL labbcatUrl, String username, String password) {
       super(labbcatUrl, username, password);
    } // end of constructor
 
@@ -245,4 +244,4 @@ public class GraphStoreAdministration
       throw new StoreException("Not implemented");
    }
 
-} // end of class GraphStoreAdministration
+} // end of class LabbcatAdmin
