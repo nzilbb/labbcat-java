@@ -217,7 +217,6 @@ public class Match {
       Text = json.optString("Text");
       AfterMatch = json.optString("AfterMatch");
    } // end of constructor
-
    
    /**
     * String represtation for logging.

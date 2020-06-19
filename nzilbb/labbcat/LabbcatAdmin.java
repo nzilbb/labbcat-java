@@ -23,12 +23,18 @@ package nzilbb.labbcat;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.io.IOException;
+import java.util.Vector;
 import nzilbb.ag.IGraphStoreAdministration;
 import nzilbb.ag.PermissionException;
 import nzilbb.ag.StoreException;
 import nzilbb.ag.serialize.IDeserializer;
 import nzilbb.ag.serialize.ISerializer;
 import nzilbb.ag.serialize.SerializationDescriptor;
+import nzilbb.labbcat.http.*;
+import nzilbb.labbcat.model.Corpus;
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 /**
  * Client-side implementation of 
@@ -244,4 +250,110 @@ public class LabbcatAdmin extends LabbcatEdit implements IGraphStoreAdministrati
       throw new StoreException("Not implemented");
    }
 
+   // Other methods:
+
+   /**
+    * Creates a new corpus record.
+    * @param corpus The corpus details to save.
+    * @return The corpus just created.
+    * @throws StoreException, PermissionException
+    */
+   public Corpus createCorpus(Corpus corpus) throws StoreException, PermissionException {
+      try {
+         HttpRequestPost request = post("api/admin/corpora")
+            .setHeader("Accept", "application/json");
+         if (verbose) System.out.println("createCorpus -> " + request);
+         response = new Response(request.post(corpus.toJSON()), verbose);
+         response.checkForErrors(); // throws a StoreException on error
+         if (response.isModelNull()) return null;
+         return new Corpus((JSONObject)response.getModel());
+      } catch(IOException x) {
+         throw new StoreException("Could not get response.", x);
+      }
+   } // end of createCorpus()
+
+   /**
+    * Reads a list of corpus records.
+    * @return A list of corpora.
+    * @throws StoreException, PermissionException
+    */
+   public Corpus[] readCorpora() throws StoreException, PermissionException {
+      return readCorpora(null, null);
+   }
+   
+   /**
+    * Reads a list of corpus records.
+    * @param pageNumber The zero-based  page of records to return (if null, all records
+    * will be returned). 
+    * @param pageLength The length of pages (if null, the default page length is 20).
+    * @return A list of corpora.
+    * @throws StoreException, PermissionException
+    */
+   public Corpus[] readCorpora(Integer pageNumber, Integer pageLength) throws StoreException, PermissionException {
+      try {
+         HttpRequestGet request = get("api/admin/corpora")
+            .setHeader("Accept", "application/json");
+         if (pageLength != null) request.setParameter("p", pageLength);
+         if (pageNumber != null) request.setParameter("l", pageNumber);
+         if (verbose) System.out.println("readCorpora -> " + request);
+         response = new Response(request.get(), verbose);
+         response.checkForErrors(); // throws a StoreException on error
+         if (response.isModelNull()) return null;
+         JSONArray array = (JSONArray)response.getModel();
+         Vector<Corpus> corpora = new Vector<Corpus>();
+         if (array != null) {
+            for (int i = 0; i < array.length(); i++) {
+               corpora.add(new Corpus(array.getJSONObject(i)));
+            }
+         }
+         return corpora.toArray(new Corpus[0]);
+      } catch(IOException x) {
+         throw new StoreException("Could not get response.", x);
+      }
+   } // end of readCorpora()
+   
+   /**
+    * Updates an existing corpus record.
+    * @param corpus The corpus details to save.
+    * @return The corpus just updated.
+    * @throws StoreException, PermissionException
+    */
+   public Corpus updateCorpus(Corpus corpus) throws StoreException, PermissionException {
+      try{
+         HttpRequestPost request = put("api/admin/corpora")
+            .setHeader("Accept", "application/json");
+         if (verbose) System.out.println("updateCorpus -> " + request);
+         response = new Response(request.post(corpus.toJSON()), verbose);
+         response.checkForErrors(); // throws a StoreException on error
+         if (response.isModelNull()) return null;
+         return new Corpus((JSONObject)response.getModel());
+      } catch(IOException x) {
+         throw new StoreException("Could not get response.", x);
+      }
+   } // end of updateCorpus()
+   
+   /**
+    * Deletes an existing corpus record.
+    * @param corpus The corpus to delete.
+    * @throws StoreException, PermissionException
+    */
+   public void deleteCorpus(Corpus corpus) throws StoreException, PermissionException {
+      deleteCorpus(corpus.getName());
+   }
+   
+   /**
+    * Deletes an existing corpus record.
+    * @param name The name/ID of the corpus to delete.
+    * @throws StoreException, PermissionException
+    */
+   public void deleteCorpus(String name) throws StoreException, PermissionException {
+      try{
+         HttpRequestPost request = delete("api/admin/corpora/" + name);
+         if (verbose) System.out.println("deleteCorpus -> " + request);
+         response = new Response(request.post(), verbose);
+         response.checkForErrors(); // throws a StoreException on error
+      } catch(IOException x) {
+         throw new StoreException("Could not get response.", x);
+      }
+   } // end of updateCorpus()
 } // end of class LabbcatAdmin

@@ -393,12 +393,9 @@ public class LabbcatView implements IGraphStoreQuery {
     * @throws StoreException If the URL is malformed.
     */
    public URL makeUrl(String resource) throws StoreException {
-      try
-      {
+      try {
          return new URL(labbcatUrl, resource);
-      }
-      catch(Throwable t)
-      {
+      } catch(Throwable t) {
          throw new StoreException("Could not construct request URL.", t);
       }
    } // end of editUrl()
@@ -419,8 +416,6 @@ public class LabbcatView implements IGraphStoreQuery {
    /**
     * Constructs a POST request for the given resource. The resulting request will be
     * authorized if required, but otherwise has no headers or parameters set. 
-    * <p> The post-request is remembered, so subsequent calls to {@link #cancel()} will
-    * cancel the request if it's in-course.
     * @param resource The path to the resource.
     * @return The request.
     * @throws IOException
@@ -432,8 +427,38 @@ public class LabbcatView implements IGraphStoreQuery {
    } // end of post()
 
    /**
+    * Constructs a PUT request for the given resource. The resulting request will be
+    * authorized if required, but otherwise has no headers or parameters set. 
+    * @param resource The path to the resource.
+    * @return The request.
+    * @throws IOException
+    * @throws ResponseException
+    */
+   public HttpRequestPost put(String resource) throws IOException, StoreException {
+      return new HttpRequestPost(makeUrl(resource), getRequiredHttpAuthorization())
+         .setMethod("PUT")
+         .setUserAgent();
+   } // end of post()
+
+   /**
+    * Constructs a DELETE request for the given resource. The resulting request will be
+    * authorized if required, but otherwise has no headers or parameters set. 
+    * @param resource The path to the resource.
+    * @return The request.
+    * @throws IOException
+    * @throws ResponseException
+    */
+   public HttpRequestPost delete(String resource) throws IOException, StoreException {
+      return new HttpRequestPost(makeUrl(resource), getRequiredHttpAuthorization())
+         .setMethod("DELETE")
+         .setUserAgent();
+   } // end of post()
+
+   /**
     * Constructs a multipart POST request for the given resource. The resulting request
     * will be authorized if required, but otherwise has no headers or parameters set. 
+    * <p> The post-request is remembered, so subsequent calls to {@link #cancel()} will
+    * cancel the request if it's in-course.
     * @param resource The path to the resource.
     * @return The request.
     * @throws IOException

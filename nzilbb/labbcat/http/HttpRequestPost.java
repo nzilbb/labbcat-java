@@ -37,6 +37,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Random;
 import java.util.jar.JarFile;
+import org.json.JSONObject;
 
 /**
  * POST HTTP request.
@@ -166,6 +167,19 @@ public class HttpRequestPost {
       setHeader("user-agent", HttpRequestGet.UserAgent);
       return this;
    } // end of setUserAgent()
+
+   
+   /**
+    * Sets the HTTP method to use.
+    * @param method "POST", "PUT", "DELETE", etc.
+    * @return A reference to this object.
+    * @throws IOException
+    */
+   public HttpRequestPost setMethod(String method) throws IOException {
+      connection.setRequestMethod(method);
+      return this;
+   } // end of setMethod()
+
 
    @SuppressWarnings("rawtypes")
    private void postCookies() {
@@ -306,7 +320,19 @@ public class HttpRequestPost {
     * @throws IOException
     */
    public HttpURLConnection post() throws IOException {
+      if (os == null) connect();
+      os.close();
+      return connection;
+   }
+   
+   /**
+    * posts the requests to the server, with all the cookies and parameters that were added
+    * @return input stream with the server response
+    * @throws IOException
+    */
+   public HttpURLConnection post(JSONObject json) throws IOException {
       
+      write(json.toString());
       os.close();
       return connection;
    }
