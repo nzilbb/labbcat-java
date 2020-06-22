@@ -52,6 +52,8 @@ public class TestLabbcatEdit {
    static String labbcatUrl = "http://localhost:8080/labbcat/";
    static String username = "labbcat";
    static String password = "labbcat";
+   static String readonly_username = "readonly";
+   static String readonly_password = "labbcat";
    static LabbcatEdit labbcat;
 
    @BeforeClass public static void createStore() {
@@ -91,6 +93,21 @@ public class TestLabbcatEdit {
       labbcat.getId();
    }
 
+   @Test() public void unauthorizedRequest()
+      throws Exception {
+      LabbcatEdit labbcat = new LabbcatEdit(labbcatUrl, readonly_username, readonly_password);
+      labbcat.setBatchMode(true);
+      try {
+         labbcat.deleteTranscript("non-existent transcript");
+         fail("Can't deleteTranscript as non-edit user");
+      } catch(ResponseException x) {
+         // check it's for the right reason
+         assertEquals("Read failed for lack of auth: "
+                      + x.getResponse().getHttpStatus() + " " + x.getResponse().getRaw(),
+                      403, x.getResponse().getHttpStatus());
+      }
+   }
+   
    @Test public void inheritedLabbcatViewFunctions() throws Exception {
       String id = labbcat.getId();
       assertEquals("getId: ID matches the url",

@@ -237,7 +237,10 @@ public class Response {
     */
    public Response load(InputStream input)
     throws IOException {
-      return load(IO.InputStreamToString(input));
+      if (input != null) {
+         load(IO.InputStreamToString(input));
+      }
+      return this;
    } // end of load()
    
    /**
