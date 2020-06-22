@@ -293,8 +293,8 @@ public class LabbcatAdmin extends LabbcatEdit implements IGraphStoreAdministrati
       try {
          HttpRequestGet request = get("api/admin/corpora")
             .setHeader("Accept", "application/json");
-         if (pageLength != null) request.setParameter("p", pageLength);
-         if (pageNumber != null) request.setParameter("l", pageNumber);
+         if (pageLength != null) request.setParameter("pageNumber", pageLength);
+         if (pageNumber != null) request.setParameter("pageLength", pageNumber);
          if (verbose) System.out.println("readCorpora -> " + request);
          response = new Response(request.get(), verbose);
          response.checkForErrors(); // throws a StoreException on error
