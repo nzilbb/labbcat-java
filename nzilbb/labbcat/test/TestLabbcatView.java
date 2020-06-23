@@ -38,6 +38,7 @@ import nzilbb.ag.MediaFile;
 import nzilbb.ag.MediaTrackDefinition;
 import nzilbb.ag.StoreException;
 import nzilbb.labbcat.*;
+import nzilbb.labbcat.model.*;
 import org.json.JSONArray;
 import org.json.JSONObject;
 

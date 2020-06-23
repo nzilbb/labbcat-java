@@ -37,6 +37,7 @@ import nzilbb.ag.MediaFile;
 import nzilbb.ag.MediaTrackDefinition;
 import nzilbb.ag.StoreException;
 import nzilbb.labbcat.*;
+import nzilbb.labbcat.model.*;
 
 /**
  * Unit tests for LabbcatEdit.
