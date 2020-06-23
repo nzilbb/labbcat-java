@@ -33,6 +33,8 @@ import nzilbb.ag.serialize.ISerializer;
 import nzilbb.ag.serialize.SerializationDescriptor;
 import nzilbb.labbcat.http.*;
 import nzilbb.labbcat.model.Corpus;
+import nzilbb.labbcat.model.MediaTrack;
+import nzilbb.labbcat.model.Project;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -356,4 +358,215 @@ public class LabbcatAdmin extends LabbcatEdit implements IGraphStoreAdministrati
          throw new StoreException("Could not get response.", x);
       }
    } // end of updateCorpus()
+   
+   /**
+    * Creates a new project record.
+    * @param project The project details to save.
+    * @return The project just created.
+    * @throws StoreException, PermissionException
+    */
+   public Project createProject(Project project) throws StoreException, PermissionException {
+      try {
+         HttpRequestPost request = post("api/admin/projects")
+            .setHeader("Accept", "application/json");
+         if (verbose) System.out.println("createProject -> " + request);
+         response = new Response(request.post(project.toJSON()), verbose);
+         response.checkForErrors(); // throws a StoreException on error
+         if (response.isModelNull()) return null;
+         return new Project((JSONObject)response.getModel());
+      } catch(IOException x) {
+         throw new StoreException("Could not get response.", x);
+      }
+   } // end of createProject()
+
+   /**
+    * Reads a list of project records.
+    * @return A list of projects.
+    * @throws StoreException, PermissionException
+    */
+   public Project[] readProjects() throws StoreException, PermissionException {
+      return readProjects(null, null);
+   }
+   
+   /**
+    * Reads a list of project records.
+    * @param pageNumber The zero-based  page of records to return (if null, all records
+    * will be returned). 
+    * @param pageLength The length of pages (if null, the default page length is 20).
+    * @return A list of projects.
+    * @throws StoreException, PermissionException
+    */
+   public Project[] readProjects(Integer pageNumber, Integer pageLength) throws StoreException, PermissionException {
+      try {
+         HttpRequestGet request = get("api/admin/projects")
+            .setHeader("Accept", "application/json");
+         if (pageLength != null) request.setParameter("pageNumber", pageLength);
+         if (pageNumber != null) request.setParameter("pageLength", pageNumber);
+         if (verbose) System.out.println("readProjects -> " + request);
+         response = new Response(request.get(), verbose);
+         response.checkForErrors(); // throws a StoreException on error
+         if (response.isModelNull()) return null;
+         JSONArray array = (JSONArray)response.getModel();
+         Vector<Project> projects = new Vector<Project>();
+         if (array != null) {
+            for (int i = 0; i < array.length(); i++) {
+               projects.add(new Project(array.getJSONObject(i)));
+            }
+         }
+         return projects.toArray(new Project[0]);
+      } catch(IOException x) {
+         throw new StoreException("Could not get response.", x);
+      }
+   } // end of readProjects()
+   
+   /**
+    * Updates an existing project record.
+    * @param project The project details to save.
+    * @return The project just updated.
+    * @throws StoreException, PermissionException
+    */
+   public Project updateProject(Project project) throws StoreException, PermissionException {
+      try{
+         HttpRequestPost request = put("api/admin/projects")
+            .setHeader("Accept", "application/json");
+         if (verbose) System.out.println("updateProject -> " + request);
+         response = new Response(request.post(project.toJSON()), verbose);
+         response.checkForErrors(); // throws a StoreException on error
+         if (response.isModelNull()) return null;
+         return new Project((JSONObject)response.getModel());
+      } catch(IOException x) {
+         throw new StoreException("Could not get response.", x);
+      }
+   } // end of updateProject()
+   
+   /**
+    * Deletes an existing project record.
+    * @param project The project to delete.
+    * @throws StoreException, PermissionException
+    */
+   public void deleteProject(Project project) throws StoreException, PermissionException {
+      deleteProject(project.getProject());
+   }
+   
+   /**
+    * Deletes an existing project record.
+    * @param name The name/ID of the project to delete.
+    * @throws StoreException, PermissionException
+    */
+   public void deleteProject(String name) throws StoreException, PermissionException {
+      try{
+         HttpRequestPost request = delete("api/admin/projects/" + name);
+         if (verbose) System.out.println("deleteProject -> " + request);
+         response = new Response(request.post(), verbose);
+         response.checkForErrors(); // throws a StoreException on error
+      } catch(IOException x) {
+         throw new StoreException("Could not get response.", x);
+      }
+   } // end of updateProject()
+   
+   /**
+    * Creates a new media track record.
+    * @param mediaTrack The mediaTrack details to save.
+    * @return The mediaTrack just created.
+    * @throws StoreException, PermissionException
+    */
+   public MediaTrack createMediaTrack(MediaTrack mediaTrack) throws StoreException, PermissionException {
+      try {
+         HttpRequestPost request = post("api/admin/mediatracks")
+            .setHeader("Accept", "application/json");
+         if (verbose) System.out.println("createMediaTrack -> " + request);
+         response = new Response(request.post(mediaTrack.toJSON()), verbose);
+         response.checkForErrors(); // throws a StoreException on error
+         if (response.isModelNull()) return null;
+         return new MediaTrack((JSONObject)response.getModel());
+      } catch(IOException x) {
+         throw new StoreException("Could not get response.", x);
+      }
+   } // end of createMediaTrack()
+   
+   /**
+    * Reads a list of mediaTrack records.
+    * @return A list of mediaTracks.
+    * @throws StoreException, PermissionException
+    */
+   public MediaTrack[] readMediaTracks() throws StoreException, PermissionException {
+      return readMediaTracks(null, null);
+   }
+   
+   /**
+    * Reads a list of media track records.
+    * @param pageNumber The zero-based  page of records to return (if null, all records
+    * will be returned). 
+    * @param pageLength The length of pages (if null, the default page length is 20).
+    * @return A list of mediaTracks.
+    * @throws StoreException, PermissionException
+    */
+   public MediaTrack[] readMediaTracks(Integer pageNumber, Integer pageLength) throws StoreException, PermissionException {
+      try {
+         HttpRequestGet request = get("api/admin/mediatracks")
+            .setHeader("Accept", "application/json");
+         if (pageLength != null) request.setParameter("pageNumber", pageLength);
+         if (pageNumber != null) request.setParameter("pageLength", pageNumber);
+         if (verbose) System.out.println("readMediaTracks -> " + request);
+         response = new Response(request.get(), verbose);
+         response.checkForErrors(); // throws a StoreException on error
+         if (response.isModelNull()) return null;
+         JSONArray array = (JSONArray)response.getModel();
+         Vector<MediaTrack> mediaTracks = new Vector<MediaTrack>();
+         if (array != null) {
+            for (int i = 0; i < array.length(); i++) {
+               mediaTracks.add(new MediaTrack(array.getJSONObject(i)));
+            }
+         }
+         return mediaTracks.toArray(new MediaTrack[0]);
+      } catch(IOException x) {
+         throw new StoreException("Could not get response.", x);
+      }
+   } // end of readMediaTracks()
+   
+   /**
+    * Updates an existing media track record.
+    * @param mediaTrack The mediaTrack details to save.
+    * @return The mediaTrack just updated.
+    * @throws StoreException, PermissionException
+    */
+   public MediaTrack updateMediaTrack(MediaTrack mediaTrack) throws StoreException, PermissionException {
+      try{
+         HttpRequestPost request = put("api/admin/mediatracks")
+            .setHeader("Accept", "application/json");
+         if (verbose) System.out.println("updateMediaTrack -> " + request);
+         response = new Response(request.post(mediaTrack.toJSON()), verbose);
+         response.checkForErrors(); // throws a StoreException on error
+         if (response.isModelNull()) return null;
+         return new MediaTrack((JSONObject)response.getModel());
+      } catch(IOException x) {
+         throw new StoreException("Could not get response.", x);
+      }
+   } // end of updateMediaTrack()
+   
+   /**
+    * Deletes an existing media track record.
+    * @param mediaTrack The mediaTrack to delete.
+    * @throws StoreException, PermissionException
+    */
+   public void deleteMediaTrack(MediaTrack mediaTrack) throws StoreException, PermissionException {
+      deleteMediaTrack(mediaTrack.getSuffix());
+   }
+   
+   /**
+    * Deletes an existing media track record.
+    * @param suffix The suffix of the mediaTrack to delete.
+    * @throws StoreException, PermissionException
+    */
+   public void deleteMediaTrack(String suffix) throws StoreException, PermissionException {
+      try{
+         HttpRequestPost request = delete("api/admin/mediatracks/" + suffix);
+         if (verbose) System.out.println("deleteMediaTrack -> " + request);
+         response = new Response(request.post(), verbose);
+         response.checkForErrors(); // throws a StoreException on error
+      } catch(IOException x) {
+         throw new StoreException("Could not get response.", x);
+      }
+   } // end of updateMediaTrack()
+   
 } // end of class LabbcatAdmin

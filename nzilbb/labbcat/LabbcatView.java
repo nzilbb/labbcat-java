@@ -51,6 +51,8 @@ import nzilbb.ag.PermissionException;
 import nzilbb.ag.Schema;
 import nzilbb.ag.StoreException;
 import nzilbb.labbcat.http.*;
+import nzilbb.labbcat.model.TaskStatus;
+import nzilbb.labbcat.model.Match;
 import nzilbb.util.IO;
 import nzilbb.util.MonitorableSeries;
 import org.json.JSONArray;

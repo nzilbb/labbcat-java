@@ -306,6 +306,184 @@ public class TestLabbcatAdmin {
      }
    }
 
+   @Test public void newProjectUpdateProjectAndDeleteProject() throws Exception {
+      Project originalProject = new Project()
+         .setProject("unit-test")
+         .setDescription("Temporary project for unit testing");
+      
+      try {
+         Project newProject = labbcat.createProject(originalProject);
+         assertNotNull("Project returned", newProject);
+         assertEquals("Name correct",
+                      originalProject.getProject(), newProject.getProject());
+         assertEquals("Description correct",
+                      originalProject.getDescription(), newProject.getDescription());
+         
+         try {
+            labbcat.createProject(originalProject);
+            fail("Can't create a project with existing name");
+         }
+         catch(Exception exception) {}
+         
+         Project[] projects = labbcat.readProjects();
+         // ensure the project exists
+         assertTrue("There's at least one project", projects.length >= 1);
+         boolean found = false;
+         for (Project c : projects) {
+            if (c.getProject().equals(originalProject.getProject())) {
+               found = true;
+               break;
+            }
+         }
+         assertTrue("Project was added", found);
+
+         // update it
+         Project updatedProject = new Project()
+            .setProject("unit-test")
+            .setDescription("Changed description");
+         
+         Project changedProject = labbcat.updateProject(updatedProject);
+         assertNotNull("Project returned", changedProject);
+         assertEquals("Updated Name correct",
+                      updatedProject.getProject(), changedProject.getProject());
+         assertEquals("Updated Description correct",
+                      updatedProject.getDescription(), changedProject.getDescription());
+
+         // delete it
+         labbcat.deleteProject(originalProject.getProject());
+
+         Project[] projectsAfter = labbcat.readProjects();
+         // ensure the project no longer exists
+         boolean foundAfter = false;
+         for (Project c : projectsAfter) {
+            if (c.getProject().equals(originalProject.getProject())) {
+               foundAfter = true;
+               break;
+            }
+         }
+         assertFalse("Project is gone", foundAfter);
+
+         try {
+            // can't delete it again
+            labbcat.deleteProject(originalProject);
+            fail("Can't delete project that doesn't exist");
+         } catch(Exception exception) {
+         }
+
+      } finally {
+         // ensure it's not there
+         try {
+            labbcat.deleteProject(originalProject);
+         } catch(Exception exception) {}         
+     }
+   }
+
+   @Test public void newMediaTrackUpdateMediaTrackAndDeleteMediaTrack() throws Exception {
+      MediaTrack originalMediaTrack = new MediaTrack()
+         .setSuffix("unit-test")
+         .setDescription("Temporary mediaTrack for unit testing")
+         .setDisplayOrder(99);
+      
+      try {
+         MediaTrack newMediaTrack = labbcat.createMediaTrack(originalMediaTrack);
+         assertNotNull("MediaTrack returned", newMediaTrack);
+         assertEquals("Name correct",
+                      originalMediaTrack.getSuffix(), newMediaTrack.getSuffix());
+         assertEquals("Description correct",
+                      originalMediaTrack.getDescription(), newMediaTrack.getDescription());
+         assertEquals("Display order correct",
+                      originalMediaTrack.getDisplayOrder(), newMediaTrack.getDisplayOrder());
+         
+         try {
+            labbcat.createMediaTrack(originalMediaTrack);
+            fail("Can't create a mediaTrack with existing name");
+         }
+         catch(Exception exception) {}
+         
+         MediaTrack[] mediaTracks = labbcat.readMediaTracks();
+         // ensure the mediaTrack exists
+         assertTrue("There's at least one mediaTrack", mediaTracks.length >= 1);
+         boolean found = false;
+         for (MediaTrack c : mediaTracks) {
+            if (c.getSuffix().equals(originalMediaTrack.getSuffix())) {
+               found = true;
+               break;
+            }
+         }
+         assertTrue("MediaTrack was added", found);
+
+         // update it
+         MediaTrack updatedMediaTrack = new MediaTrack()
+            .setSuffix("unit-test")
+            .setDescription("Changed description")
+            .setDisplayOrder(100);
+         
+         MediaTrack changedMediaTrack = labbcat.updateMediaTrack(updatedMediaTrack);
+         assertNotNull("MediaTrack returned", changedMediaTrack);
+         assertEquals("Updated Name correct",
+                      updatedMediaTrack.getSuffix(), changedMediaTrack.getSuffix());
+         assertEquals("Updated Description correct",
+                      updatedMediaTrack.getDescription(), changedMediaTrack.getDescription());
+         assertEquals("Updated Display order correct",
+                      updatedMediaTrack.getDisplayOrder(), changedMediaTrack.getDisplayOrder());
+
+         // delete it
+         labbcat.deleteMediaTrack(originalMediaTrack.getSuffix());
+
+         MediaTrack[] mediaTracksAfter = labbcat.readMediaTracks();
+         // ensure the mediaTrack no longer exists
+         boolean foundAfter = false;
+         for (MediaTrack c : mediaTracksAfter) {
+            if (c.getSuffix().equals(originalMediaTrack.getSuffix())) {
+               foundAfter = true;
+               break;
+            }
+         }
+         assertFalse("MediaTrack is gone", foundAfter);
+
+         try {
+            // can't delete it again
+            labbcat.deleteMediaTrack(originalMediaTrack);
+            fail("Can't delete mediaTrack that doesn't exist");
+         } catch(Exception exception) {
+         }
+
+      } finally {
+         // ensure it's not there
+         try {
+            labbcat.deleteMediaTrack(originalMediaTrack);
+         } catch(Exception exception) {}         
+     }
+   }
+   @Test public void canAddDeleteMediaTrackWithNoSuffix() throws Exception {
+
+      // if the test system has one already, ensure we restore it afterwards
+      MediaTrack existingTrack = null;
+      MediaTrack[] mediaTracks = labbcat.readMediaTracks();
+      for (MediaTrack c : mediaTracks) {
+         if (c.getSuffix().length() == 0) {
+            existingTrack = c;
+            break;
+         }
+      }
+      
+      try {
+
+         if (existingTrack != null) labbcat.deleteMediaTrack(existingTrack);
+
+         MediaTrack testTrack = new MediaTrack()
+            .setSuffix("")
+            .setDescription("Media")
+            .setDisplayOrder(0);
+         labbcat.createMediaTrack(testTrack);
+         labbcat.deleteMediaTrack(testTrack);
+
+      } finally {
+         // put the original track back
+         if (existingTrack != null) labbcat.createMediaTrack(existingTrack);
+     }
+   }
+
    public static void main(String args[]) {
       org.junit.runner.JUnitCore.main("nzilbb.labbcat.test.TestLabbcatAdmin");
    }

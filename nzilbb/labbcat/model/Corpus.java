@@ -27,9 +27,8 @@ import org.json.JSONObject;
  * Corpus record.
  * @author Robert Fromont robert@fromont.net.nz
  */
-
-public class Corpus
-{
+public class Corpus {
+   
    // Attributes:
 
    /**
@@ -119,7 +118,7 @@ public class Corpus
    } // end of constructor
    
    /**
-    * Serializes the opject to JSON.
+    * Serializes the object to JSON.
     * @return A JSON serialization of the object.
     */
    public JSONObject toJSON() {
