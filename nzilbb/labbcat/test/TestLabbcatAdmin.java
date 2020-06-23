@@ -455,34 +455,6 @@ public class TestLabbcatAdmin {
          } catch(Exception exception) {}         
      }
    }
-   @Test public void canAddDeleteMediaTrackWithNoSuffix() throws Exception {
-
-      // if the test system has one already, ensure we restore it afterwards
-      MediaTrack existingTrack = null;
-      MediaTrack[] mediaTracks = labbcat.readMediaTracks();
-      for (MediaTrack c : mediaTracks) {
-         if (c.getSuffix().length() == 0) {
-            existingTrack = c;
-            break;
-         }
-      }
-      
-      try {
-
-         if (existingTrack != null) labbcat.deleteMediaTrack(existingTrack);
-
-         MediaTrack testTrack = new MediaTrack()
-            .setSuffix("")
-            .setDescription("Media")
-            .setDisplayOrder(0);
-         labbcat.createMediaTrack(testTrack);
-         labbcat.deleteMediaTrack(testTrack);
-
-      } finally {
-         // put the original track back
-         if (existingTrack != null) labbcat.createMediaTrack(existingTrack);
-     }
-   }
 
    public static void main(String args[]) {
       org.junit.runner.JUnitCore.main("nzilbb.labbcat.test.TestLabbcatAdmin");
