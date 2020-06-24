@@ -36,6 +36,7 @@ import nzilbb.labbcat.model.Corpus;
 import nzilbb.labbcat.model.MediaTrack;
 import nzilbb.labbcat.model.Project;
 import nzilbb.labbcat.model.Role;
+import nzilbb.labbcat.model.RolePermission;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -799,5 +800,145 @@ public class LabbcatAdmin extends LabbcatEdit implements IGraphStoreAdministrati
          throw new StoreException("Could not get response.", x);
       }
    } // end of updateRole()
+
+   /**
+    * Creates a new role permission record.
+    * @param rolePermission The rolePermission details to save.
+    * @return The rolePermission just created.
+    * @throws StoreException, PermissionException
+    * @see #readRolePermissions()
+    * @see #readRolePermissions(Integer,Integer)
+    * @see #updateRolePermission(RolePermission)
+    * @see #deleteRolePermission(RolePermission)
+    * @see #deleteRolePermission(String)
+    */
+   public RolePermission createRolePermission(RolePermission rolePermission) throws StoreException, PermissionException {
+      try {
+         HttpRequestPost request = post("api/admin/roles/permissions")
+            .setHeader("Accept", "application/json");
+         if (verbose) System.out.println("createRolePermission -> " + request);
+         response = new Response(request.post(rolePermission.toJSON()), verbose);
+         response.checkForErrors(); // throws a StoreException on error
+         if (response.isModelNull()) return null;
+         return new RolePermission((JSONObject)response.getModel());
+      } catch(IOException x) {
+         throw new StoreException("Could not get response.", x);
+      }
+   } // end of createRolePermission()
+
+   /**
+    * Reads a list of role permission records.
+    * @param roleId The ID of the user role to get permissions for.
+    * @return A list of rolePermissions.
+    * @throws StoreException, PermissionException
+    * @see #createRolePermission(RolePermission)
+    * @see #readRolePermissions(Integer,Integer)
+    * @see #updateRolePermission(RolePermission)
+    * @see #deleteRolePermission(RolePermission)
+    * @see #deleteRolePermission(String)
+    */
+   public RolePermission[] readRolePermissions(String roleId)
+      throws StoreException, PermissionException {
+      return readRolePermissions(roleId, null, null);
+   }
    
+   /**
+    * Reads a list of role permission records.
+    * @param roleId The ID of the user role to get permissions for.
+    * @param pageNumber The zero-based  page of records to return (if null, all records
+    * will be returned). 
+    * @param pageLength The length of pages (if null, the default page length is 20).
+    * @return A list of rolePermissions.
+    * @throws StoreException, PermissionException
+    * @see #createRolePermission(RolePermission)
+    * @see #readRolePermissions()
+    * @see #updateRolePermission(RolePermission)
+    * @see #deleteRolePermission(RolePermission)
+    * @see #deleteRolePermission(String)
+    */
+   public RolePermission[] readRolePermissions(String roleId, Integer pageNumber, Integer pageLength)
+      throws StoreException, PermissionException {
+      try {
+         HttpRequestGet request = get("api/admin/roles/permissions/" + roleId)
+            .setHeader("Accept", "application/json");
+         if (pageLength != null) request.setParameter("pageNumber", pageLength);
+         if (pageNumber != null) request.setParameter("pageLength", pageNumber);
+         if (verbose) System.out.println("readRolePermissions -> " + request);
+         response = new Response(request.get(), verbose);
+         response.checkForErrors(); // throws a StoreException on error
+         if (response.isModelNull()) return null;
+         JSONArray array = (JSONArray)response.getModel();
+         Vector<RolePermission> rolePermissions = new Vector<RolePermission>();
+         if (array != null) {
+            for (int i = 0; i < array.length(); i++) {
+               rolePermissions.add(new RolePermission(array.getJSONObject(i)));
+            }
+         }
+         return rolePermissions.toArray(new RolePermission[0]);
+      } catch(IOException x) {
+         throw new StoreException("Could not get response.", x);
+      }
+   } // end of readRolePermissions()
+   
+   /**
+    * Updates an existing role permission record.
+    * @param rolePermission The rolePermission details to save.
+    * @return The rolePermission just updated.
+    * @throws StoreException, PermissionException
+    * @see #createRolePermission(RolePermission)
+    * @see #readRolePermissions()
+    * @see #readRolePermissions(Integer,Integer)
+    * @see #deleteRolePermission(RolePermission)
+    * @see #deleteRolePermission(String)
+    */
+   public RolePermission updateRolePermission(RolePermission rolePermission) throws StoreException, PermissionException {
+      try{
+         HttpRequestPost request = put("api/admin/roles/permissions")
+            .setHeader("Accept", "application/json");
+         if (verbose) System.out.println("updateRolePermission -> " + request);
+         response = new Response(request.post(rolePermission.toJSON()), verbose);
+         response.checkForErrors(); // throws a StoreException on error
+         if (response.isModelNull()) return null;
+         return new RolePermission((JSONObject)response.getModel());
+      } catch(IOException x) {
+         throw new StoreException("Could not get response.", x);
+      }
+   } // end of updateRolePermission()
+   
+   /**
+    * Deletes an existing role permission record.
+    * @param rolePermission The rolePermission to delete.
+    * @throws StoreException, PermissionException
+    * @see #createRolePermission(RolePermission)
+    * @see #readRolePermissions()
+    * @see #readRolePermissions(Integer,Integer)
+    * @see #updateRolePermission(RolePermission)
+    * @see #deleteRolePermission(String)
+    */
+   public void deleteRolePermission(RolePermission rolePermission) throws StoreException, PermissionException {
+      deleteRolePermission(rolePermission.getRoleId(), rolePermission.getEntity());
+   }
+   
+   /**
+    * Deletes an existing role permission record.
+    * @param roleId The name/ID of the role.
+    * @param entity The entity of the permission.
+    * @throws StoreException, PermissionException
+    * @see #createRolePermission(RolePermission)
+    * @see #readRolePermissions()
+    * @see #readRolePermissions(Integer,Integer)
+    * @see #updateRolePermission(RolePermission)
+    * @see #deleteRolePermission(RolePermission)
+    */
+   public void deleteRolePermission(String roleId, String entity) throws StoreException, PermissionException {
+      try{
+         HttpRequestPost request = delete("api/admin/roles/permissions/" + roleId + "/" + entity);
+         if (verbose) System.out.println("deleteRolePermission -> " + request);
+         response = new Response(request.post(), verbose);
+         response.checkForErrors(); // throws a StoreException on error
+      } catch(IOException x) {
+         throw new StoreException("Could not get response.", x);
+      }
+   } // end of updateRolePermission()
+
 } // end of class LabbcatAdmin

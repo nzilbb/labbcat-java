@@ -528,6 +528,101 @@ public class TestLabbcatAdmin {
      }
    }
 
+   @Test public void newRolePermissionUpdateRolePermissionAndDeleteRolePermission()
+      throws Exception {
+      RolePermission originalRolePermission = new RolePermission()
+         .setRoleId("admin")
+         .setEntity("t")
+         .setLayerId("corpus")
+         .setValuePattern("unit-test.*");
+      
+      // ensure the record doesn't exist to start with
+      try {
+         labbcat.deleteRolePermission(originalRolePermission);
+      } catch(Exception exception) {}
+      
+      try
+      {
+         RolePermission newRolePermission = labbcat.createRolePermission(originalRolePermission);
+         assertNotNull("RolePermission returned", newRolePermission);
+         assertEquals("roleId correct",
+                      originalRolePermission.getRoleId(), newRolePermission.getRoleId());
+         assertEquals("entity correct",
+                      originalRolePermission.getEntity(), newRolePermission.getEntity());
+         assertEquals("layerId correct",
+                      originalRolePermission.getLayerId(), newRolePermission.getLayerId());
+         assertEquals("valudPattern correct",
+                      originalRolePermission.getValuePattern(), newRolePermission.getValuePattern());
+         
+         try {
+            labbcat.createRolePermission(originalRolePermission);
+            fail("Can't create a rolePermission with existing name");
+         }
+         catch(Exception exception) {}
+         
+         RolePermission[] rolePermissions
+            = labbcat.readRolePermissions(originalRolePermission.getRoleId());
+         // ensure the rolePermission exists
+         assertTrue("There's at least one rolePermission", rolePermissions.length >= 1);
+         boolean found = false;
+         for (RolePermission c : rolePermissions) {
+            if (c.getRoleId().equals(originalRolePermission.getRoleId())
+                && c.getEntity().equals(originalRolePermission.getEntity())) {
+               found = true;
+               break;
+            }
+         }
+         assertTrue("RolePermission was added", found);
+
+         // update it
+         RolePermission updatedRolePermission = new RolePermission()
+            .setRoleId("admin")
+            .setEntity("t")
+            .setLayerId("transcript_language")
+            .setValuePattern("en.*");
+         
+         RolePermission changedRolePermission = labbcat.updateRolePermission(updatedRolePermission);
+         assertNotNull("RolePermission returned", changedRolePermission);
+         assertEquals("roleId unchanged",
+                      originalRolePermission.getRoleId(), changedRolePermission.getRoleId());
+         assertEquals("entity unchanged",
+                      originalRolePermission.getEntity(), changedRolePermission.getEntity());
+         assertEquals("layerId updated",
+                      updatedRolePermission.getLayerId(), changedRolePermission.getLayerId());
+         assertEquals("valudPattern updated",
+                      updatedRolePermission.getValuePattern(), changedRolePermission.getValuePattern());
+         // delete it
+         labbcat.deleteRolePermission(
+            originalRolePermission.getRoleId(), originalRolePermission.getEntity());
+         
+         RolePermission[] rolePermissionsAfter = labbcat.readRolePermissions(
+            originalRolePermission.getRoleId());
+         // ensure the rolePermission no longer exists
+         boolean foundAfter = false;
+         for (RolePermission c : rolePermissionsAfter) {
+            if (c.getRoleId().equals(originalRolePermission.getRoleId())
+                && c.getEntity().equals(originalRolePermission.getEntity())) {
+               foundAfter = true;
+               break;
+            }
+         }
+         assertFalse("RolePermission is gone", foundAfter);
+
+         try {
+            // can't delete it again
+            labbcat.deleteRolePermission(originalRolePermission);
+            fail("Can't delete rolePermission that doesn't exist");
+         } catch(Exception exception) {
+         }
+         
+      } finally {
+         // ensure it's not there
+         try {
+            labbcat.deleteRolePermission(originalRolePermission);
+         } catch(Exception exception) {}         
+      }
+   }
+   
    public static void main(String args[]) {
       org.junit.runner.JUnitCore.main("nzilbb.labbcat.test.TestLabbcatAdmin");
    }
