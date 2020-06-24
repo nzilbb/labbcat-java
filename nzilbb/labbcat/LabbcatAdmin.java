@@ -259,6 +259,11 @@ public class LabbcatAdmin extends LabbcatEdit implements IGraphStoreAdministrati
     * @param corpus The corpus details to save.
     * @return The corpus just created.
     * @throws StoreException, PermissionException
+    * @see #readCorpora()
+    * @see #readCorpora(Integer,Integer)
+    * @see #updateCorpus(Corpus)
+    * @see #deleteCorpus(Corpus)
+    * @see #deleteCorpus(String)
     */
    public Corpus createCorpus(Corpus corpus) throws StoreException, PermissionException {
       try {
@@ -278,6 +283,11 @@ public class LabbcatAdmin extends LabbcatEdit implements IGraphStoreAdministrati
     * Reads a list of corpus records.
     * @return A list of corpora.
     * @throws StoreException, PermissionException
+    * @see #createCorpus(Corpus)
+    * @see #readCorpora(Integer,Integer)
+    * @see #updateCorpus(Corpus)
+    * @see #deleteCorpus(Corpus)
+    * @see #deleteCorpus(String)
     */
    public Corpus[] readCorpora() throws StoreException, PermissionException {
       return readCorpora(null, null);
@@ -290,6 +300,11 @@ public class LabbcatAdmin extends LabbcatEdit implements IGraphStoreAdministrati
     * @param pageLength The length of pages (if null, the default page length is 20).
     * @return A list of corpora.
     * @throws StoreException, PermissionException
+    * @see #createCorpus(Corpus)
+    * @see #readCorpora()
+    * @see #updateCorpus(Corpus)
+    * @see #deleteCorpus(Corpus)
+    * @see #deleteCorpus(String)
     */
    public Corpus[] readCorpora(Integer pageNumber, Integer pageLength) throws StoreException, PermissionException {
       try {
@@ -319,6 +334,11 @@ public class LabbcatAdmin extends LabbcatEdit implements IGraphStoreAdministrati
     * @param corpus The corpus details to save.
     * @return The corpus just updated.
     * @throws StoreException, PermissionException
+    * @see #createCorpus(Corpus)
+    * @see #readCorpora()
+    * @see #readCorpora(Integer,Integer)
+    * @see #deleteCorpus(Corpus)
+    * @see #deleteCorpus(String)
     */
    public Corpus updateCorpus(Corpus corpus) throws StoreException, PermissionException {
       try{
@@ -338,6 +358,11 @@ public class LabbcatAdmin extends LabbcatEdit implements IGraphStoreAdministrati
     * Deletes an existing corpus record.
     * @param corpus The corpus to delete.
     * @throws StoreException, PermissionException
+    * @see #createCorpus(Corpus)
+    * @see #readCorpora()
+    * @see #readCorpora(Integer,Integer)
+    * @see #updateCorpus(Corpus)
+    * @see #deleteCorpus(String)
     */
    public void deleteCorpus(Corpus corpus) throws StoreException, PermissionException {
       deleteCorpus(corpus.getName());
@@ -347,6 +372,11 @@ public class LabbcatAdmin extends LabbcatEdit implements IGraphStoreAdministrati
     * Deletes an existing corpus record.
     * @param name The name/ID of the corpus to delete.
     * @throws StoreException, PermissionException
+    * @see #createCorpus(Corpus)
+    * @see #readCorpora()
+    * @see #readCorpora(Integer,Integer)
+    * @see #updateCorpus(Corpus)
+    * @see #deleteCorpus(Corpus)
     */
    public void deleteCorpus(String name) throws StoreException, PermissionException {
       try{
@@ -364,6 +394,11 @@ public class LabbcatAdmin extends LabbcatEdit implements IGraphStoreAdministrati
     * @param project The project details to save.
     * @return The project just created.
     * @throws StoreException, PermissionException
+    * @see #readProjects()
+    * @see #readProjects(Integer,Integer)
+    * @see #updateProject(Project)
+    * @see #deleteProject(Project)
+    * @see #deleteProject(String)
     */
    public Project createProject(Project project) throws StoreException, PermissionException {
       try {
@@ -383,6 +418,11 @@ public class LabbcatAdmin extends LabbcatEdit implements IGraphStoreAdministrati
     * Reads a list of project records.
     * @return A list of projects.
     * @throws StoreException, PermissionException
+    * @see #createProject(Project)
+    * @see #readProjects(Integer,Integer)
+    * @see #updateProject(Project)
+    * @see #deleteProject(Project)
+    * @see #deleteProject(String)
     */
    public Project[] readProjects() throws StoreException, PermissionException {
       return readProjects(null, null);
@@ -395,8 +435,14 @@ public class LabbcatAdmin extends LabbcatEdit implements IGraphStoreAdministrati
     * @param pageLength The length of pages (if null, the default page length is 20).
     * @return A list of projects.
     * @throws StoreException, PermissionException
+    * @see #createProject(Project)
+    * @see #readProjects()
+    * @see #updateProject(Project)
+    * @see #deleteProject(Project)
+    * @see #deleteProject(String)
     */
-   public Project[] readProjects(Integer pageNumber, Integer pageLength) throws StoreException, PermissionException {
+   public Project[] readProjects(Integer pageNumber, Integer pageLength)
+      throws StoreException, PermissionException {
       try {
          HttpRequestGet request = get("api/admin/projects")
             .setHeader("Accept", "application/json");
@@ -424,6 +470,11 @@ public class LabbcatAdmin extends LabbcatEdit implements IGraphStoreAdministrati
     * @param project The project details to save.
     * @return The project just updated.
     * @throws StoreException, PermissionException
+    * @see #createProject(Project)
+    * @see #readProjects()
+    * @see #readProjects(Integer,Integer)
+    * @see #deleteProject(Project)
+    * @see #deleteProject(String)
     */
    public Project updateProject(Project project) throws StoreException, PermissionException {
       try{
@@ -443,6 +494,11 @@ public class LabbcatAdmin extends LabbcatEdit implements IGraphStoreAdministrati
     * Deletes an existing project record.
     * @param project The project to delete.
     * @throws StoreException, PermissionException
+    * @see #createProject(Project)
+    * @see #readProjects()
+    * @see #readProjects(Integer,Integer)
+    * @see #updateProject(Project)
+    * @see #deleteProject(String)
     */
    public void deleteProject(Project project) throws StoreException, PermissionException {
       deleteProject(project.getProject());
@@ -452,6 +508,11 @@ public class LabbcatAdmin extends LabbcatEdit implements IGraphStoreAdministrati
     * Deletes an existing project record.
     * @param name The name/ID of the project to delete.
     * @throws StoreException, PermissionException
+    * @see #createProject(Project)
+    * @see #readProjects()
+    * @see #readProjects(Integer,Integer)
+    * @see #updateProject(Project)
+    * @see #deleteProject(Project)
     */
    public void deleteProject(String name) throws StoreException, PermissionException {
       try{
@@ -469,8 +530,14 @@ public class LabbcatAdmin extends LabbcatEdit implements IGraphStoreAdministrati
     * @param mediaTrack The mediaTrack details to save.
     * @return The mediaTrack just created.
     * @throws StoreException, PermissionException
+    * @see #readMediaTracks()
+    * @see #readMediaTracks(Integer,Integer)
+    * @see #updateMediaTrack(MediaTrack)
+    * @see #deleteMediaTrack(MediaTrack)
+    * @see #deleteMediaTrack(String)
     */
-   public MediaTrack createMediaTrack(MediaTrack mediaTrack) throws StoreException, PermissionException {
+   public MediaTrack createMediaTrack(MediaTrack mediaTrack)
+      throws StoreException, PermissionException {
       try {
          HttpRequestPost request = post("api/admin/mediatracks")
             .setHeader("Accept", "application/json");
@@ -488,6 +555,11 @@ public class LabbcatAdmin extends LabbcatEdit implements IGraphStoreAdministrati
     * Reads a list of mediaTrack records.
     * @return A list of mediaTracks.
     * @throws StoreException, PermissionException
+    * @see #createMediaTrack(MediaTrack)
+    * @see #readMediaTracks(Integer,Integer)
+    * @see #updateMediaTrack(MediaTrack)
+    * @see #deleteMediaTrack(MediaTrack)
+    * @see #deleteMediaTrack(String)
     */
    public MediaTrack[] readMediaTracks() throws StoreException, PermissionException {
       return readMediaTracks(null, null);
@@ -500,8 +572,14 @@ public class LabbcatAdmin extends LabbcatEdit implements IGraphStoreAdministrati
     * @param pageLength The length of pages (if null, the default page length is 20).
     * @return A list of mediaTracks.
     * @throws StoreException, PermissionException
+    * @see #createMediaTrack(MediaTrack)
+    * @see #readMediaTracks()
+    * @see #updateMediaTrack(MediaTrack)
+    * @see #deleteMediaTrack(MediaTrack)
+    * @see #deleteMediaTrack(String)
     */
-   public MediaTrack[] readMediaTracks(Integer pageNumber, Integer pageLength) throws StoreException, PermissionException {
+   public MediaTrack[] readMediaTracks(Integer pageNumber, Integer pageLength)
+      throws StoreException, PermissionException {
       try {
          HttpRequestGet request = get("api/admin/mediatracks")
             .setHeader("Accept", "application/json");
@@ -529,8 +607,14 @@ public class LabbcatAdmin extends LabbcatEdit implements IGraphStoreAdministrati
     * @param mediaTrack The mediaTrack details to save.
     * @return The mediaTrack just updated.
     * @throws StoreException, PermissionException
+    * @see #createMediaTrack(MediaTrack)
+    * @see #readMediaTracks()
+    * @see #readMediaTracks(Integer,Integer)
+    * @see #deleteMediaTrack(MediaTrack)
+    * @see #deleteMediaTrack(String)
     */
-   public MediaTrack updateMediaTrack(MediaTrack mediaTrack) throws StoreException, PermissionException {
+   public MediaTrack updateMediaTrack(MediaTrack mediaTrack)
+      throws StoreException, PermissionException {
       try{
          HttpRequestPost request = put("api/admin/mediatracks")
             .setHeader("Accept", "application/json");
@@ -548,6 +632,11 @@ public class LabbcatAdmin extends LabbcatEdit implements IGraphStoreAdministrati
     * Deletes an existing media track record.
     * @param mediaTrack The mediaTrack to delete.
     * @throws StoreException, PermissionException
+    * @see #createMediaTrack(MediaTrack)
+    * @see #readMediaTracks()
+    * @see #readMediaTracks(Integer,Integer)
+    * @see #updateMediaTrack(MediaTrack)
+    * @see #deleteMediaTrack(String)
     */
    public void deleteMediaTrack(MediaTrack mediaTrack) throws StoreException, PermissionException {
       deleteMediaTrack(mediaTrack.getSuffix());
@@ -557,6 +646,11 @@ public class LabbcatAdmin extends LabbcatEdit implements IGraphStoreAdministrati
     * Deletes an existing media track record.
     * @param suffix The suffix of the mediaTrack to delete.
     * @throws StoreException, PermissionException
+    * @see #createMediaTrack(MediaTrack)
+    * @see #readMediaTracks()
+    * @see #readMediaTracks(Integer,Integer)
+    * @see #updateMediaTrack(MediaTrack)
+    * @see #deleteMediaTrack(MediaTrack)
     */
    public void deleteMediaTrack(String suffix) throws StoreException, PermissionException {
       try{
