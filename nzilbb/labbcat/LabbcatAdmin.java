@@ -35,6 +35,7 @@ import nzilbb.labbcat.http.*;
 import nzilbb.labbcat.model.Corpus;
 import nzilbb.labbcat.model.MediaTrack;
 import nzilbb.labbcat.model.Project;
+import nzilbb.labbcat.model.Role;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -662,5 +663,141 @@ public class LabbcatAdmin extends LabbcatEdit implements IGraphStoreAdministrati
          throw new StoreException("Could not get response.", x);
       }
    } // end of updateMediaTrack()
+   
+   /**
+    * Creates a new role record.
+    * @param role The role details to save.
+    * @return The role just created.
+    * @throws StoreException, PermissionException
+    * @see #readRoles()
+    * @see #readRoles(Integer,Integer)
+    * @see #updateRole(Role)
+    * @see #deleteRole(Role)
+    * @see #deleteRole(String)
+    */
+   public Role createRole(Role role) throws StoreException, PermissionException {
+      try {
+         HttpRequestPost request = post("api/admin/roles")
+            .setHeader("Accept", "application/json");
+         if (verbose) System.out.println("createRole -> " + request);
+         response = new Response(request.post(role.toJSON()), verbose);
+         response.checkForErrors(); // throws a StoreException on error
+         if (response.isModelNull()) return null;
+         return new Role((JSONObject)response.getModel());
+      } catch(IOException x) {
+         throw new StoreException("Could not get response.", x);
+      }
+   } // end of createRole()
+
+   /**
+    * Reads a list of role records.
+    * @return A list of roles.
+    * @throws StoreException, PermissionException
+    * @see #createRole(Role)
+    * @see #readRoles(Integer,Integer)
+    * @see #updateRole(Role)
+    * @see #deleteRole(Role)
+    * @see #deleteRole(String)
+    */
+   public Role[] readRoles() throws StoreException, PermissionException {
+      return readRoles(null, null);
+   }
+   
+   /**
+    * Reads a list of role records.
+    * @param pageNumber The zero-based  page of records to return (if null, all records
+    * will be returned). 
+    * @param pageLength The length of pages (if null, the default page length is 20).
+    * @return A list of roles.
+    * @throws StoreException, PermissionException
+    * @see #createRole(Role)
+    * @see #readRoles()
+    * @see #updateRole(Role)
+    * @see #deleteRole(Role)
+    * @see #deleteRole(String)
+    */
+   public Role[] readRoles(Integer pageNumber, Integer pageLength)
+      throws StoreException, PermissionException {
+      try {
+         HttpRequestGet request = get("api/admin/roles")
+            .setHeader("Accept", "application/json");
+         if (pageLength != null) request.setParameter("pageNumber", pageLength);
+         if (pageNumber != null) request.setParameter("pageLength", pageNumber);
+         if (verbose) System.out.println("readRoles -> " + request);
+         response = new Response(request.get(), verbose);
+         response.checkForErrors(); // throws a StoreException on error
+         if (response.isModelNull()) return null;
+         JSONArray array = (JSONArray)response.getModel();
+         Vector<Role> roles = new Vector<Role>();
+         if (array != null) {
+            for (int i = 0; i < array.length(); i++) {
+               roles.add(new Role(array.getJSONObject(i)));
+            }
+         }
+         return roles.toArray(new Role[0]);
+      } catch(IOException x) {
+         throw new StoreException("Could not get response.", x);
+      }
+   } // end of readRoles()
+   
+   /**
+    * Updates an existing role record.
+    * @param role The role details to save.
+    * @return The role just updated.
+    * @throws StoreException, PermissionException
+    * @see #createRole(Role)
+    * @see #readRoles()
+    * @see #readRoles(Integer,Integer)
+    * @see #deleteRole(Role)
+    * @see #deleteRole(String)
+    */
+   public Role updateRole(Role role) throws StoreException, PermissionException {
+      try{
+         HttpRequestPost request = put("api/admin/roles")
+            .setHeader("Accept", "application/json");
+         if (verbose) System.out.println("updateRole -> " + request);
+         response = new Response(request.post(role.toJSON()), verbose);
+         response.checkForErrors(); // throws a StoreException on error
+         if (response.isModelNull()) return null;
+         return new Role((JSONObject)response.getModel());
+      } catch(IOException x) {
+         throw new StoreException("Could not get response.", x);
+      }
+   } // end of updateRole()
+   
+   /**
+    * Deletes an existing role record.
+    * @param role The role to delete.
+    * @throws StoreException, PermissionException
+    * @see #createRole(Role)
+    * @see #readRoles()
+    * @see #readRoles(Integer,Integer)
+    * @see #updateRole(Role)
+    * @see #deleteRole(String)
+    */
+   public void deleteRole(Role role) throws StoreException, PermissionException {
+      deleteRole(role.getRoleId());
+   }
+   
+   /**
+    * Deletes an existing role record.
+    * @param name The name/ID of the role to delete.
+    * @throws StoreException, PermissionException
+    * @see #createRole(Role)
+    * @see #readRoles()
+    * @see #readRoles(Integer,Integer)
+    * @see #updateRole(Role)
+    * @see #deleteRole(Role)
+    */
+   public void deleteRole(String name) throws StoreException, PermissionException {
+      try{
+         HttpRequestPost request = delete("api/admin/roles/" + name);
+         if (verbose) System.out.println("deleteRole -> " + request);
+         response = new Response(request.post(), verbose);
+         response.checkForErrors(); // throws a StoreException on error
+      } catch(IOException x) {
+         throw new StoreException("Could not get response.", x);
+      }
+   } // end of updateRole()
    
 } // end of class LabbcatAdmin

@@ -456,6 +456,78 @@ public class TestLabbcatAdmin {
      }
    }
 
+   @Test public void newRoleUpdateRoleAndDeleteRole() throws Exception {
+      Role originalRole = new Role()
+         .setRoleId("unit-test")
+         .setDescription("Temporary role for unit testing");
+      
+      try {
+         Role newRole = labbcat.createRole(originalRole);
+         assertNotNull("Role returned", newRole);
+         assertEquals("Name correct",
+                      originalRole.getRoleId(), newRole.getRoleId());
+         assertEquals("Description correct",
+                      originalRole.getDescription(), newRole.getDescription());
+         
+         try {
+            labbcat.createRole(originalRole);
+            fail("Can't create a role with existing name");
+         }
+         catch(Exception exception) {}
+         
+         Role[] roles = labbcat.readRoles();
+         // ensure the role exists
+         assertTrue("There's at least one role", roles.length >= 1);
+         boolean found = false;
+         for (Role c : roles) {
+            if (c.getRoleId().equals(originalRole.getRoleId())) {
+               found = true;
+               break;
+            }
+         }
+         assertTrue("Role was added", found);
+
+         // update it
+         Role updatedRole = new Role()
+            .setRoleId("unit-test")
+            .setDescription("Changed description");
+         
+         Role changedRole = labbcat.updateRole(updatedRole);
+         assertNotNull("Role returned", changedRole);
+         assertEquals("Updated Name correct",
+                      updatedRole.getRoleId(), changedRole.getRoleId());
+         assertEquals("Updated Description correct",
+                      updatedRole.getDescription(), changedRole.getDescription());
+
+         // delete it
+         labbcat.deleteRole(originalRole.getRoleId());
+
+         Role[] rolesAfter = labbcat.readRoles();
+         // ensure the role no longer exists
+         boolean foundAfter = false;
+         for (Role c : rolesAfter) {
+            if (c.getRoleId().equals(originalRole.getRoleId())) {
+               foundAfter = true;
+               break;
+            }
+         }
+         assertFalse("Role is gone", foundAfter);
+
+         try {
+            // can't delete it again
+            labbcat.deleteRole(originalRole);
+            fail("Can't delete role that doesn't exist");
+         } catch(Exception exception) {
+         }
+         
+      } finally {
+         // ensure it's not there
+         try {
+            labbcat.deleteRole(originalRole);
+         } catch(Exception exception) {}         
+     }
+   }
+
    public static void main(String args[]) {
       org.junit.runner.JUnitCore.main("nzilbb.labbcat.test.TestLabbcatAdmin");
    }
