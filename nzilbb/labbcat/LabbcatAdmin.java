@@ -812,7 +812,8 @@ public class LabbcatAdmin extends LabbcatEdit implements IGraphStoreAdministrati
     * @see #deleteRolePermission(RolePermission)
     * @see #deleteRolePermission(String)
     */
-   public RolePermission createRolePermission(RolePermission rolePermission) throws StoreException, PermissionException {
+   public RolePermission createRolePermission(RolePermission rolePermission)
+      throws StoreException, PermissionException {
       try {
          HttpRequestPost request = post("api/admin/roles/permissions")
             .setHeader("Accept", "application/json");
@@ -891,7 +892,8 @@ public class LabbcatAdmin extends LabbcatEdit implements IGraphStoreAdministrati
     * @see #deleteRolePermission(RolePermission)
     * @see #deleteRolePermission(String)
     */
-   public RolePermission updateRolePermission(RolePermission rolePermission) throws StoreException, PermissionException {
+   public RolePermission updateRolePermission(RolePermission rolePermission)
+      throws StoreException, PermissionException {
       try{
          HttpRequestPost request = put("api/admin/roles/permissions")
             .setHeader("Accept", "application/json");
@@ -915,7 +917,8 @@ public class LabbcatAdmin extends LabbcatEdit implements IGraphStoreAdministrati
     * @see #updateRolePermission(RolePermission)
     * @see #deleteRolePermission(String)
     */
-   public void deleteRolePermission(RolePermission rolePermission) throws StoreException, PermissionException {
+   public void deleteRolePermission(RolePermission rolePermission)
+      throws StoreException, PermissionException {
       deleteRolePermission(rolePermission.getRoleId(), rolePermission.getEntity());
    }
    
@@ -930,7 +933,8 @@ public class LabbcatAdmin extends LabbcatEdit implements IGraphStoreAdministrati
     * @see #updateRolePermission(RolePermission)
     * @see #deleteRolePermission(RolePermission)
     */
-   public void deleteRolePermission(String roleId, String entity) throws StoreException, PermissionException {
+   public void deleteRolePermission(String roleId, String entity)
+      throws StoreException, PermissionException {
       try{
          HttpRequestPost request = delete("api/admin/roles/permissions/" + roleId + "/" + entity);
          if (verbose) System.out.println("deleteRolePermission -> " + request);
