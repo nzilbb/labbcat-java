@@ -209,6 +209,22 @@ public class LabbcatView implements IGraphStoreQuery {
    /** Current request, if any */
    protected HttpRequestPostMultipart postRequest;   
   
+   /**
+    * The language code for server message localization, e.g. "es-AR" for Argentine Spanish.
+    * @see #getLanguage()
+    * @see #setLanguage(String)
+    */
+   protected String language;
+   /**
+    * Getter for {@link #language}: The language code for server message localization, e.g. "es-AR" for Argentine Spanish.
+    * @return The language code for server message localization, e.g. "es-AR" for Argentine Spanish.
+    */
+   public String getLanguage() { return language; }
+   /**
+    * Setter for {@link #language}: The language code for server message localization, e.g. "es-AR" for Argentine Spanish.
+    * @param newLanguage The language code for server message localization, e.g. "es-AR" for Argentine Spanish.
+    */
+   public LabbcatView setLanguage(String newLanguage) { language = newLanguage; return this; }
    // Methods:
    
    /**
@@ -413,7 +429,7 @@ public class LabbcatView implements IGraphStoreQuery {
     */
    public HttpRequestGet get(String resource) throws IOException, StoreException {
       return new HttpRequestGet(makeUrl(resource), getRequiredHttpAuthorization())
-         .setUserAgent();
+         .setUserAgent().setLanguage(language);
    } // end of get()
 
    /**
@@ -426,7 +442,7 @@ public class LabbcatView implements IGraphStoreQuery {
     */
    public HttpRequestPost post(String resource) throws IOException, StoreException {
       return new HttpRequestPost(makeUrl(resource), getRequiredHttpAuthorization())
-         .setUserAgent();
+         .setUserAgent().setLanguage(language);
    } // end of post()
 
    /**
@@ -440,7 +456,7 @@ public class LabbcatView implements IGraphStoreQuery {
    public HttpRequestPost put(String resource) throws IOException, StoreException {
       return new HttpRequestPost(makeUrl(resource), getRequiredHttpAuthorization())
          .setMethod("PUT")
-         .setUserAgent();
+         .setUserAgent().setLanguage(language);
    } // end of post()
 
    /**
@@ -454,7 +470,7 @@ public class LabbcatView implements IGraphStoreQuery {
    public HttpRequestPost delete(String resource) throws IOException, StoreException {
       return new HttpRequestPost(makeUrl(resource), getRequiredHttpAuthorization())
          .setMethod("DELETE")
-         .setUserAgent();
+         .setUserAgent().setLanguage(language);
    } // end of post()
 
    /**
@@ -472,7 +488,7 @@ public class LabbcatView implements IGraphStoreQuery {
       
       postRequest = new HttpRequestPostMultipart(
          makeUrl(resource), getRequiredHttpAuthorization())
-         .setUserAgent();
+         .setUserAgent().setLanguage(language);
       return postRequest;
    } // end of postMultipart()
 
@@ -490,7 +506,7 @@ public class LabbcatView implements IGraphStoreQuery {
       try {
          URL url = url("getId");
          HttpRequestGet request = new HttpRequestGet(url, getRequiredHttpAuthorization())
-            .setUserAgent().setHeader("Accept", "application/json");
+            .setUserAgent().setLanguage(language).setHeader("Accept", "application/json");
          if (verbose) System.out.println("getId -> " + request);
          response = new Response(request.get(), verbose);
          response.checkForErrors(); // throws a StoreException on error
@@ -513,7 +529,7 @@ public class LabbcatView implements IGraphStoreQuery {
       try {
          URL url = url("getLayerIds");
          HttpRequestGet request = new HttpRequestGet(url, getRequiredHttpAuthorization())
-            .setUserAgent().setHeader("Accept", "application/json");
+            .setUserAgent().setLanguage(language).setHeader("Accept", "application/json");
          if (verbose) System.out.println("getLayerIds -> " + request);
          response = new Response(request.get(), verbose);
          response.checkForErrors(); // throws a StoreException on error
@@ -543,7 +559,7 @@ public class LabbcatView implements IGraphStoreQuery {
       try {
          URL url = url("getLayers");
          HttpRequestGet request = new HttpRequestGet(url, getRequiredHttpAuthorization()) 
-            .setUserAgent().setHeader("Accept", "application/json");
+            .setUserAgent().setLanguage(language).setHeader("Accept", "application/json");
          if (verbose) System.out.println("getLayers -> " + request);
          response = new Response(request.get(), verbose);
          response.checkForErrors(); // throws a StoreException on error
@@ -585,7 +601,7 @@ public class LabbcatView implements IGraphStoreQuery {
       try {
          URL url = url("getLayer");
          HttpRequestGet request = new HttpRequestGet(url, getRequiredHttpAuthorization()) 
-            .setUserAgent().setHeader("Accept", "application/json")
+            .setUserAgent().setLanguage(language).setHeader("Accept", "application/json")
             .setParameter("id", id);
          if (verbose) System.out.println("getLayer -> " + request);
          response = new Response(request.get(), verbose);
@@ -609,7 +625,7 @@ public class LabbcatView implements IGraphStoreQuery {
       try {
          URL url = url("getCorpusIds");
          HttpRequestGet request = new HttpRequestGet(url, getRequiredHttpAuthorization())
-            .setUserAgent().setHeader("Accept", "application/json");
+            .setUserAgent().setLanguage(language).setHeader("Accept", "application/json");
          if (verbose) System.out.println("getCorpusIds -> " + request);
          response = new Response(request.get(), verbose);
          response.checkForErrors(); // throws a StoreException on error
@@ -641,7 +657,7 @@ public class LabbcatView implements IGraphStoreQuery {
       try {
          URL url = url("getParticipantIds");
          HttpRequestGet request = new HttpRequestGet(url, getRequiredHttpAuthorization())
-            .setUserAgent().setHeader("Accept", "application/json");
+            .setUserAgent().setLanguage(language).setHeader("Accept", "application/json");
          if (verbose) System.out.println("getParticipantIds -> " + request);
          response = new Response(request.get(), verbose);
          response.checkForErrors(); // throws a StoreException on error
@@ -673,7 +689,7 @@ public class LabbcatView implements IGraphStoreQuery {
       try {
          URL url = url("getParticipant");
          HttpRequestGet request = new HttpRequestGet(url, getRequiredHttpAuthorization()) 
-            .setUserAgent().setHeader("Accept", "application/json")
+            .setUserAgent().setLanguage(language).setHeader("Accept", "application/json")
             .setParameter("id", id);
          if (verbose) System.out.println("getParticipant -> " + request);
          response = new Response(request.get(), verbose);
@@ -712,7 +728,7 @@ public class LabbcatView implements IGraphStoreQuery {
          URL url = url("countMatchingParticipantIds");
          if (verbose) System.out.println("countMatchingParticipantIds -> " + url);
          HttpRequestGet request = new HttpRequestGet(url, getRequiredHttpAuthorization())
-            .setUserAgent().setHeader("Accept", "application/json")
+            .setUserAgent().setLanguage(language).setHeader("Accept", "application/json")
             .setParameter("expression", expression);
          response = new Response(request.get(), verbose);
          response.checkForErrors(); // throws a StoreException on error
@@ -750,7 +766,7 @@ public class LabbcatView implements IGraphStoreQuery {
       try {
          URL url = url("getMatchingParticipantIds");
          HttpRequestGet request = new HttpRequestGet(url, getRequiredHttpAuthorization())
-            .setUserAgent().setHeader("Accept", "application/json")
+            .setUserAgent().setLanguage(language).setHeader("Accept", "application/json")
             .setParameter("expression", expression);
          if (pageLength != null) request.setParameter("pageLength", pageLength);
          if (pageNumber != null) request.setParameter("pageNumber", pageNumber);
@@ -785,7 +801,7 @@ public class LabbcatView implements IGraphStoreQuery {
       try {
          URL url = url("getTranscriptIds");
          HttpRequestGet request = new HttpRequestGet(url, getRequiredHttpAuthorization())
-            .setUserAgent().setHeader("Accept", "application/json");
+            .setUserAgent().setLanguage(language).setHeader("Accept", "application/json");
          if (verbose) System.out.println("getTranscriptIds -> " + request);
          response = new Response(request.get(), verbose);
          response.checkForErrors(); // throws a StoreException on error
@@ -818,7 +834,7 @@ public class LabbcatView implements IGraphStoreQuery {
       try {
          URL url = url("getTranscriptIdsInCorpus");
          HttpRequestGet request = new HttpRequestGet(url, getRequiredHttpAuthorization())
-            .setUserAgent().setHeader("Accept", "application/json")
+            .setUserAgent().setLanguage(language).setHeader("Accept", "application/json")
             .setParameter("id", id);
          if (verbose) System.out.println("getTranscriptIdsInCorpus -> " + request);
          response = new Response(request.get(), verbose);
@@ -850,7 +866,7 @@ public class LabbcatView implements IGraphStoreQuery {
       try {
          URL url = url("getTranscriptIdsWithParticipant");
          HttpRequestGet request = new HttpRequestGet(url, getRequiredHttpAuthorization())
-            .setUserAgent().setHeader("Accept", "application/json")
+            .setUserAgent().setLanguage(language).setHeader("Accept", "application/json")
             .setParameter("id", id);
          if (verbose) System.out.println("getTranscriptIdsWithParticipant -> " + request);
          response = new Response(request.get(), verbose);
@@ -902,7 +918,7 @@ public class LabbcatView implements IGraphStoreQuery {
          URL url = url("countMatchingTranscriptIds");
          if (verbose) System.out.println("countMatchingTranscriptIds -> " + url);
          HttpRequestGet request = new HttpRequestGet(url, getRequiredHttpAuthorization())
-            .setUserAgent().setHeader("Accept", "application/json")
+            .setUserAgent().setLanguage(language).setHeader("Accept", "application/json")
             .setParameter("expression", expression);
          response = new Response(request.get(), verbose);
          response.checkForErrors(); // throws a StoreException on error
@@ -952,7 +968,7 @@ public class LabbcatView implements IGraphStoreQuery {
       try {
          URL url = url("getMatchingTranscriptIds");
          HttpRequestGet request = new HttpRequestGet(url, getRequiredHttpAuthorization()) 
-            .setUserAgent().setHeader("Accept", "application/json")
+            .setUserAgent().setLanguage(language).setHeader("Accept", "application/json")
             .setParameter("expression", expression);
          if (pageLength != null) request.setParameter("pageLength", pageLength);
          if (pageNumber != null) request.setParameter("pageNumber", pageNumber);
@@ -999,7 +1015,7 @@ public class LabbcatView implements IGraphStoreQuery {
          URL url = url("countMatchingAnnotations");
          if (verbose) System.out.println("countMatchingAnnotations -> " + url);
          HttpRequestGet request = new HttpRequestGet(url, getRequiredHttpAuthorization())
-            .setUserAgent().setHeader("Accept", "application/json")
+            .setUserAgent().setLanguage(language).setHeader("Accept", "application/json")
             .setParameter("expression", expression);
          response = new Response(request.get(), verbose);
          response.checkForErrors(); // throws a StoreException on error
@@ -1037,7 +1053,7 @@ public class LabbcatView implements IGraphStoreQuery {
       try {
          URL url = url("getMatchingAnnotations");
          HttpRequestGet request = new HttpRequestGet(url, getRequiredHttpAuthorization()) 
-            .setUserAgent().setHeader("Accept", "application/json")
+            .setUserAgent().setLanguage(language).setHeader("Accept", "application/json")
             .setParameter("expression", expression);
          if (pageLength != null) request.setParameter("pageLength", pageLength);
          if (pageNumber != null) request.setParameter("pageNumber", pageNumber);
@@ -1074,7 +1090,7 @@ public class LabbcatView implements IGraphStoreQuery {
          URL url = url("countAnnotations");
          if (verbose) System.out.println("countAnnotations -> " + url);
          HttpRequestGet request = new HttpRequestGet(url, getRequiredHttpAuthorization())
-            .setUserAgent().setHeader("Accept", "application/json")
+            .setUserAgent().setLanguage(language).setHeader("Accept", "application/json")
             .setParameter("id", id)
             .setParameter("layerId", layerId);
          response = new Response(request.get(), verbose);
@@ -1103,7 +1119,7 @@ public class LabbcatView implements IGraphStoreQuery {
       try {
          URL url = url("getAnnotations");
          HttpRequestGet request = new HttpRequestGet(url, getRequiredHttpAuthorization()) 
-            .setUserAgent().setHeader("Accept", "application/json")
+            .setUserAgent().setLanguage(language).setHeader("Accept", "application/json")
             .setParameter("id", id)
             .setParameter("layerId", layerId);
          if (pageLength != null) request.setParameter("pageLength", pageLength);
@@ -1164,7 +1180,7 @@ public class LabbcatView implements IGraphStoreQuery {
       try {
          URL url = url("getAnchors");
          HttpRequestGet request = new HttpRequestGet(url, getRequiredHttpAuthorization()) 
-            .setUserAgent().setHeader("Accept", "application/json")
+            .setUserAgent().setLanguage(language).setHeader("Accept", "application/json")
             .setParameter("id", id)
             .setParameter("anchorIds", anchorIds);
          if (verbose) System.out.println("getAnchors -> " + request);
@@ -1284,7 +1300,7 @@ public class LabbcatView implements IGraphStoreQuery {
       try {
          URL url = url("getMediaTracks");
          HttpRequestGet request = new HttpRequestGet(url, getRequiredHttpAuthorization()) 
-            .setUserAgent().setHeader("Accept", "application/json");
+            .setUserAgent().setLanguage(language).setHeader("Accept", "application/json");
          if (verbose) System.out.println("getMediaTracks -> " + request);
          response = new Response(request.get(), verbose);
          response.checkForErrors(); // throws a StoreException on error
@@ -1316,7 +1332,7 @@ public class LabbcatView implements IGraphStoreQuery {
       try {
          URL url = url("getAvailableMedia");
          HttpRequestGet request = new HttpRequestGet(url, getRequiredHttpAuthorization()) 
-            .setUserAgent().setHeader("Accept", "application/json")
+            .setUserAgent().setLanguage(language).setHeader("Accept", "application/json")
             .setParameter("id", id);
          if (verbose) System.out.println("getAvailableMedia -> " + request);
          response = new Response(request.get(), verbose);
@@ -1353,7 +1369,7 @@ public class LabbcatView implements IGraphStoreQuery {
       try {
          URL url = url("getMedia");
          HttpRequestGet request = new HttpRequestGet(url, getRequiredHttpAuthorization())
-            .setUserAgent().setHeader("Accept", "application/json")
+            .setUserAgent().setLanguage(language).setHeader("Accept", "application/json")
             .setParameter("id", id)
             .setParameter("trackSuffix", trackSuffix)
             .setParameter("mimeType", mimeType);
@@ -1389,7 +1405,7 @@ public class LabbcatView implements IGraphStoreQuery {
       try {
          URL url = url("getMedia");
          HttpRequestGet request = new HttpRequestGet(url, getRequiredHttpAuthorization())
-            .setUserAgent().setHeader("Accept", "application/json")
+            .setUserAgent().setLanguage(language).setHeader("Accept", "application/json")
             .setParameter("id", id)
             .setParameter("trackSuffix", trackSuffix)
             .setParameter("mimeType", mimeType)
@@ -1419,7 +1435,7 @@ public class LabbcatView implements IGraphStoreQuery {
       try {
          URL url = url("getEpisodeDocuments");
          HttpRequestGet request = new HttpRequestGet(url, getRequiredHttpAuthorization()) 
-            .setUserAgent().setHeader("Accept", "application/json")
+            .setUserAgent().setLanguage(language).setHeader("Accept", "application/json")
             .setParameter("id", id);
          if (verbose) System.out.println("getEpisodeDocuments -> " + request);
          response = new Response(request.get(), verbose);

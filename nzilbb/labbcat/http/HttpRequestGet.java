@@ -174,6 +174,16 @@ public class HttpRequestGet {
    } // end of setUserAgent()
    
    /**
+    * Set the Accept-Language header with the given language code, if any.,
+    * @param language The language code, e.g. "es-AR", or null.
+    * @return A reference to this object.
+    */
+   public HttpRequestGet setLanguage(String language) {
+      if (language != null) setHeader("Accept-Language", language);
+      return this;
+   } // end of setLanguage()
+   
+   /**
     * Sets a request parameter value
     * @param sParameter
     * @param oValue

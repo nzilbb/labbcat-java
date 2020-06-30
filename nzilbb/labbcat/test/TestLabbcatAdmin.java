@@ -92,6 +92,30 @@ public class TestLabbcatAdmin {
       labbcat.getId();
    }
 
+   @Test public void messageLocalization() throws Exception {
+      try {
+         // can't delete it again
+         labbcat.setLanguage("en");
+         labbcat.deleteCorpus("this-corpus-doesn't-exist");
+         fail("Can't delete corpus that doesn't exist");
+      } catch(ResponseException exception) {
+         String error = exception.getResponse().getErrors().elementAt(0);
+         assertTrue("Error is in English: " + error,
+                    error.matches(".*not found.*"));
+      }
+      
+      try {
+         // can't delete it again
+         labbcat.setLanguage("es");
+         labbcat.deleteCorpus("this-corpus-doesn't-exist");
+         fail("Can't delete corpus that doesn't exist");
+      } catch(ResponseException exception) {
+         String error = exception.getResponse().getErrors().elementAt(0);
+         assertTrue("Error is Spanish: " + error,
+                    error.matches(".*no existe.*"));
+      }
+   }
+   
    @Test public void inheritedLabbcatViewFunctions() throws Exception {
       String id = labbcat.getId();
       assertEquals("getId: ID matches the url",

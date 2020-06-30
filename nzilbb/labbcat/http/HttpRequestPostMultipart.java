@@ -195,6 +195,16 @@ public class HttpRequestPostMultipart {
       setHeader("user-agent", HttpRequestGet.UserAgent);
       return this;
    } // end of setUserAgent()
+   
+   /**
+    * Set the Accept-Language header with the given language code, if any.,
+    * @param language The language code, e.g. "es-AR", or null.
+    * @return A reference to this object.
+    */
+   public HttpRequestPostMultipart setLanguage(String language) {
+      if (language != null) setHeader("Accept-Language", language);
+      return this;
+   } // end of setLanguage()
 
    @SuppressWarnings("rawtypes")
    private void postCookies() {

@@ -168,6 +168,15 @@ public class HttpRequestPost {
       return this;
    } // end of setUserAgent()
 
+   /**
+    * Set the Accept-Language header with the given language code, if any.,
+    * @param language The language code, e.g. "es-AR", or null.
+    * @return A reference to this object.
+    */
+   public HttpRequestPost setLanguage(String language) {
+      if (language != null) setHeader("Accept-Language", language);
+      return this;
+   } // end of setLanguage()
    
    /**
     * Sets the HTTP method to use.
@@ -179,7 +188,6 @@ public class HttpRequestPost {
       connection.setRequestMethod(method);
       return this;
    } // end of setMethod()
-
 
    @SuppressWarnings("rawtypes")
    private void postCookies() {
