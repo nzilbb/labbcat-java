@@ -648,6 +648,95 @@ public class TestLabbcatAdmin {
       }
    }
    
+   @Test public void readSystemAttributeAndUpdateSystemAttribute() throws Exception {
+      SystemAttribute[] systemAttributes = labbcat.readSystemAttributes();
+      // ensure the systemAttribute exists
+      assertTrue("There's at least one systemAttribute", systemAttributes.length >= 1);
+      SystemAttribute originalTitle = null;
+      SystemAttribute originalTranscriptSubdir = null;
+      for (SystemAttribute a : systemAttributes) {
+         if (a.getAttribute().equals("title")) {
+            originalTitle = a;
+         } else if (a.getAttribute().equals("transcriptSubdir")) {
+            originalTranscriptSubdir = a;
+         }
+      }
+      assertNotNull("title attribute returned", originalTitle);
+      assertNotNull("title attribute has value", originalTitle.getValue());
+      assertNotNull("transcriptSubdir attribute returned", originalTranscriptSubdir);
+      assertNotNull("transcriptSubdir attribute has value", originalTranscriptSubdir.getValue());
+      assertEquals("transcriptSubdir attribute is read-only",
+                   "readonly", originalTranscriptSubdir.getType());
+
+      try {
+         // update it
+         SystemAttribute updatedTitle = new SystemAttribute()
+            .setAttribute("title")
+            .setValue("unit-test") // should be updated
+            .setType("Changed type") // should not be updated
+            .setStyle("Changed style") // should not be updated
+            .setLabel("Changed label"); // should not be updated
+      
+         SystemAttribute changedTitle = labbcat.updateSystemAttribute(updatedTitle);
+         assertNotNull("SystemAttribute returned after object update", changedTitle);
+         assertEquals("Updated Value correct after object update",
+                      updatedTitle.getValue(), changedTitle.getValue());
+
+         SystemAttribute[] systemAttributesAfter = labbcat.readSystemAttributes();
+         // ensure only the value has been updated
+         SystemAttribute listedTitle = null;
+         for (SystemAttribute a : systemAttributesAfter) {
+            if (a.getAttribute().equals("title")) {
+               listedTitle = a;
+               break;
+            }
+         }
+         assertNotNull("SystemAttribute is still there", listedTitle);
+         assertEquals("Updated Value correct", updatedTitle.getValue(), listedTitle.getValue());
+         assertEquals("type unchanged", originalTitle.getType(), listedTitle.getType());
+         assertEquals("style unchanged", originalTitle.getStyle(), listedTitle.getStyle());
+         assertEquals("label unchanged", originalTitle.getLabel(), listedTitle.getLabel());
+         assertEquals("description unchanged",
+                      originalTitle.getDescription(), listedTitle.getDescription());
+
+         changedTitle = labbcat.updateSystemAttribute("title", "updated-value");
+         assertNotNull("SystemAttribute returned after string update", changedTitle);
+         assertEquals("Updated Value correct after string update",
+                      "updated-value", changedTitle.getValue());
+         
+         try {
+            SystemAttribute updatedTranscriptSubdir = new SystemAttribute()
+               .setAttribute("transcriptSubdir")
+               .setValue("unit-test");
+            // can't update read-only attribute
+            labbcat.updateSystemAttribute(updatedTranscriptSubdir);
+            // if we got here, it was incorrectly updated, so put back the original value
+            labbcat.updateSystemAttribute(originalTranscriptSubdir);
+            // ... and then fail
+            fail("Can't update read-only attribute");
+         } catch(Exception exception) {
+         }
+         
+         try {
+            SystemAttribute nonexistentAttribute = new SystemAttribute()
+               .setAttribute("unit-test")
+               .setValue("unit-test");
+            // can't update read-only attribute
+            labbcat.updateSystemAttribute(nonexistentAttribute);
+            fail("Can't update nonexistent attribute");
+         } catch(Exception exception) {
+         }
+         
+      } finally {
+         // put back original title
+         try {
+            labbcat.updateSystemAttribute(originalTitle);
+         } catch(Exception exception) {
+            System.out.println("ERROR restoring title: " + exception);
+         }
+     }
+   }
+
    public static void main(String args[]) {
       org.junit.runner.JUnitCore.main("nzilbb.labbcat.test.TestLabbcatAdmin");
    }

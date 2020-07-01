@@ -37,6 +37,7 @@ import nzilbb.labbcat.model.MediaTrack;
 import nzilbb.labbcat.model.Project;
 import nzilbb.labbcat.model.Role;
 import nzilbb.labbcat.model.RolePermission;
+import nzilbb.labbcat.model.SystemAttribute;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -806,11 +807,11 @@ public class LabbcatAdmin extends LabbcatEdit implements IGraphStoreAdministrati
     * @param rolePermission The rolePermission details to save.
     * @return The rolePermission just created.
     * @throws StoreException, PermissionException
-    * @see #readRolePermissions()
-    * @see #readRolePermissions(Integer,Integer)
+    * @see #readRolePermissions(String)
+    * @see #readRolePermissions(String,Integer,Integer)
     * @see #updateRolePermission(RolePermission)
     * @see #deleteRolePermission(RolePermission)
-    * @see #deleteRolePermission(String)
+    * @see #deleteRolePermission(String,String)
     */
    public RolePermission createRolePermission(RolePermission rolePermission)
       throws StoreException, PermissionException {
@@ -833,10 +834,10 @@ public class LabbcatAdmin extends LabbcatEdit implements IGraphStoreAdministrati
     * @return A list of rolePermissions.
     * @throws StoreException, PermissionException
     * @see #createRolePermission(RolePermission)
-    * @see #readRolePermissions(Integer,Integer)
+    * @see #readRolePermissions(String,Integer,Integer)
     * @see #updateRolePermission(RolePermission)
     * @see #deleteRolePermission(RolePermission)
-    * @see #deleteRolePermission(String)
+    * @see #deleteRolePermission(String,String)
     */
    public RolePermission[] readRolePermissions(String roleId)
       throws StoreException, PermissionException {
@@ -852,10 +853,10 @@ public class LabbcatAdmin extends LabbcatEdit implements IGraphStoreAdministrati
     * @return A list of rolePermissions.
     * @throws StoreException, PermissionException
     * @see #createRolePermission(RolePermission)
-    * @see #readRolePermissions()
+    * @see #readRolePermissions(String)
     * @see #updateRolePermission(RolePermission)
     * @see #deleteRolePermission(RolePermission)
-    * @see #deleteRolePermission(String)
+    * @see #deleteRolePermission(String,String)
     */
    public RolePermission[] readRolePermissions(String roleId, Integer pageNumber, Integer pageLength)
       throws StoreException, PermissionException {
@@ -887,10 +888,10 @@ public class LabbcatAdmin extends LabbcatEdit implements IGraphStoreAdministrati
     * @return The rolePermission just updated.
     * @throws StoreException, PermissionException
     * @see #createRolePermission(RolePermission)
-    * @see #readRolePermissions()
-    * @see #readRolePermissions(Integer,Integer)
+    * @see #readRolePermissions(String)
+    * @see #readRolePermissions(String,Integer,Integer)
     * @see #deleteRolePermission(RolePermission)
-    * @see #deleteRolePermission(String)
+    * @see #deleteRolePermission(String,String)
     */
    public RolePermission updateRolePermission(RolePermission rolePermission)
       throws StoreException, PermissionException {
@@ -912,10 +913,10 @@ public class LabbcatAdmin extends LabbcatEdit implements IGraphStoreAdministrati
     * @param rolePermission The rolePermission to delete.
     * @throws StoreException, PermissionException
     * @see #createRolePermission(RolePermission)
-    * @see #readRolePermissions()
-    * @see #readRolePermissions(Integer,Integer)
+    * @see #readRolePermissions(String)
+    * @see #readRolePermissions(String,Integer,Integer)
     * @see #updateRolePermission(RolePermission)
-    * @see #deleteRolePermission(String)
+    * @see #deleteRolePermission(String,String)
     */
    public void deleteRolePermission(RolePermission rolePermission)
       throws StoreException, PermissionException {
@@ -928,8 +929,8 @@ public class LabbcatAdmin extends LabbcatEdit implements IGraphStoreAdministrati
     * @param entity The entity of the permission.
     * @throws StoreException, PermissionException
     * @see #createRolePermission(RolePermission)
-    * @see #readRolePermissions()
-    * @see #readRolePermissions(Integer,Integer)
+    * @see #readRolePermissions(String)
+    * @see #readRolePermissions(String,Integer,Integer)
     * @see #updateRolePermission(RolePermission)
     * @see #deleteRolePermission(RolePermission)
     */
@@ -945,4 +946,68 @@ public class LabbcatAdmin extends LabbcatEdit implements IGraphStoreAdministrati
       }
    } // end of updateRolePermission()
 
+   /**
+    * Reads a list of system_attribute records.
+    * @return A list of system attributes.
+    * @throws StoreException, PermissionException
+    * @see #updateSystemAttribute(SystemAttribute)
+    */
+   public SystemAttribute[] readSystemAttributes()
+      throws StoreException, PermissionException {
+      try {
+         HttpRequestGet request = get("api/admin/systemattributes")
+            .setHeader("Accept", "application/json");
+         if (verbose) System.out.println("readSystemAttributes -> " + request);
+         response = new Response(request.get(), verbose);
+         response.checkForErrors(); // throws a StoreException on error
+         if (response.isModelNull()) return null;
+         JSONArray array = (JSONArray)response.getModel();
+         Vector<SystemAttribute> systemAttributes = new Vector<SystemAttribute>();
+         if (array != null) {
+            for (int i = 0; i < array.length(); i++) {
+               systemAttributes.add(new SystemAttribute(array.getJSONObject(i)));
+            }
+         }
+         return systemAttributes.toArray(new SystemAttribute[0]);
+      } catch(IOException x) {
+         throw new StoreException("Could not get response.", x);
+      }
+   } // end of readSystemAttributes()
+   
+   /**
+    * Updates an existing systemAttribute record.
+    * @param attribute The ID of the attribute to update.
+    * @param value The new value of the attribute.
+    * @return The systemAttribute just updated.
+    * @throws StoreException If the attribute doesn't exist or its type is "readonly".
+    * @throws PermissionException
+    * @see #readSystemAttributes()
+    * @see #updateSystemAttribute(SystemAttribute)
+    */
+   public SystemAttribute updateSystemAttribute(String attribute, String value)
+      throws StoreException, PermissionException {
+      return updateSystemAttribute(new SystemAttribute().setAttribute(attribute).setValue(value));
+   } // end of updateSystemAttribute()
+   
+   /**
+    * Updates an existing systemAttribute record.
+    * @param systemAttribute The systemAttribute details to save.
+    * @return The systemAttribute just updated.
+    * @throws StoreException, PermissionException
+    * @see #readSystemAttributes()
+    * @see #updateSystemAttribute(String,String)
+    */
+   public SystemAttribute updateSystemAttribute(SystemAttribute systemAttribute) throws StoreException, PermissionException {
+      try{
+         HttpRequestPost request = put("api/admin/systemattributes")
+            .setHeader("Accept", "application/json");
+         if (verbose) System.out.println("updateSystemAttribute -> " + request);
+         response = new Response(request.post(systemAttribute.toJSON()), verbose);
+         response.checkForErrors(); // throws a StoreException on error
+         if (response.isModelNull()) return null;
+         return new SystemAttribute((JSONObject)response.getModel());
+      } catch(IOException x) {
+         throw new StoreException("Could not get response.", x);
+      }
+   } // end of updateSystemAttribute()
 } // end of class LabbcatAdmin
