@@ -25,11 +25,11 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.io.IOException;
 import java.util.Vector;
-import nzilbb.ag.IGraphStoreAdministration;
+import nzilbb.ag.GraphStoreAdministration;
 import nzilbb.ag.PermissionException;
 import nzilbb.ag.StoreException;
-import nzilbb.ag.serialize.IDeserializer;
-import nzilbb.ag.serialize.ISerializer;
+import nzilbb.ag.serialize.GraphDeserializer;
+import nzilbb.ag.serialize.GraphSerializer;
 import nzilbb.ag.serialize.SerializationDescriptor;
 import nzilbb.labbcat.http.*;
 import nzilbb.labbcat.model.Corpus;
@@ -43,7 +43,7 @@ import org.json.JSONObject;
 
 /**
  * Client-side implementation of 
- * <a href="https://nzilbb.github.io/ag/javadoc/nzilbb/ag/IGraphStoreAdministration.html">nzilbb.ag.IGraphStoreAdminitration</a>.
+ * <a href="https://nzilbb.github.io/ag/javadoc/nzilbb/ag/GraphStoreAdministration.html">nzilbb.ag.GraphStoreAdminitration</a>.
  * <p>This class inherits the <em>read-write</em> operations of {@link LabbcatEdit}
  * and adds some administration operations, including definition of layers,
  * registration of converters, etc., i.e. those that can be performed by users with
@@ -62,7 +62,7 @@ import org.json.JSONObject;
  * @author Robert Fromont robert@fromont.net.nz
  */
 
-public class LabbcatAdmin extends LabbcatEdit implements IGraphStoreAdministration {
+public class LabbcatAdmin extends LabbcatEdit implements GraphStoreAdministration {
    
    // Attributes:
   
@@ -129,7 +129,7 @@ public class LabbcatAdmin extends LabbcatEdit implements IGraphStoreAdministrati
       }
    } // end of editUrl()   
 
-   // IGraphStoreAdministration methods:
+   // GraphStoreAdministration methods:
    
    /**
     * <em>NOT YET IMPLEMENTED</em> - Registers a transcript deserializer.
@@ -137,7 +137,7 @@ public class LabbcatAdmin extends LabbcatEdit implements IGraphStoreAdministrati
     * @throws StoreException If an error prevents the operation.
     * @throws PermissionException If the operation is not permitted.
     */
-   public void registerDeserializer(IDeserializer deserializer)
+   public void registerDeserializer(GraphDeserializer deserializer)
       throws StoreException, PermissionException {
       
       throw new StoreException("Not implemented");
@@ -149,7 +149,7 @@ public class LabbcatAdmin extends LabbcatEdit implements IGraphStoreAdministrati
     * @throws StoreException If an error prevents the operation.
     * @throws PermissionException If the operation is not permitted.
     */
-   public void deregisterDeserializer(IDeserializer deserializer)
+   public void deregisterDeserializer(GraphDeserializer deserializer)
       throws StoreException, PermissionException {
       
       throw new StoreException("Not implemented");
@@ -174,7 +174,7 @@ public class LabbcatAdmin extends LabbcatEdit implements IGraphStoreAdministrati
     * @throws StoreException If an error prevents the operation.
     * @throws PermissionException If the operation is not permitted.
     */
-   public IDeserializer deserializerForMimeType(String mimeType)
+   public GraphDeserializer deserializerForMimeType(String mimeType)
       throws StoreException, PermissionException {
       
       throw new StoreException("Not implemented");
@@ -187,7 +187,7 @@ public class LabbcatAdmin extends LabbcatEdit implements IGraphStoreAdministrati
     * @throws StoreException If an error prevents the operation.
     * @throws PermissionException If the operation is not permitted.
     */
-   public IDeserializer deserializerForFilesSuffix(String suffix)
+   public GraphDeserializer deserializerForFilesSuffix(String suffix)
       throws StoreException, PermissionException {
       
       throw new StoreException("Not implemented");
@@ -199,7 +199,7 @@ public class LabbcatAdmin extends LabbcatEdit implements IGraphStoreAdministrati
     * @throws StoreException If an error prevents the operation.
     * @throws PermissionException If the operation is not permitted.
     */
-   public void registerSerializer(ISerializer serializer)
+   public void registerSerializer(GraphSerializer serializer)
       throws StoreException, PermissionException {
       
       throw new StoreException("Not implemented");
@@ -211,7 +211,7 @@ public class LabbcatAdmin extends LabbcatEdit implements IGraphStoreAdministrati
     * @throws StoreException If an error prevents the operation.
     * @throws PermissionException If the operation is not permitted.
     */
-   public void deregisterSerializer(ISerializer serializer)
+   public void deregisterSerializer(GraphSerializer serializer)
       throws StoreException, PermissionException {
       
       throw new StoreException("Not implemented");
@@ -236,7 +236,7 @@ public class LabbcatAdmin extends LabbcatEdit implements IGraphStoreAdministrati
     * @throws StoreException If an error prevents the operation.
     * @throws PermissionException If the operation is not permitted.
     */
-   public ISerializer serializerForMimeType(String mimeType)
+   public GraphSerializer serializerForMimeType(String mimeType)
       throws StoreException, PermissionException {
       
       throw new StoreException("Not implemented");
@@ -249,7 +249,7 @@ public class LabbcatAdmin extends LabbcatEdit implements IGraphStoreAdministrati
     * @throws StoreException If an error prevents the operation.
     * @throws PermissionException If the operation is not permitted.
     */
-   public ISerializer serializerForFilesSuffix(String suffix)
+   public GraphSerializer serializerForFilesSuffix(String suffix)
       throws StoreException, PermissionException {
       
       throw new StoreException("Not implemented");

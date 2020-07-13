@@ -28,7 +28,7 @@ import java.net.URL;
 import nzilbb.ag.Annotation;
 import nzilbb.ag.Graph;
 import nzilbb.ag.GraphNotFoundException;
-import nzilbb.ag.IGraphStore;
+import nzilbb.ag.GraphStore;
 import nzilbb.ag.PermissionException;
 import nzilbb.ag.StoreException;
 import nzilbb.labbcat.http.*;
@@ -37,7 +37,7 @@ import org.json.JSONObject;
 
 /**
  * Client-side implementation of 
- * <a href="https://nzilbb.github.io/ag/javadoc/nzilbb/ag/IGraphStore.html">nzilbb.ag.IGraphStore</a>.
+ * <a href="https://nzilbb.github.io/ag/javadoc/nzilbb/ag/GraphStore.html">nzilbb.ag.GraphStore</a>.
  * <p>This class inherits the <em>read-only</em> operations of {@link LabbcatView}
  * and adds some <em>write</em> operations for updating data, i.e. those that can be
  * performed by users with <q>edit</q> permission.
@@ -75,7 +75,7 @@ import org.json.JSONObject;
  * @author Robert Fromont robert@fromont.net.nz
  */
 
-public class LabbcatEdit extends LabbcatView implements IGraphStore
+public class LabbcatEdit extends LabbcatView implements GraphStore
 {
    // Attributes:
   
@@ -143,7 +143,7 @@ public class LabbcatEdit extends LabbcatView implements IGraphStore
       }
    } // end of editUrl()   
 
-   // IGraphStore methods:
+   // GraphStore methods:
    
    /**
     * <em>NOT YET IMPLEMENTED</em> - Saves the given transcript. The transcript can be partial e.g. include only some of the layers

@@ -43,7 +43,7 @@ import nzilbb.ag.Anchor;
 import nzilbb.ag.Annotation;
 import nzilbb.ag.Graph;
 import nzilbb.ag.GraphNotFoundException;
-import nzilbb.ag.IGraphStoreQuery;
+import nzilbb.ag.GraphStoreQuery;
 import nzilbb.ag.Layer;
 import nzilbb.ag.MediaFile;
 import nzilbb.ag.MediaTrackDefinition;
@@ -61,7 +61,7 @@ import org.json.JSONObject;
 
 /**
  * Client-side implementation of 
- * <a href="https://nzilbb.github.io/ag/javadoc/nzilbb/ag/IGraphStoreQuery.html">nzilbb.ag.IGraphStoreQuery</a>.
+ * <a href="https://nzilbb.github.io/ag/javadoc/nzilbb/ag/GraphStoreQuery.html">nzilbb.ag.GraphStoreQuery</a>.
  * <p>This class provides only <em>read-only</em> operations, i.e. those that can be
  * performed by users with <q>view</q> permission. 
  * <p> e.g.
@@ -80,7 +80,7 @@ import org.json.JSONObject;
  * </pre>
  * @author Robert Fromont robert@fromont.net.nz
  */
-public class LabbcatView implements IGraphStoreQuery {
+public class LabbcatView implements GraphStoreQuery {
    
    // Attributes:
   
@@ -492,7 +492,7 @@ public class LabbcatView implements IGraphStoreQuery {
       return postRequest;
    } // end of postMultipart()
 
-   // IGraphStoreQuery methods:
+   // GraphStoreQuery methods:
    
    /**
     * Gets the store's ID.
