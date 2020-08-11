@@ -28,6 +28,7 @@ import java.io.PrintWriter;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.URLEncoder;
 import java.nio.file.Files;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
@@ -50,6 +51,7 @@ import nzilbb.ag.MediaTrackDefinition;
 import nzilbb.ag.PermissionException;
 import nzilbb.ag.Schema;
 import nzilbb.ag.StoreException;
+import nzilbb.ag.serialize.SerializationDescriptor;
 import nzilbb.labbcat.http.*;
 import nzilbb.labbcat.model.TaskStatus;
 import nzilbb.labbcat.model.Match;
@@ -407,7 +409,7 @@ public class LabbcatView implements GraphStoreQuery {
 
    /**
     * Constructs a URL for the given resource.
-    * @param resource
+    * @param resource The resource, which must be URLEncoded if necessary.
     * @return A URL for the given resource.
     * @throws StoreException If the URL is malformed.
     */
@@ -2349,4 +2351,87 @@ public class LabbcatView implements GraphStoreQuery {
       return csv;
    }
 
+   /**
+    * Lists the descriptors of all registered serializers.
+    * @return A list of the descriptors of all registered serializers.
+    * @throws StoreException If an error prevents the operation from completing.
+    * @throws PermissionException If the operation is not permitted.
+    */
+   public SerializationDescriptor[] getSerializerDescriptors()
+      throws StoreException, PermissionException {
+      try {
+         URL url = url("getSerializerDescriptors");
+         HttpRequestGet request = new HttpRequestGet(url, getRequiredHttpAuthorization()) 
+            .setUserAgent().setLanguage(language).setHeader("Accept", "application/json");
+         if (verbose) System.out.println("getSerializerDescriptors -> " + request);
+         response = new Response(request.get(), verbose);
+         response.checkForErrors(); // throws a StoreException on error
+         if (response.isModelNull()) return null;
+         JSONArray array = (JSONArray)response.getModel();
+         Vector<SerializationDescriptor> descriptors = new Vector<SerializationDescriptor>();
+         if (array != null) {
+            for (int i = 0; i < array.length(); i++) {
+               descriptors.add(new SerializationDescriptor(array.getJSONObject(i)));
+            }
+         }
+         return descriptors.toArray(new SerializationDescriptor[0]);
+      } catch(IOException x) {
+         throw new StoreException("Could not get response.", x);
+      }
+   }
+   
+   /**
+    * Lists the descriptors of all registered deserializers.
+    * @return A list of the descriptors of all registered deserializers.
+    * @throws StoreException If an error prevents the descriptors from being listed.
+    * @throws PermissionException If listing the deserializers is not permitted.
+    */
+   public SerializationDescriptor[] getDeserializerDescriptors()
+      throws StoreException, PermissionException {
+      try {
+         URL url = url("getDeserializerDescriptors");
+         HttpRequestGet request = new HttpRequestGet(url, getRequiredHttpAuthorization()) 
+            .setUserAgent().setLanguage(language).setHeader("Accept", "application/json");
+         if (verbose) System.out.println("getDeserializerDescriptors -> " + request);
+         response = new Response(request.get(), verbose);
+         response.checkForErrors(); // throws a StoreException on error
+         if (response.isModelNull()) return null;
+         JSONArray array = (JSONArray)response.getModel();
+         Vector<SerializationDescriptor> descriptors = new Vector<SerializationDescriptor>();
+         if (array != null) {
+            for (int i = 0; i < array.length(); i++) {
+               descriptors.add(new SerializationDescriptor(array.getJSONObject(i)));
+            }
+         }
+         return descriptors.toArray(new SerializationDescriptor[0]);
+      } catch(IOException x) {
+         throw new StoreException("Could not get response.", x);
+      }
+   }
+   /**
+    * Gets the value of the given system attribute.
+    * @param attribute Name of the attribute.
+    * @return The value of the given attribute.
+    * @throws StoreException If an error prevents the descriptors from being listed.
+    * @throws PermissionException If listing the deserializers is not permitted.
+    */
+   public String getSystemAttribute(String attribute)
+      throws StoreException, PermissionException {
+      try {
+         URL url = makeUrl("api/systemattributes/" + URLEncoder.encode(attribute, "UTF-8"));
+         HttpRequestGet request = new HttpRequestGet(url, getRequiredHttpAuthorization()) 
+            .setUserAgent().setLanguage(language).setHeader("Accept", "application/json");
+         if (verbose) System.out.println("getSystemAttribute -> " + request);
+         response = new Response(request.get(), verbose);
+         response.checkForErrors(); // throws a StoreException on error
+         if (response.isModelNull()) return null;
+         JSONObject model = (JSONObject)response.getModel();
+         return model.optString("value");
+      } catch(ResponseException rx) {
+         if (rx.getResponse().getHttpStatus() == HttpURLConnection.HTTP_NOT_FOUND) return null;
+         throw rx;
+      } catch(IOException x) {
+         throw new StoreException("Could not get response.", x);
+      }
+   }
 } // end of class LabbcatView

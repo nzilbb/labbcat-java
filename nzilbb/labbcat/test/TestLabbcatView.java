@@ -37,6 +37,7 @@ import nzilbb.ag.Layer;
 import nzilbb.ag.MediaFile;
 import nzilbb.ag.MediaTrackDefinition;
 import nzilbb.ag.StoreException;
+import nzilbb.ag.serialize.SerializationDescriptor;
 import nzilbb.labbcat.*;
 import nzilbb.labbcat.model.*;
 import org.json.JSONArray;
@@ -594,6 +595,38 @@ public class TestLabbcatView {
       csv.delete();
    }
 
+   @Test public void getSerializerDescriptors() throws Exception {
+      SerializationDescriptor[] descriptors = labbcat.getSerializerDescriptors();
+      // for (SerializationDescriptor descriptor : descriptors) System.out.println("descriptor " + descriptor);
+      assertTrue("Some descriptors are returned",
+                 descriptors.length > 0);
+      Set<Object> mimeTypeSet = Arrays.asList(descriptors).stream()
+         .map(l->l.getMimeType())
+         .collect(Collectors.toSet());
+      assertTrue("Has plain text serialization: " + mimeTypeSet,
+                 mimeTypeSet.contains("text/plain"));
+   }
+   
+   @Test public void getDeserializerDescriptors() throws Exception {
+      SerializationDescriptor[] descriptors = labbcat.getDeserializerDescriptors();
+      for (SerializationDescriptor descriptor : descriptors) System.out.println("descriptor " + descriptor);
+      assertTrue("Some descriptors are returned",
+                 descriptors.length > 0);
+      Set<Object> mimeTypeSet = Arrays.asList(descriptors).stream()
+         .map(l->l.getMimeType())
+         .collect(Collectors.toSet());
+      assertTrue("Has plain text serialization: " + mimeTypeSet,
+                 mimeTypeSet.contains("text/plain"));
+   }
+   
+   @Test public void getSystemAttribute() throws Exception {
+      String value = labbcat.getSystemAttribute("title");
+      assertNotNull("Value returned", value);
+      labbcat.setVerbose(true);
+      value = labbcat.getSystemAttribute("doesn't exist");
+      assertNull("Value returned", value);
+   }
+   
    public static void main(String args[]) {
       org.junit.runner.JUnitCore.main("nzilbb.labbcat.test.TestLabbcatView");
    }
