@@ -609,7 +609,7 @@ public class TestLabbcatView {
    
    @Test public void getDeserializerDescriptors() throws Exception {
       SerializationDescriptor[] descriptors = labbcat.getDeserializerDescriptors();
-      for (SerializationDescriptor descriptor : descriptors) System.out.println("descriptor " + descriptor);
+      // for (SerializationDescriptor descriptor : descriptors) System.out.println("descriptor " + descriptor);
       assertTrue("Some descriptors are returned",
                  descriptors.length > 0);
       Set<Object> mimeTypeSet = Arrays.asList(descriptors).stream()
