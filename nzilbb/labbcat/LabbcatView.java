@@ -56,6 +56,7 @@ import nzilbb.labbcat.http.*;
 import nzilbb.labbcat.model.TaskStatus;
 import nzilbb.labbcat.model.Match;
 import nzilbb.labbcat.model.MatchId;
+import nzilbb.labbcat.model.User;
 import nzilbb.util.IO;
 import nzilbb.util.MonitorableSeries;
 import org.json.JSONArray;
@@ -184,7 +185,7 @@ public class LabbcatView implements GraphStoreQuery {
     * @see #getMinLabbcatVersion()
     * @see #setMinLabbcatVersion(String)
     */
-   protected String minLabbcatVersion = "20200603.1837";
+   protected String minLabbcatVersion = "20200812.1253";
    /**
     * Getter for {@link #minLabbcatVersion}: Minimum server version required for this API to work properly.
     * @return Minimum server version required for this API to work properly.
@@ -2408,6 +2409,7 @@ public class LabbcatView implements GraphStoreQuery {
          throw new StoreException("Could not get response.", x);
       }
    }
+
    /**
     * Gets the value of the given system attribute.
     * @param attribute Name of the attribute.
@@ -2415,8 +2417,7 @@ public class LabbcatView implements GraphStoreQuery {
     * @throws StoreException If an error prevents the descriptors from being listed.
     * @throws PermissionException If listing the deserializers is not permitted.
     */
-   public String getSystemAttribute(String attribute)
-      throws StoreException, PermissionException {
+   public String getSystemAttribute(String attribute) throws StoreException, PermissionException {
       try {
          URL url = makeUrl("api/systemattributes/" + URLEncoder.encode(attribute, "UTF-8"));
          HttpRequestGet request = new HttpRequestGet(url, getRequiredHttpAuthorization()) 
@@ -2434,4 +2435,26 @@ public class LabbcatView implements GraphStoreQuery {
          throw new StoreException("Could not get response.", x);
       }
    }
+   
+   /**
+    * Gets information about the current suer, including the roles or groups they are in.
+    * @return The user record.
+    * @throws StoreException If an error occurs while trying to retrieve the user information.
+    */
+   public User getUserInfo() throws StoreException {
+      try {
+         URL url = makeUrl("api/user");
+         HttpRequestGet request = new HttpRequestGet(url, getRequiredHttpAuthorization()) 
+            .setUserAgent().setLanguage(language).setHeader("Accept", "application/json");
+         if (verbose) System.out.println("getUserInfo -> " + request);
+         response = new Response(request.get(), verbose);
+         response.checkForErrors(); // throws a StoreException on error
+         if (response.isModelNull()) return null;
+         JSONObject model = (JSONObject)response.getModel();
+         return new User(model);
+      } catch(IOException x) {
+         throw new StoreException("Could not get response.", x);
+      }
+   } // end of getUserInfo()
+
 } // end of class LabbcatView

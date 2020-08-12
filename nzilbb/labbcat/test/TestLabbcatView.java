@@ -622,9 +622,16 @@ public class TestLabbcatView {
    @Test public void getSystemAttribute() throws Exception {
       String value = labbcat.getSystemAttribute("title");
       assertNotNull("Value returned", value);
-      labbcat.setVerbose(true);
       value = labbcat.getSystemAttribute("doesn't exist");
       assertNull("Value returned", value);
+   }
+   
+   @Test public void getUserInfo() throws Exception {
+      User user = labbcat.getUserInfo();
+      assertNotNull("Value returned", user);
+      // user.getUser() might be null, if there's no user auth 
+      assertNotNull("Roles returned", user.getRoles());
+      assertTrue("There are roles", user.getRoles().length > 0);
    }
    
    public static void main(String args[]) {
