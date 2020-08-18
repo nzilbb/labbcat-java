@@ -737,6 +737,54 @@ public class TestLabbcatAdmin {
      }
    }
 
+   @Test public void saveTranscriptTypeOptions() throws Exception {
+      Layer originalTranscriptType = labbcat.getLayer("transcript_type");
+      assertNotNull("There's a transcript_type layer",
+                    originalTranscriptType);
+      assertTrue("There's at least one transcript type",
+                 originalTranscriptType.getValidLabels().size() > 0);
+
+      try {
+
+         Layer editedTranscriptType1 = (Layer)originalTranscriptType.clone();
+         
+         // add an option
+         String newOption1 = "unit-test-1";
+         editedTranscriptType1.getValidLabels().put(newOption1, newOption1);
+
+         Layer editedTranscriptType2 = labbcat.saveLayer(editedTranscriptType1);
+
+         assertTrue("new option 1 is there: " + editedTranscriptType2.getValidLabels(),
+                     editedTranscriptType2.getValidLabels().keySet().contains(newOption1));
+         assertEquals("All options are what we expect",
+                      editedTranscriptType1.getValidLabels(),
+                      editedTranscriptType2.getValidLabels());
+         // remove an option
+         editedTranscriptType2.getValidLabels().remove(newOption1);      
+         
+         // add an option
+         String newOption2 = "unit-test-2";
+         editedTranscriptType2.getValidLabels().put(newOption2, newOption2);
+      
+         Layer finalTranscriptType = labbcat.saveLayer(editedTranscriptType2);
+
+         assertFalse("old option 1 isn't there",
+                     finalTranscriptType.getValidLabels().keySet().contains(newOption1));
+         assertTrue("new option 2 is there",
+                     finalTranscriptType.getValidLabels().keySet().contains(newOption2));
+         assertEquals("All options are what we expect",
+                      editedTranscriptType2.getValidLabels(),
+                      finalTranscriptType.getValidLabels());
+         
+      } finally {
+         // put back original options
+         try {
+            labbcat.saveLayer(originalTranscriptType);
+         } catch(Exception exception) {
+            System.out.println("ERROR restoring title: " + exception);
+         }
+      }
+   }
    public static void main(String args[]) {
       org.junit.runner.JUnitCore.main("nzilbb.labbcat.test.TestLabbcatAdmin");
    }

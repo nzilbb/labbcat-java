@@ -21,11 +21,12 @@
 //
 package nzilbb.labbcat;
 
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.io.IOException;
 import java.util.Vector;
 import nzilbb.ag.GraphStoreAdministration;
+import nzilbb.ag.Layer;
 import nzilbb.ag.PermissionException;
 import nzilbb.ag.StoreException;
 import nzilbb.ag.serialize.GraphDeserializer;
@@ -116,7 +117,7 @@ public class LabbcatAdmin extends LabbcatEdit implements GraphStoreAdministratio
    } // end of constructor
 
    /**
-    * Constructs a URL for the given resource.
+    * Constructs a store URL for the given resource.
     * @param resource
     * @return A URL for the given resource.
     * @throws StoreException If the URL is malformed.
@@ -254,7 +255,32 @@ public class LabbcatAdmin extends LabbcatEdit implements GraphStoreAdministratio
       
       throw new StoreException("Not implemented");
    }
-
+   
+   /**
+    * Saves changes to a layer, or adds a new layer.
+    * @param layer A new or modified layer definition.
+    * @return The resulting layer definition.
+    * @throws StoreException If an error prevents the operation.
+    * @throws PermissionException If the operation is not permitted.
+    */
+   public Layer saveLayer(Layer layer) throws StoreException, PermissionException {
+      try {
+         HttpRequestPost request = new HttpRequestPost(
+            adminUrl("saveLayer"), getRequiredHttpAuthorization())
+            .setUserAgent().setLanguage(language)
+            .setHeader("Accept", "application/json");
+         if (verbose) System.out.println("createCorpus -> " + request);
+         response = new Response(request.post(new JSONObject(layer.toJsonString())), verbose);
+         response.checkForErrors(); // throws a StoreException on error
+         if (response.isModelNull()) return null;
+         Layer result = new Layer();
+         result.fromJson(response.getModel().toString());
+         return result;
+      } catch(IOException x) {
+         throw new StoreException("Could not get response.", x);
+      }
+   }
+      
    // Other methods:
 
    /**
