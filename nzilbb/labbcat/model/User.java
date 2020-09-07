@@ -21,8 +21,11 @@
 //
 package nzilbb.labbcat.model;
 
-import org.json.JSONArray;
-import org.json.JSONObject;
+import javax.json.Json;
+import javax.json.JsonArray;
+import javax.json.JsonArrayBuilder;
+import javax.json.JsonObject;
+import javax.json.JsonObjectBuilder;
 
 /**
  * Model of a user record, including roles.
@@ -77,11 +80,11 @@ public class User
    /**
     * Constructor from JSON.
     */
-   public User(JSONObject json) {      
-      user = json.optString("user");
-      if (json.has("roles")) {
-         JSONArray roleArray = json.getJSONArray("roles");
-         roles = new String[roleArray.length()];
+   public User(JsonObject json) {      
+      user = json.getString("user");
+      if (json.containsKey("roles")) {
+         JsonArray roleArray = json.getJsonArray("roles");
+         roles = new String[roleArray.size()];
          for (int r = 0; r < roles.length; r++) {
             roles[r] = roleArray.getString(r);
          }
@@ -92,16 +95,17 @@ public class User
     * Serializes the object to JSON.
     * @return A JSON serialization of the object.
     */
-   public JSONObject toJSON() {
-      JSONArray roleArray = new JSONArray();
+   public JsonObject toJson() {
+      JsonArrayBuilder roleArray = Json.createArrayBuilder();
       if (roles != null) {
          for (String role : roles) {
-            roleArray.put(role);
+            roleArray = roleArray.add(role);
          } // next role
       }
-      return new JSONObject()
-         .put("user", user)
-         .put("roles", roleArray);
+      return Json.createObjectBuilder()
+         .add("user", user)
+         .add("roles", roleArray)
+         .build();
    } // end of toJSON()
 
 } // end of class User

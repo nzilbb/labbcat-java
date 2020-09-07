@@ -19,6 +19,17 @@
     <tstamp/>
     <!-- Create the build directory structure used by compile -->
     <mkdir dir="${build}"/>
+    <!-- Get glassfish open-source implementation of javax.json -->    
+    <get src="http://www.java2s.com/Code/JarDownload/javax.json/javax.json-1.0.jar.zip" 
+	 dest="${lib}/javax.json-1.0.jar.zip" 
+	 skipexisting="true"
+	 verbose="true"
+	 usetimestamp="true"/>
+    <unzip src="${lib}/javax.json-1.0.jar.zip" dest="${lib}"></unzip>
+    <move
+        file="${lib}/javax.json-1.0.jar"
+        tofile="${lib}/javax.json.jar"
+        />
   </target>
   
   <target name="gitlibs" description="Ensure we have the jar libraries we need">
@@ -35,7 +46,7 @@
     <javac srcdir="${src}" destdir="${build}"
 	   includes="${srcfiles}"
 	   excludes="${testsrcfiles} **/package-info.java"
-	   classpath="${lib}/nzilbb.ag.jar"
+	   classpath="${lib}/nzilbb.ag.jar;${lib}/javax.json.jar"
 	   listfiles="yes"
 	   target="${config.classversion}"
 	   source="${config.classversion}"
@@ -72,7 +83,7 @@
   <target name="javadoc" depends="init,dist"
           description="Document the source" >
     <javadoc destdir="${javadoc}"
-             classpath="${lib}/nzilbb.ag.jar"
+             classpath="${lib}/nzilbb.ag.jar;${lib}/javax.json.jar"
              packagenames="nzilbb.labbcat nzilbb.labbcat.http nzilbb.labbcat.util"
              access="public"
 	     Author="yes"
@@ -89,7 +100,7 @@
   <target name="test" depends="dist" description="Run nzilbb.labbcat.server unit tests">
     <javac srcdir="${src}" destdir="."
 	   includes="${testsrcfiles}"
-	   classpath=".;${config.junitjar};${dist}/${ant.project.name}.jar;${lib}/nzilbb.ag.jar;${lib}/antlr-runtime-4.7.2.jar"
+	   classpath=".;${config.junitjar};${dist}/${ant.project.name}.jar;${lib}/nzilbb.ag.jar;${lib}/antlr-runtime-4.7.2.jar;${lib}/javax.json.jar"
 	   listfiles="yes"
 	   target="${config.classversion}"
 	   source="${config.classversion}"
@@ -103,7 +114,7 @@
 	fork="true"
 	>
       <classpath>
-	<pathelement path=".;${dist}/${ant.project.name}.jar;${config.junitjar};${lib}/nzilbb.ag.jar;${lib}/antlr-runtime-4.7.2.jar"/>
+	<pathelement path=".;${dist}/${ant.project.name}.jar;${config.junitjar};${lib}/nzilbb.ag.jar;${lib}/antlr-runtime-4.7.2.jar;${lib}/javax.json.jar"/>
       </classpath>
       <jvmarg value="-ea"/>
       <formatter type="plain" usefile="false" />

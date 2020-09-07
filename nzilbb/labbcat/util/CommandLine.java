@@ -21,8 +21,20 @@
 //
 package nzilbb.labbcat.util;
 
+import java.io.StringReader;
+import java.io.StringWriter;
 import java.lang.reflect.Method;
+import java.util.HashMap;
 import java.util.Vector;
+import javax.json.Json;
+import javax.json.JsonArray;
+import javax.json.JsonArrayBuilder;
+import javax.json.JsonException;
+import javax.json.JsonObject;
+import javax.json.JsonObjectBuilder;
+import javax.json.JsonWriter;
+import javax.json.JsonWriterFactory;
+import javax.json.stream.JsonGenerator;
 import nzilbb.labbcat.LabbcatAdmin;
 import nzilbb.labbcat.Response;
 import nzilbb.labbcat.ResponseException;
@@ -30,8 +42,6 @@ import nzilbb.util.CommandLineProgram;
 import nzilbb.util.ProgramDescription;
 import nzilbb.util.Switch;
 import nzilbb.util.Timers;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 /**
  * Command-line utility for making ad-hoc LaBB-CAT API calls.
@@ -329,9 +339,20 @@ public class CommandLine extends CommandLineProgram {
          if (response.getRaw() != null && response.getRaw().length() > 0) {
             if (indent) {
                try {
-                  System.out.println(new JSONObject(response.getRaw()).toString(4));
+                  // print an indented version of the resonse
+                  JsonObject jsonResponse = Json.createReader(
+                     new StringReader(response.getRaw())).readObject();
+                  JsonWriterFactory writerFactory = Json.createWriterFactory(
+                     new HashMap<String,Boolean>() {{ 
+                        put(JsonGenerator.PRETTY_PRINTING, Boolean.TRUE);
+                     }});
+                  StringWriter buffer = new StringWriter();
+                  JsonWriter writer = writerFactory.createWriter(buffer);
+                  writer.writeObject(jsonResponse);
+                  writer.close();
+                  System.out.println(buffer.toString());
                }
-               catch(JSONException exception) {
+               catch(JsonException exception) {
                   // couldn't parse as JSON, so just print the raw response
                   System.out.println(response.getRaw());
                }

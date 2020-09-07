@@ -23,13 +23,17 @@ package nzilbb.labbcat;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.StringReader;
 import java.net.HttpURLConnection;
 import java.util.Vector;
+import javax.json.Json;
+import javax.json.JsonArray;
+import javax.json.JsonArrayBuilder;
+import javax.json.JsonException;
+import javax.json.JsonObject;
+import javax.json.JsonObjectBuilder;
 import nzilbb.ag.StoreException;
 import nzilbb.util.IO;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 /**
  * A class representing the JSON response of a LaBB-CAT request.
@@ -257,36 +261,44 @@ public class Response {
          errors.add("Empty response from server.");
       } else {
          try {      
-            JSONObject json = new JSONObject(raw);
+            JsonObject json = Json.createReader(new StringReader(raw)).readObject();
             
-            title = json.getString("title");
-            if (verbose) System.out.println("title: " + title);
-            version = json.optString("version");
-            if (verbose) System.out.println("version: " + version);
-            code = json.getInt("code");
-            if (verbose) System.out.println("code: " + code);
-            model = json.get("model");      
-            if (verbose) System.out.println("model: " + model);
+            if (json.containsKey("title")) {
+               title = json.getString("title");
+               if (verbose) System.out.println("title: " + title);
+            }
+            if (json.containsKey("version")) {
+               version = json.getString("version");
+               if (verbose) System.out.println("version: " + version);
+            }
+            if (json.containsKey("code")) {
+               code = json.getInt("code");
+               if (verbose) System.out.println("code: " + code);
+            }
+            if (json.containsKey("model")) {
+               model = json.get("model");      
+               if (verbose) System.out.println("model: " + model);
+            }
             if (verbose && model != null) System.out.println("model type: " + model.getClass().getName());
             
-            JSONArray array = json.getJSONArray("messages");
             messages = new Vector<String>();
-            if (array != null) {
-               for (int i = 0; i < array.length(); i++) {
+            if (json.containsKey("messages")) {
+               JsonArray array = json.getJsonArray("messages");
+               for (int i = 0; i < array.size(); i++) {
                   if (verbose) System.out.println("messages["+i+"]: " + array.getString(i));
                   messages.add(array.getString(i));
                }
             }
             
-            array = json.getJSONArray("errors");
             errors = new Vector<String>();
-            if (array != null) {
-               for (int i = 0; i < array.length(); i++) {
+            if (json.containsKey("errors")) {
+               JsonArray array = json.getJsonArray("errors");
+               for (int i = 0; i < array.size(); i++) {
                   if (verbose) System.out.println("errors["+i+"]: " + array.getString(i));
                   errors.add(array.getString(i));
                }
             }
-         } catch (JSONException x) {
+         } catch (JsonException x) {
             // not JSON response
             if (verbose) {
                System.out.println("JSONException: " + x.getMessage());

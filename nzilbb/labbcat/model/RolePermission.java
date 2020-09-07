@@ -21,7 +21,11 @@
 //
 package nzilbb.labbcat.model;
 
-import org.json.JSONObject;
+import javax.json.Json;
+import javax.json.JsonArray;
+import javax.json.JsonArrayBuilder;
+import javax.json.JsonObject;
+import javax.json.JsonObjectBuilder;
 
 /**
  * User role permission record.
@@ -129,25 +133,26 @@ public class RolePermission {
    /**
     * Constructor from JSON.
     */
-   public RolePermission(JSONObject json) {      
-      roleId = json.optString("role_id");
-      entity = json.optString("entity");
-      layerId = "transcript_"+json.optString("attribute_name");
+   public RolePermission(JsonObject json) {      
+      roleId = json.getString("role_id");
+      entity = json.getString("entity");
+      layerId = "transcript_"+json.getString("attribute_name");
       if (layerId.equals("transcript_corpus")) layerId = "corpus";
       else if (layerId.equals("transcript_null")) layerId = null;
-      valuePattern = json.optString("value_pattern");
+      valuePattern = json.getString("value_pattern");
    } // end of constructor
    
    /**
     * Serializes the object to JSON.
     * @return A JSON serialization of the object.
     */
-   public JSONObject toJSON() {
-      return new JSONObject()
-         .put("role_id", roleId)
-         .put("entity", entity)
-         .put("attribute_name", layerId == null?null:layerId.replaceAll("^transcript_",""))
-         .put("value_pattern", valuePattern);
+   public JsonObject toJson() {
+      return Json.createObjectBuilder()
+         .add("role_id", roleId)
+         .add("entity", entity)
+         .add("attribute_name", layerId == null?null:layerId.replaceAll("^transcript_",""))
+         .add("value_pattern", valuePattern)
+         .build();
    } // end of toJSON()
    
 } // end of class Role

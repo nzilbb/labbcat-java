@@ -21,7 +21,11 @@
 //
 package nzilbb.labbcat.model;
 
-import org.json.JSONObject;
+import javax.json.Json;
+import javax.json.JsonArray;
+import javax.json.JsonArrayBuilder;
+import javax.json.JsonObject;
+import javax.json.JsonObjectBuilder;
 
 /**
  * The status of a server-side task.
@@ -196,17 +200,26 @@ public class TaskStatus {
    /**
     * Constructor from JSON.
     */
-   public TaskStatus(JSONObject json) {
+   public TaskStatus(JsonObject json) {
       
-      threadId = json.optString("threadId");
-      threadName = json.optString("threadName");
-      running = json.optBoolean("running");
-      duration = json.optInt("duration");
-      percentComplete = json.optInt("percentComplete");
-      refreshSeconds = json.optInt("refreshSeconds");
-      resultUrl = json.optString("resultUrl");
-      resultText = json.optString("resultText");
-      status = json.optString("status");
+      if (json.containsKey("threadId"))
+         threadId = json.get("threadId").toString();
+      if (json.containsKey("threadName"))
+         threadName = json.getString("threadName");
+      if (json.containsKey("running"))
+         running = json.getBoolean("running");
+      if (json.containsKey("duration"))
+         duration = json.getJsonNumber("duration").intValue();
+      if (json.containsKey("percentComplete"))
+         percentComplete = json.getJsonNumber("percentComplete").intValue();
+      if (json.containsKey("refreshSeconds"))
+         refreshSeconds = json.getJsonNumber("refreshSeconds").intValue();
+      if (json.containsKey("resultUrl"))
+         resultUrl = json.getString("resultUrl");
+      if (json.containsKey("resultText"))
+         resultText = json.getString("resultText");
+      if (json.containsKey("status"))
+         status = json.getString("status");
    } // end of constructor
    
    /**

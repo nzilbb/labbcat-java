@@ -37,7 +37,11 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Random;
 import java.util.jar.JarFile;
-import org.json.JSONObject;
+import javax.json.Json;
+import javax.json.JsonArray;
+import javax.json.JsonArrayBuilder;
+import javax.json.JsonObject;
+import javax.json.JsonObjectBuilder;
 
 /**
  * POST HTTP request.
@@ -338,7 +342,7 @@ public class HttpRequestPost {
     * @return input stream with the server response
     * @throws IOException
     */
-   public HttpURLConnection post(JSONObject json) throws IOException {
+   public HttpURLConnection post(JsonObject json) throws IOException {
       
       write(json.toString());
       os.close();

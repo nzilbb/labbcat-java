@@ -29,16 +29,16 @@ import java.util.Vector;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
+import javax.json.JsonObject;
 import nzilbb.ag.Annotation;
 import nzilbb.labbcat.LabbcatAdmin;
-import nzilbb.labbcat.model.Match;
 import nzilbb.labbcat.PatternBuilder;
+import nzilbb.labbcat.model.Match;
 import nzilbb.labbcat.model.TaskStatus;
 import nzilbb.util.CommandLineProgram;
 import nzilbb.util.ProgramDescription;
 import nzilbb.util.Switch;
 import nzilbb.util.Timers;
-import org.json.JSONObject;
 
 /**
  * Command-line utility for load-testing LaBB-CAT servers.
@@ -448,7 +448,7 @@ public class LoadTester extends CommandLineProgram {
          try {
             LabbcatAdmin labbcat = new LabbcatAdmin(labbcatUrl, username, password);
             //labbcat.setVerbose(verbose);
-            JSONObject pattern = new PatternBuilder().addMatchLayer("orthography", searchFor).build();
+            JsonObject pattern = new PatternBuilder().addMatchLayer("orthography", searchFor).build();
             for (int r = 0; r < repetitions; r++) {
                if (verbose) System.out.println("Client "+c+" Repetition: " + r);
                if (!verbose) System.out.print(".");

@@ -21,7 +21,12 @@
 //
 package nzilbb.labbcat.model;
 
-import org.json.JSONObject;
+import javax.json.Json;
+import javax.json.JsonArray;
+import javax.json.JsonArrayBuilder;
+import javax.json.JsonObject;
+import javax.json.JsonObjectBuilder;
+import javax.json.JsonValue;
 
 /**
  * Corpus record.
@@ -110,23 +115,26 @@ public class Corpus {
    /**
     * Constructor from JSON.
     */
-   public Corpus(JSONObject json) {      
-      if (json.has("corpus_id")) corpusId = json.getInt("corpus_id");
-      name = json.optString("corpus_name");
-      language = json.optString("corpus_language");
-      description = json.optString("corpus_description");
+   public Corpus(JsonObject json) {
+      if (json.containsKey("corpus_id")) {
+         corpusId = Integer.parseInt(json.get("corpus_id").toString());
+      }
+      name = json.getString("corpus_name");
+      language = json.getString("corpus_language");
+      description = json.getString("corpus_description");
    } // end of constructor
    
    /**
     * Serializes the object to JSON.
     * @return A JSON serialization of the object.
     */
-   public JSONObject toJSON() {
-      return new JSONObject()
-         .put("corpus_id", corpusId)
-         .put("corpus_name", name)
-         .put("corpus_language", language)
-         .put("corpus_description", description);
+   public JsonObject toJson() {
+      return Json.createObjectBuilder()
+         .add("corpus_id", corpusId)
+         .add("corpus_name", name)
+         .add("corpus_language", language)
+         .add("corpus_description", description)
+         .build();
    } // end of toJSON()
 
 } // end of class Corpus

@@ -31,6 +31,11 @@ import java.util.Arrays;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
+import javax.json.Json;
+import javax.json.JsonObject;
+import javax.json.JsonArray;
+import javax.json.JsonObjectBuilder;
+import javax.json.JsonArrayBuilder;
 import nzilbb.ag.Anchor;
 import nzilbb.ag.Annotation;
 import nzilbb.ag.Layer;
@@ -40,8 +45,6 @@ import nzilbb.ag.StoreException;
 import nzilbb.ag.serialize.SerializationDescriptor;
 import nzilbb.labbcat.*;
 import nzilbb.labbcat.model.*;
-import org.json.JSONArray;
-import org.json.JSONObject;
 
 /**
  * Unit tests for LabbcatView.
@@ -406,18 +409,20 @@ public class TestLabbcatView {
 
    @Test(expected = StoreException.class) public void searchInvalidPattern()
       throws Exception {
-      String threadId = labbcat.search(new JSONObject(), null, null, false, false, null);
+      String threadId = labbcat.search(
+         Json.createObjectBuilder().build(), null, null, false, false, null);
    }
 
    @Test public void searchAndCancelTask()
       throws Exception {
       // start a long-running search - all words
-      JSONObject pattern = new JSONObject()
-         .put("columns", new JSONArray()
-              .put(new JSONObject()
-                   .put("layers", new JSONObject()
-                        .put("orthography", new JSONObject()
-                             .put("pattern", ".*")))));
+      JsonObject pattern = Json.createObjectBuilder()
+         .add("columns", Json.createArrayBuilder()
+              .add(Json.createObjectBuilder()
+                   .add("layers", Json.createObjectBuilder()
+                        .add("orthography", Json.createObjectBuilder()
+                             .add("pattern", ".*")))))
+         .build();
       String threadId = labbcat.search(pattern, null, null, false, false, null);
       labbcat.cancelTask(threadId);
    }
@@ -431,7 +436,7 @@ public class TestLabbcatView {
       String[] participantId = { ids[0] };
 
       // all instances of "and"
-      JSONObject pattern = new PatternBuilder().addMatchLayer("orthography", "and").build();
+      JsonObject pattern = new PatternBuilder().addMatchLayer("orthography", "and").build();
       String threadId = labbcat.search(pattern, participantId, null, false, false, null);
       try {
          TaskStatus task = labbcat.waitForTask(threadId, 30);
@@ -479,7 +484,7 @@ public class TestLabbcatView {
       String[] participantId = { ids[0] };      
 
       // all instances of "and"
-      JSONObject pattern = new PatternBuilder().addMatchLayer("orthography", "and").build();
+      JsonObject pattern = new PatternBuilder().addMatchLayer("orthography", "and").build();
       String threadId = labbcat.search(pattern, participantId, null, false, false, null);
       try {
          TaskStatus task = labbcat.waitForTask(threadId, 30);
@@ -526,7 +531,7 @@ public class TestLabbcatView {
       String[] participantId = { ids[0] };      
 
       // all instances of "and"
-      JSONObject pattern = new PatternBuilder().addMatchLayer("orthography", "and").build();
+      JsonObject pattern = new PatternBuilder().addMatchLayer("orthography", "and").build();
       String threadId = labbcat.search(pattern, participantId, null, false, false, null);
       try {
          TaskStatus task = labbcat.waitForTask(threadId, 30);

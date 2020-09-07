@@ -21,7 +21,11 @@
 //
 package nzilbb.labbcat.model;
 
-import org.json.JSONObject;
+import javax.json.Json;
+import javax.json.JsonArray;
+import javax.json.JsonArrayBuilder;
+import javax.json.JsonObject;
+import javax.json.JsonObjectBuilder;
 
 /**
  * MediaTrack record.
@@ -92,21 +96,24 @@ public class MediaTrack {
    /**
     * Constructor from JSON.
     */
-   public MediaTrack(JSONObject json) {      
-      suffix = json.optString("suffix");
-      description = json.optString("description");
-      if (json.has("display_order")) displayOrder = json.getInt("display_order");
+   public MediaTrack(JsonObject json) {      
+      suffix = json.getString("suffix");
+      description = json.getString("description");
+      if (json.containsKey("display_order")) {
+         displayOrder = json.getJsonNumber("display_order").intValue();
+      }
    } // end of constructor
    
    /**
     * Serializes the object to JSON.
     * @return A JSON serialization of the object.
     */
-   public JSONObject toJSON() {
-      return new JSONObject()
-         .put("suffix", suffix)
-         .put("description", description)
-         .put("display_order", displayOrder);
+   public JsonObject toJson() {
+      return Json.createObjectBuilder()
+         .add("suffix", suffix)
+         .add("description", description)
+         .add("display_order", displayOrder)
+         .build();
    } // end of toJSON()
    
 } // end of class MediaTrack

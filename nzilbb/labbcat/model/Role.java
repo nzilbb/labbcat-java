@@ -21,7 +21,11 @@
 //
 package nzilbb.labbcat.model;
 
-import org.json.JSONObject;
+import javax.json.Json;
+import javax.json.JsonArray;
+import javax.json.JsonArrayBuilder;
+import javax.json.JsonObject;
+import javax.json.JsonObjectBuilder;
 
 /**
  * User role record.
@@ -76,19 +80,20 @@ public class Role {
    /**
     * Constructor from JSON.
     */
-   public Role(JSONObject json) {      
-      roleId = json.optString("role_id");
-      description = json.optString("description");
+   public Role(JsonObject json) {      
+      roleId = json.getString("role_id");
+      description = json.getString("description");
    } // end of constructor
    
    /**
     * Serializes the object to JSON.
     * @return A JSON serialization of the object.
     */
-   public JSONObject toJSON() {
-      return new JSONObject()
-         .put("role_id", roleId)
-         .put("description", description);
+   public JsonObject toJson() {
+      return Json.createObjectBuilder()
+         .add("role_id", roleId)
+         .add("description", description)
+         .build();
    } // end of toJSON()
    
 } // end of class Role

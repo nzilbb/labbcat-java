@@ -21,9 +21,12 @@
 //
 package nzilbb.labbcat.model;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
+import javax.json.Json;
+import javax.json.JsonArray;
+import javax.json.JsonArrayBuilder;
+import javax.json.JsonException;
+import javax.json.JsonObject;
+import javax.json.JsonObjectBuilder;
 
 /**
  * Represents a single match from search results.
@@ -205,17 +208,17 @@ public class Match {
    /**
     * Constructor from JSON.
     */
-   public Match(JSONObject json) {
+   public Match(JsonObject json) {
       
-      MatchId = json.optString("MatchId");
-      Transcript = json.optString("Transcript");
-      Participant = json.optString("Participant");
-      Corpus = json.optString("Corpus");
-      Line = json.optDouble("Line");
-      LineEnd = json.optDouble("LineEnd");
-      BeforeMatch = json.optString("BeforeMatch");
-      Text = json.optString("Text");
-      AfterMatch = json.optString("AfterMatch");
+      MatchId = json.getString("MatchId");
+      Transcript = json.getString("Transcript");
+      Participant = json.getString("Participant");
+      Corpus = json.getString("Corpus");
+      Line = json.getJsonNumber("Line").doubleValue();
+      LineEnd = json.getJsonNumber("LineEnd").doubleValue();
+      BeforeMatch = json.getString("BeforeMatch");
+      Text = json.getString("Text");
+      AfterMatch = json.getString("AfterMatch");
    } // end of constructor
    
    /**

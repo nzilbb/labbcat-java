@@ -21,7 +21,11 @@
 //
 package nzilbb.labbcat.model;
 
-import org.json.JSONObject;
+import javax.json.Json;
+import javax.json.JsonArray;
+import javax.json.JsonArrayBuilder;
+import javax.json.JsonObject;
+import javax.json.JsonObjectBuilder;
 
 /**
  * Project record.
@@ -93,21 +97,24 @@ public class Project {
    /**
     * Constructor from JSON.
     */
-   public Project(JSONObject json) {      
-      if (json.has("project_id")) projectId = json.getInt("project_id");
-      project = json.optString("project");
-      description = json.optString("description");
+   public Project(JsonObject json) {      
+      if (json.containsKey("project_id")) {
+         projectId = Integer.parseInt(json.get("project_id").toString());
+      }
+      project = json.getString("project");
+      description = json.getString("description");
    } // end of constructor
    
    /**
     * Serializes the object to JSON.
     * @return A JSON serialization of the object.
     */
-   public JSONObject toJSON() {
-      return new JSONObject()
-         .put("project_id", projectId)
-         .put("project", project)
-         .put("description", description);
+   public JsonObject toJson() {
+      return Json.createObjectBuilder()
+         .add("project_id", projectId)
+         .add("project", project)
+         .add("description", description)
+         .build();
    } // end of toJSON()
    
 } // end of class Project

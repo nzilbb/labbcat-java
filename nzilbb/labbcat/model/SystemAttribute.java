@@ -23,7 +23,11 @@ package nzilbb.labbcat.model;
 
 import java.util.Map;
 import java.util.LinkedHashMap;
-import org.json.JSONObject;
+import javax.json.Json;
+import javax.json.JsonArray;
+import javax.json.JsonArrayBuilder;
+import javax.json.JsonObject;
+import javax.json.JsonObjectBuilder;
 
 /**
  * system_attribute record.
@@ -134,39 +138,39 @@ public class SystemAttribute {
    } // end of constructor
    
    /** Constructor from JSON. */
-   public SystemAttribute(JSONObject json) {      
-      attribute = json.optString("attribute");
-      type = json.optString("type");
-      style = json.optString("style");
-      label = json.optString("label");
-      description = json.optString("description");
-      value = json.optString("value");
-      if (json.has("options")) {
+   public SystemAttribute(JsonObject json) {      
+      attribute = json.getString("attribute");
+      if (json.containsKey("type")) type = json.getString("type");
+      if (json.containsKey("style")) style = json.getString("style");
+      if (json.containsKey("label")) label = json.getString("label");
+      if (json.containsKey("description")) description = json.getString("description");
+      if (json.containsKey("value")) value = json.getString("value");
+      if (json.containsKey("options")) {
          options = new LinkedHashMap<String,String>();
-         for (String value : json.getJSONObject("options").keySet()) {
-            options.put(value, json.getJSONObject("options").getString(value));
+         for (String value : json.getJsonObject("options").keySet()) {
+            options.put(value, json.getJsonObject("options").getString(value));
          } // next option
       }
    } // end of constructor
    
    /** Serializes the object to JSON.
     * @return A JSON serialization of the object. */
-   public JSONObject toJSON() {
-      JSONObject o = new JSONObject()
-         .put("attribute", attribute);
-      if (type != null) o.put("type", type);
-      if (style != null) o.put("style", style);
-      if (label != null) o.put("label", label);
-      if (description != null) o.put("description", description);
+   public JsonObject toJson() {
+      JsonObjectBuilder o = Json.createObjectBuilder()
+         .add("attribute", attribute);
+      if (type != null) o = o.add("type", type);
+      if (style != null) o = o.add("style", style);
+      if (label != null) o = o.add("label", label);
+      if (description != null) o = o.add("description", description);
       if (options != null) {
-         JSONObject optionsObject = new JSONObject();
+         JsonObjectBuilder optionsObject = Json.createObjectBuilder();
          for (String value : options.keySet()) {
-            optionsObject.put(value, options.get(value));
+            optionsObject = optionsObject.add(value, options.get(value));
          } // next option
-         o.put("options", optionsObject);
+         o = o.add("options", optionsObject);
       }
-      if (value != null) o.put("value", value);
-      return o;
+      if (value != null) o = o.add("value", value);
+      return o.build();
    } // end of toJSON()
 
 } // end of class SystemAttribute

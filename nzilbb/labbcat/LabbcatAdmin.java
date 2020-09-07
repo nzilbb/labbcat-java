@@ -25,6 +25,9 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Vector;
+import javax.json.Json;
+import javax.json.JsonArray;
+import javax.json.JsonObject;
 import nzilbb.ag.GraphStoreAdministration;
 import nzilbb.ag.Layer;
 import nzilbb.ag.PermissionException;
@@ -39,8 +42,6 @@ import nzilbb.labbcat.model.Project;
 import nzilbb.labbcat.model.Role;
 import nzilbb.labbcat.model.RolePermission;
 import nzilbb.labbcat.model.SystemAttribute;
-import org.json.JSONArray;
-import org.json.JSONObject;
 
 /**
  * Client-side implementation of 
@@ -269,8 +270,8 @@ public class LabbcatAdmin extends LabbcatEdit implements GraphStoreAdministratio
             adminUrl("saveLayer"), getRequiredHttpAuthorization())
             .setUserAgent().setLanguage(language)
             .setHeader("Accept", "application/json");
-         if (verbose) System.out.println("createCorpus -> " + request);
-         response = new Response(request.post(new JSONObject(layer.toJsonString())), verbose);
+         if (verbose) System.out.println("saveLayer -> " + request + " : " + layer.toJson());
+         response = new Response(request.post(layer.toJson()), verbose);
          response.checkForErrors(); // throws a StoreException on error
          if (response.isModelNull()) return null;
          Layer result = new Layer();
@@ -299,10 +300,10 @@ public class LabbcatAdmin extends LabbcatEdit implements GraphStoreAdministratio
          HttpRequestPost request = post("api/admin/corpora")
             .setHeader("Accept", "application/json");
          if (verbose) System.out.println("createCorpus -> " + request);
-         response = new Response(request.post(corpus.toJSON()), verbose);
+         response = new Response(request.post(corpus.toJson()), verbose);
          response.checkForErrors(); // throws a StoreException on error
          if (response.isModelNull()) return null;
-         return new Corpus((JSONObject)response.getModel());
+         return new Corpus((JsonObject)response.getModel());
       } catch(IOException x) {
          throw new StoreException("Could not get response.", x);
       }
@@ -345,11 +346,11 @@ public class LabbcatAdmin extends LabbcatEdit implements GraphStoreAdministratio
          response = new Response(request.get(), verbose);
          response.checkForErrors(); // throws a StoreException on error
          if (response.isModelNull()) return null;
-         JSONArray array = (JSONArray)response.getModel();
+         JsonArray array = (JsonArray)response.getModel();
          Vector<Corpus> corpora = new Vector<Corpus>();
          if (array != null) {
-            for (int i = 0; i < array.length(); i++) {
-               corpora.add(new Corpus(array.getJSONObject(i)));
+            for (int i = 0; i < array.size(); i++) {
+               corpora.add(new Corpus(array.getJsonObject(i)));
             }
          }
          return corpora.toArray(new Corpus[0]);
@@ -374,10 +375,10 @@ public class LabbcatAdmin extends LabbcatEdit implements GraphStoreAdministratio
          HttpRequestPost request = put("api/admin/corpora")
             .setHeader("Accept", "application/json");
          if (verbose) System.out.println("updateCorpus -> " + request);
-         response = new Response(request.post(corpus.toJSON()), verbose);
+         response = new Response(request.post(corpus.toJson()), verbose);
          response.checkForErrors(); // throws a StoreException on error
          if (response.isModelNull()) return null;
-         return new Corpus((JSONObject)response.getModel());
+         return new Corpus((JsonObject)response.getModel());
       } catch(IOException x) {
          throw new StoreException("Could not get response.", x);
       }
@@ -434,10 +435,10 @@ public class LabbcatAdmin extends LabbcatEdit implements GraphStoreAdministratio
          HttpRequestPost request = post("api/admin/projects")
             .setHeader("Accept", "application/json");
          if (verbose) System.out.println("createProject -> " + request);
-         response = new Response(request.post(project.toJSON()), verbose);
+         response = new Response(request.post(project.toJson()), verbose);
          response.checkForErrors(); // throws a StoreException on error
          if (response.isModelNull()) return null;
-         return new Project((JSONObject)response.getModel());
+         return new Project((JsonObject)response.getModel());
       } catch(IOException x) {
          throw new StoreException("Could not get response.", x);
       }
@@ -481,11 +482,11 @@ public class LabbcatAdmin extends LabbcatEdit implements GraphStoreAdministratio
          response = new Response(request.get(), verbose);
          response.checkForErrors(); // throws a StoreException on error
          if (response.isModelNull()) return null;
-         JSONArray array = (JSONArray)response.getModel();
+         JsonArray array = (JsonArray)response.getModel();
          Vector<Project> projects = new Vector<Project>();
          if (array != null) {
-            for (int i = 0; i < array.length(); i++) {
-               projects.add(new Project(array.getJSONObject(i)));
+            for (int i = 0; i < array.size(); i++) {
+               projects.add(new Project(array.getJsonObject(i)));
             }
          }
          return projects.toArray(new Project[0]);
@@ -510,10 +511,10 @@ public class LabbcatAdmin extends LabbcatEdit implements GraphStoreAdministratio
          HttpRequestPost request = put("api/admin/projects")
             .setHeader("Accept", "application/json");
          if (verbose) System.out.println("updateProject -> " + request);
-         response = new Response(request.post(project.toJSON()), verbose);
+         response = new Response(request.post(project.toJson()), verbose);
          response.checkForErrors(); // throws a StoreException on error
          if (response.isModelNull()) return null;
-         return new Project((JSONObject)response.getModel());
+         return new Project((JsonObject)response.getModel());
       } catch(IOException x) {
          throw new StoreException("Could not get response.", x);
       }
@@ -571,10 +572,10 @@ public class LabbcatAdmin extends LabbcatEdit implements GraphStoreAdministratio
          HttpRequestPost request = post("api/admin/mediatracks")
             .setHeader("Accept", "application/json");
          if (verbose) System.out.println("createMediaTrack -> " + request);
-         response = new Response(request.post(mediaTrack.toJSON()), verbose);
+         response = new Response(request.post(mediaTrack.toJson()), verbose);
          response.checkForErrors(); // throws a StoreException on error
          if (response.isModelNull()) return null;
-         return new MediaTrack((JSONObject)response.getModel());
+         return new MediaTrack((JsonObject)response.getModel());
       } catch(IOException x) {
          throw new StoreException("Could not get response.", x);
       }
@@ -618,11 +619,11 @@ public class LabbcatAdmin extends LabbcatEdit implements GraphStoreAdministratio
          response = new Response(request.get(), verbose);
          response.checkForErrors(); // throws a StoreException on error
          if (response.isModelNull()) return null;
-         JSONArray array = (JSONArray)response.getModel();
+         JsonArray array = (JsonArray)response.getModel();
          Vector<MediaTrack> mediaTracks = new Vector<MediaTrack>();
          if (array != null) {
-            for (int i = 0; i < array.length(); i++) {
-               mediaTracks.add(new MediaTrack(array.getJSONObject(i)));
+            for (int i = 0; i < array.size(); i++) {
+               mediaTracks.add(new MediaTrack(array.getJsonObject(i)));
             }
          }
          return mediaTracks.toArray(new MediaTrack[0]);
@@ -648,10 +649,10 @@ public class LabbcatAdmin extends LabbcatEdit implements GraphStoreAdministratio
          HttpRequestPost request = put("api/admin/mediatracks")
             .setHeader("Accept", "application/json");
          if (verbose) System.out.println("updateMediaTrack -> " + request);
-         response = new Response(request.post(mediaTrack.toJSON()), verbose);
+         response = new Response(request.post(mediaTrack.toJson()), verbose);
          response.checkForErrors(); // throws a StoreException on error
          if (response.isModelNull()) return null;
-         return new MediaTrack((JSONObject)response.getModel());
+         return new MediaTrack((JsonObject)response.getModel());
       } catch(IOException x) {
          throw new StoreException("Could not get response.", x);
       }
@@ -708,10 +709,10 @@ public class LabbcatAdmin extends LabbcatEdit implements GraphStoreAdministratio
          HttpRequestPost request = post("api/admin/roles")
             .setHeader("Accept", "application/json");
          if (verbose) System.out.println("createRole -> " + request);
-         response = new Response(request.post(role.toJSON()), verbose);
+         response = new Response(request.post(role.toJson()), verbose);
          response.checkForErrors(); // throws a StoreException on error
          if (response.isModelNull()) return null;
-         return new Role((JSONObject)response.getModel());
+         return new Role((JsonObject)response.getModel());
       } catch(IOException x) {
          throw new StoreException("Could not get response.", x);
       }
@@ -755,11 +756,11 @@ public class LabbcatAdmin extends LabbcatEdit implements GraphStoreAdministratio
          response = new Response(request.get(), verbose);
          response.checkForErrors(); // throws a StoreException on error
          if (response.isModelNull()) return null;
-         JSONArray array = (JSONArray)response.getModel();
+         JsonArray array = (JsonArray)response.getModel();
          Vector<Role> roles = new Vector<Role>();
          if (array != null) {
-            for (int i = 0; i < array.length(); i++) {
-               roles.add(new Role(array.getJSONObject(i)));
+            for (int i = 0; i < array.size(); i++) {
+               roles.add(new Role(array.getJsonObject(i)));
             }
          }
          return roles.toArray(new Role[0]);
@@ -784,10 +785,10 @@ public class LabbcatAdmin extends LabbcatEdit implements GraphStoreAdministratio
          HttpRequestPost request = put("api/admin/roles")
             .setHeader("Accept", "application/json");
          if (verbose) System.out.println("updateRole -> " + request);
-         response = new Response(request.post(role.toJSON()), verbose);
+         response = new Response(request.post(role.toJson()), verbose);
          response.checkForErrors(); // throws a StoreException on error
          if (response.isModelNull()) return null;
-         return new Role((JSONObject)response.getModel());
+         return new Role((JsonObject)response.getModel());
       } catch(IOException x) {
          throw new StoreException("Could not get response.", x);
       }
@@ -845,10 +846,10 @@ public class LabbcatAdmin extends LabbcatEdit implements GraphStoreAdministratio
          HttpRequestPost request = post("api/admin/roles/permissions")
             .setHeader("Accept", "application/json");
          if (verbose) System.out.println("createRolePermission -> " + request);
-         response = new Response(request.post(rolePermission.toJSON()), verbose);
+         response = new Response(request.post(rolePermission.toJson()), verbose);
          response.checkForErrors(); // throws a StoreException on error
          if (response.isModelNull()) return null;
-         return new RolePermission((JSONObject)response.getModel());
+         return new RolePermission((JsonObject)response.getModel());
       } catch(IOException x) {
          throw new StoreException("Could not get response.", x);
       }
@@ -895,11 +896,11 @@ public class LabbcatAdmin extends LabbcatEdit implements GraphStoreAdministratio
          response = new Response(request.get(), verbose);
          response.checkForErrors(); // throws a StoreException on error
          if (response.isModelNull()) return null;
-         JSONArray array = (JSONArray)response.getModel();
+         JsonArray array = (JsonArray)response.getModel();
          Vector<RolePermission> rolePermissions = new Vector<RolePermission>();
          if (array != null) {
-            for (int i = 0; i < array.length(); i++) {
-               rolePermissions.add(new RolePermission(array.getJSONObject(i)));
+            for (int i = 0; i < array.size(); i++) {
+               rolePermissions.add(new RolePermission(array.getJsonObject(i)));
             }
          }
          return rolePermissions.toArray(new RolePermission[0]);
@@ -925,10 +926,10 @@ public class LabbcatAdmin extends LabbcatEdit implements GraphStoreAdministratio
          HttpRequestPost request = put("api/admin/roles/permissions")
             .setHeader("Accept", "application/json");
          if (verbose) System.out.println("updateRolePermission -> " + request);
-         response = new Response(request.post(rolePermission.toJSON()), verbose);
+         response = new Response(request.post(rolePermission.toJson()), verbose);
          response.checkForErrors(); // throws a StoreException on error
          if (response.isModelNull()) return null;
-         return new RolePermission((JSONObject)response.getModel());
+         return new RolePermission((JsonObject)response.getModel());
       } catch(IOException x) {
          throw new StoreException("Could not get response.", x);
       }
@@ -987,11 +988,11 @@ public class LabbcatAdmin extends LabbcatEdit implements GraphStoreAdministratio
          response = new Response(request.get(), verbose);
          response.checkForErrors(); // throws a StoreException on error
          if (response.isModelNull()) return null;
-         JSONArray array = (JSONArray)response.getModel();
+         JsonArray array = (JsonArray)response.getModel();
          Vector<SystemAttribute> systemAttributes = new Vector<SystemAttribute>();
          if (array != null) {
-            for (int i = 0; i < array.length(); i++) {
-               systemAttributes.add(new SystemAttribute(array.getJSONObject(i)));
+            for (int i = 0; i < array.size(); i++) {
+               systemAttributes.add(new SystemAttribute(array.getJsonObject(i)));
             }
          }
          return systemAttributes.toArray(new SystemAttribute[0]);
@@ -1028,10 +1029,10 @@ public class LabbcatAdmin extends LabbcatEdit implements GraphStoreAdministratio
          HttpRequestPost request = put("api/admin/systemattributes")
             .setHeader("Accept", "application/json");
          if (verbose) System.out.println("updateSystemAttribute -> " + request);
-         response = new Response(request.post(systemAttribute.toJSON()), verbose);
+         response = new Response(request.post(systemAttribute.toJson()), verbose);
          response.checkForErrors(); // throws a StoreException on error
          if (response.isModelNull()) return null;
-         return new SystemAttribute((JSONObject)response.getModel());
+         return new SystemAttribute((JsonObject)response.getModel());
       } catch(IOException x) {
          throw new StoreException("Could not get response.", x);
       }

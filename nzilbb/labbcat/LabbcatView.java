@@ -29,8 +29,8 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLEncoder;
-import java.nio.file.Files;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.util.Base64;
 import java.util.Date;
 import java.util.HashMap;
@@ -38,6 +38,10 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Vector;
 import java.util.function.Consumer;
+import javax.json.Json;
+import javax.json.JsonArray;
+import javax.json.JsonNumber;
+import javax.json.JsonObject;
 import javax.swing.JOptionPane;
 import javax.swing.JPasswordField;
 import nzilbb.ag.Anchor;
@@ -53,14 +57,12 @@ import nzilbb.ag.Schema;
 import nzilbb.ag.StoreException;
 import nzilbb.ag.serialize.SerializationDescriptor;
 import nzilbb.labbcat.http.*;
-import nzilbb.labbcat.model.TaskStatus;
 import nzilbb.labbcat.model.Match;
 import nzilbb.labbcat.model.MatchId;
+import nzilbb.labbcat.model.TaskStatus;
 import nzilbb.labbcat.model.User;
 import nzilbb.util.IO;
 import nzilbb.util.MonitorableSeries;
-import org.json.JSONArray;
-import org.json.JSONObject;
 
 /**
  * Client-side implementation of 
@@ -77,7 +79,7 @@ import org.json.JSONObject;
  * String[] documents = labbcat.{@link #getTranscriptIdsInCorpus(String) getTranscriptIdsInCorpus}(corpora[0]);
  * // search for tokens of "and"
  * Matches[] matches = labbcat.{@link #getMatches(String,int) getMatches}(
- *     labbcat.{@link #search(JSONObject,String[],String[],boolean,boolean,Integer) search}(
+ *     labbcat.{@link #search(JsonObject,String[],String[],boolean,boolean,Integer) search}(
  *        new {@link PatternBuilder}().addMatchLayer("orthography", "and").build(),
  *        participantIds, null, true, false, null), 1);
  * </pre>
@@ -514,7 +516,7 @@ public class LabbcatView implements GraphStoreQuery {
          response = new Response(request.get(), verbose);
          response.checkForErrors(); // throws a StoreException on error
          if (response.isModelNull()) return null;
-         return (String)response.getModel();
+         return response.getModel().toString();
       } catch(IOException x) {
          throw new StoreException("Could not get response.", x);
       }
@@ -537,10 +539,10 @@ public class LabbcatView implements GraphStoreQuery {
          response = new Response(request.get(), verbose);
          response.checkForErrors(); // throws a StoreException on error
          if (response.isModelNull()) return null;
-         JSONArray array = (JSONArray)response.getModel();
+         JsonArray array = (JsonArray)response.getModel();
          Vector<String> ids = new Vector<String>();
          if (array != null) {
-            for (int i = 0; i < array.length(); i++) {
+            for (int i = 0; i < array.size(); i++) {
                ids.add(array.getString(i));
             }
          }
@@ -567,11 +569,11 @@ public class LabbcatView implements GraphStoreQuery {
          response = new Response(request.get(), verbose);
          response.checkForErrors(); // throws a StoreException on error
          if (response.isModelNull()) return null;
-         JSONArray array = (JSONArray)response.getModel();
+         JsonArray array = (JsonArray)response.getModel();
          Vector<Layer> layers = new Vector<Layer>();
          if (array != null) {
-            for (int i = 0; i < array.length(); i++) {
-               layers.add(new Layer(array.getJSONObject(i)));
+            for (int i = 0; i < array.size(); i++) {
+               layers.add(new Layer(array.getJsonObject(i)));
             }
          }
          return layers.toArray(new Layer[0]);
@@ -610,7 +612,7 @@ public class LabbcatView implements GraphStoreQuery {
          response = new Response(request.get(), verbose);
          response.checkForErrors(); // throws a StoreException on error
          if (response.isModelNull()) return null;
-         return new Layer((JSONObject)response.getModel());
+         return new Layer((JsonObject)response.getModel());
       } catch(IOException x) {
          throw new StoreException("Could not get response.", x);
       }
@@ -633,11 +635,11 @@ public class LabbcatView implements GraphStoreQuery {
          response = new Response(request.get(), verbose);
          response.checkForErrors(); // throws a StoreException on error
          if (response.isModelNull()) return null;
-         JSONArray array = (JSONArray)response.getModel();
+         JsonArray array = (JsonArray)response.getModel();
          Vector<String> ids = new Vector<String>();
          if (array != null)
          {
-            for (int i = 0; i < array.length(); i++)
+            for (int i = 0; i < array.size(); i++)
             {
                ids.add(array.getString(i));
             }
@@ -665,10 +667,10 @@ public class LabbcatView implements GraphStoreQuery {
          response = new Response(request.get(), verbose);
          response.checkForErrors(); // throws a StoreException on error
          if (response.isModelNull()) return null;
-         JSONArray array = (JSONArray)response.getModel();
+         JsonArray array = (JsonArray)response.getModel();
          Vector<String> ids = new Vector<String>();
          if (array != null) {
-            for (int i = 0; i < array.length(); i++) {
+            for (int i = 0; i < array.size(); i++) {
                ids.add(array.getString(i));
             }
          }
@@ -698,7 +700,7 @@ public class LabbcatView implements GraphStoreQuery {
          response = new Response(request.get(), verbose);
          response.checkForErrors(); // throws a StoreException on error
          if (response.isModelNull()) return null;
-         return new Annotation((JSONObject)response.getModel());
+         return (Annotation)new Annotation().fromJson((JsonObject)response.getModel());
       } catch(IOException x) {
          throw new StoreException("Could not get response.", x);
       }
@@ -735,7 +737,7 @@ public class LabbcatView implements GraphStoreQuery {
             .setParameter("expression", expression);
          response = new Response(request.get(), verbose);
          response.checkForErrors(); // throws a StoreException on error
-         return (Integer)response.getModel();
+         return ((JsonNumber)response.getModel()).intValue();
       } catch(IOException x) {
          throw new StoreException("Could not get response.", x);
       }
@@ -777,11 +779,11 @@ public class LabbcatView implements GraphStoreQuery {
          response = new Response(request.get(), verbose);
          response.checkForErrors(); // throws a StoreException on error
          if (response.isModelNull()) return null;
-         JSONArray array = (JSONArray)response.getModel();
+         JsonArray array = (JsonArray)response.getModel();
          Vector<String> ids = new Vector<String>();
          if (array != null)
          {
-            for (int i = 0; i < array.length(); i++)
+            for (int i = 0; i < array.size(); i++)
             {
                ids.add(array.getString(i));
             }
@@ -809,11 +811,11 @@ public class LabbcatView implements GraphStoreQuery {
          response = new Response(request.get(), verbose);
          response.checkForErrors(); // throws a StoreException on error
          if (response.isModelNull()) return null;
-         JSONArray array = (JSONArray)response.getModel();
+         JsonArray array = (JsonArray)response.getModel();
          Vector<String> ids = new Vector<String>();
          if (array != null)
          {
-            for (int i = 0; i < array.length(); i++)
+            for (int i = 0; i < array.size(); i++)
             {
                ids.add(array.getString(i));
             }
@@ -843,10 +845,10 @@ public class LabbcatView implements GraphStoreQuery {
          response = new Response(request.get(), verbose);
          response.checkForErrors(); // throws a StoreException on error
          if (response.isModelNull()) return null;
-         JSONArray array = (JSONArray)response.getModel();
+         JsonArray array = (JsonArray)response.getModel();
          Vector<String> ids = new Vector<String>();
          if (array != null) {
-            for (int i = 0; i < array.length(); i++) {
+            for (int i = 0; i < array.size(); i++) {
                ids.add(array.getString(i));
             }
          }
@@ -875,10 +877,10 @@ public class LabbcatView implements GraphStoreQuery {
          response = new Response(request.get(), verbose);
          response.checkForErrors(); // throws a StoreException on error
          if (response.isModelNull()) return null;
-         JSONArray array = (JSONArray)response.getModel();
+         JsonArray array = (JsonArray)response.getModel();
          Vector<String> ids = new Vector<String>();
          if (array != null) {
-            for (int i = 0; i < array.length(); i++) {
+            for (int i = 0; i < array.size(); i++) {
                ids.add(array.getString(i));
             }
          }
@@ -925,7 +927,7 @@ public class LabbcatView implements GraphStoreQuery {
             .setParameter("expression", expression);
          response = new Response(request.get(), verbose);
          response.checkForErrors(); // throws a StoreException on error
-         return (Integer)response.getModel();
+         return ((JsonNumber)response.getModel()).intValue();
       } catch(IOException x) {
          throw new StoreException("Could not get response.", x);
       }
@@ -979,10 +981,10 @@ public class LabbcatView implements GraphStoreQuery {
          response = new Response(request.get(), verbose);
          response.checkForErrors(); // throws a StoreException on error
          if (response.isModelNull()) return null;
-         JSONArray array = (JSONArray)response.getModel();
+         JsonArray array = (JsonArray)response.getModel();
          Vector<String> ids = new Vector<String>();
          if (array != null) {
-            for (int i = 0; i < array.length(); i++) {
+            for (int i = 0; i < array.size(); i++) {
                ids.add(array.getString(i));
             }
          }
@@ -1022,7 +1024,7 @@ public class LabbcatView implements GraphStoreQuery {
             .setParameter("expression", expression);
          response = new Response(request.get(), verbose);
          response.checkForErrors(); // throws a StoreException on error
-         return (Integer)response.getModel();
+         return ((JsonNumber)response.getModel()).intValue();
       } catch(IOException x) {
          throw new StoreException("Could not get response.", x);
       }
@@ -1064,11 +1066,11 @@ public class LabbcatView implements GraphStoreQuery {
          response = new Response(request.get(), verbose);
          response.checkForErrors(); // throws a StoreException on error
          if (response.isModelNull()) return null;
-         JSONArray array = (JSONArray)response.getModel();
+         JsonArray array = (JsonArray)response.getModel();
          Vector<Annotation> annotations = new Vector<Annotation>();
          if (array != null) {
-            for (int i = 0; i < array.length(); i++) {
-               annotations.add(new Annotation(array.getJSONObject(i)));
+            for (int i = 0; i < array.size(); i++) {
+               annotations.add((Annotation)new Annotation().fromJson(array.getJsonObject(i)));
             }
          }
          return annotations.toArray(new Annotation[0]);
@@ -1098,8 +1100,7 @@ public class LabbcatView implements GraphStoreQuery {
             .setParameter("layerId", layerId);
          response = new Response(request.get(), verbose);
          response.checkForErrors(); // throws a StoreException on error
-         if (response.getModel() instanceof Integer) return (Integer)response.getModel();
-         return (Long)response.getModel();
+         return ((JsonNumber)response.getModel()).longValue();
       } catch(IOException x) {
          throw new StoreException("Could not get response.", x);
       }
@@ -1131,11 +1132,11 @@ public class LabbcatView implements GraphStoreQuery {
          response = new Response(request.get(), verbose);
          response.checkForErrors(); // throws a StoreException on error
          if (response.isModelNull()) return null;
-         JSONArray array = (JSONArray)response.getModel();
+         JsonArray array = (JsonArray)response.getModel();
          Vector<Annotation> annotations = new Vector<Annotation>();
          if (array != null) {
-            for (int i = 0; i < array.length(); i++) {
-               annotations.add(new Annotation(array.getJSONObject(i)));
+            for (int i = 0; i < array.size(); i++) {
+               annotations.add((Annotation)new Annotation().fromJson(array.getJsonObject(i)));
             }
          }
          return annotations.toArray(new Annotation[0]);
@@ -1190,11 +1191,11 @@ public class LabbcatView implements GraphStoreQuery {
          response = new Response(request.get(), verbose);
          response.checkForErrors(); // throws a StoreException on error
          if (response.isModelNull()) return null;
-         JSONArray array = (JSONArray)response.getModel();
+         JsonArray array = (JsonArray)response.getModel();
          Vector<Anchor> anchors = new Vector<Anchor>();
          if (array != null) {
-            for (int i = 0; i < array.length(); i++) {
-               anchors.add(new Anchor(array.getJSONObject(i)));
+            for (int i = 0; i < array.size(); i++) {
+               anchors.add(new Anchor(array.getJsonObject(i)));
             }
          }
          return anchors.toArray(new Anchor[0]);
@@ -1308,11 +1309,11 @@ public class LabbcatView implements GraphStoreQuery {
          response = new Response(request.get(), verbose);
          response.checkForErrors(); // throws a StoreException on error
          if (response.isModelNull()) return null;
-         JSONArray array = (JSONArray)response.getModel();
+         JsonArray array = (JsonArray)response.getModel();
          Vector<MediaTrackDefinition> tracks = new Vector<MediaTrackDefinition>();
          if (array != null) {
-            for (int i = 0; i < array.length(); i++) {
-               tracks.add(new MediaTrackDefinition(array.getJSONObject(i)));
+            for (int i = 0; i < array.size(); i++) {
+               tracks.add(new MediaTrackDefinition(array.getJsonObject(i)));
             }
          }
          return tracks.toArray(new MediaTrackDefinition[0]);
@@ -1341,11 +1342,11 @@ public class LabbcatView implements GraphStoreQuery {
          response = new Response(request.get(), verbose);
          response.checkForErrors(); // throws a StoreException on error
          if (response.isModelNull()) return null;
-         JSONArray array = (JSONArray)response.getModel();
+         JsonArray array = (JsonArray)response.getModel();
          Vector<MediaFile> files = new Vector<MediaFile>();
          if (array != null) {
-            for (int i = 0; i < array.length(); i++) {
-               files.add(new MediaFile(array.getJSONObject(i)));
+            for (int i = 0; i < array.size(); i++) {
+               files.add(new MediaFile(array.getJsonObject(i)));
             }
          }
          return files.toArray(new MediaFile[0]);
@@ -1380,7 +1381,7 @@ public class LabbcatView implements GraphStoreQuery {
          response = new Response(request.get(), verbose);
          response.checkForErrors(); // throws a StoreException on error
          if (response.isModelNull()) return null;
-         return (String)response.getModel();
+         return response.getModel().toString();
       } catch(IOException x) {
          throw new StoreException("Could not get response.", x);
       }
@@ -1418,7 +1419,7 @@ public class LabbcatView implements GraphStoreQuery {
          response = new Response(request.get(), verbose);
          response.checkForErrors(); // throws a StoreException on error
          if (response.isModelNull()) return null;
-         return (String)response.getModel();
+         return response.getModel().toString();
       } catch(IOException x) {
          throw new StoreException("Could not get response.", x);
       }
@@ -1444,11 +1445,11 @@ public class LabbcatView implements GraphStoreQuery {
          response = new Response(request.get(), verbose);
          response.checkForErrors(); // throws a StoreException on error
          if (response.isModelNull()) return null;
-         JSONArray array = (JSONArray)response.getModel();
+         JsonArray array = (JsonArray)response.getModel();
          Vector<MediaFile> files = new Vector<MediaFile>();
          if (array != null) {
-            for (int i = 0; i < array.length(); i++) {
-               files.add(new MediaFile(array.getJSONObject(i)));
+            for (int i = 0; i < array.size(); i++) {
+               files.add(new MediaFile(array.getJsonObject(i)));
             }
          }
          return files.toArray(new MediaFile[0]);
@@ -1479,7 +1480,7 @@ public class LabbcatView implements GraphStoreQuery {
       response = new Response(request.get(), verbose);
       response.checkForErrors(); // throws a ResponseException on error
       if (response.isModelNull()) return null;
-      return new TaskStatus((JSONObject)response.getModel());
+      return new TaskStatus((JsonObject)response.getModel());
    } // end of taskStatus()
    
    /**
@@ -1572,11 +1573,11 @@ public class LabbcatView implements GraphStoreQuery {
       response = new Response(request.get(), verbose);
       response.checkForErrors(); // throws a ResponseException on error
       if (response.isModelNull()) return null;
-      JSONObject model = (JSONObject)response.getModel();
+      JsonObject model = (JsonObject)response.getModel();
       HashMap<String,TaskStatus> result = new HashMap<String,TaskStatus>();
       for (String threadId : model.keySet()) {
          result.put(threadId,
-                    new TaskStatus(model.getJSONObject(threadId)));
+                    new TaskStatus(model.getJsonObject(threadId)));
       } // next task
       return result;
    } // end of getTasks()
@@ -1639,37 +1640,37 @@ public class LabbcatView implements GraphStoreQuery {
     *
     * <p>Examples of valid pattern objects include:
     * <pre>// words starting with 'ps...'
-    *  JSONObject pattern = new JSONObject()
-    *     .put("columns", new JSONArray()
-    *          .put(new JSONObject()
-    *               .put("layers", new JSONObject()
-    *                    .put("orthography", new JSONObject()
+    *  JsonObject pattern = new JsonObject()
+    *     .put("columns", new JsonArray()
+    *          .put(new JsonObject()
+    *               .put("layers", new JsonObject()
+    *                    .put("orthography", new JsonObject()
     *                         .put("pattern", "ps.*")))));
     * 
     * // the word 'the' followed immediately or with one intervening word by
     * // a hapax legomenon (word with a frequency of 1) that doesn't start with a vowel
-    * JSONObject pattern2 = new JSONObject()
-    *    .put("columns", new JSONArray()
-    *         .put(new JSONObject()
-    *              .put("layers", new JSONObject()
-    *                   .put("orthography", new JSONObject()
+    * JsonObject pattern2 = new JsonObject()
+    *    .put("columns", new JsonArray()
+    *         .put(new JsonObject()
+    *              .put("layers", new JsonObject()
+    *                   .put("orthography", new JsonObject()
     *                        .put("pattern", "the"))),
     *              .put("adj", 2)),
-    *         .put(new JSONObject()
-    *              .put("layers", new JSONObject()
-    *                   .put("phonemes", new JSONObject()
+    *         .put(new JsonObject()
+    *              .put("layers", new JsonObject()
+    *                   .put("phonemes", new JsonObject()
     *                        .put("not", Boolean.TRUE)
     *                        .put("pattern","[cCEFHiIPqQuUV0123456789~#\\$@].*")),
-    *                   .put("frequency", new JSONObject()
+    *                   .put("frequency", new JsonObject()
     *                        .put("max", "2")))));
     * </pre>
     * <p>The PatternBuilder class is designed to make constructing valid patterns easier:
     * <pre> // words starting with 'ps...'
-    * JSONObject pattern = new PatternBuilder().addMatchLayer("orthography", "ps.*").build();
+    * JsonObject pattern = new PatternBuilder().addMatchLayer("orthography", "ps.*").build();
     * 
     * // the word 'the' followed immediately or with one intervening word by
     * // a hapax legomenon (word with a frequency of 1) that doesn't start with a vowel
-    * JSONObject pattern2 = new PatternBuilder()
+    * JsonObject pattern2 = new PatternBuilder()
     *    .addColumn()
     *    .addMatchLayer("orthography", "the")
     *    .addColumn()
@@ -1697,7 +1698,7 @@ public class LabbcatView implements GraphStoreQuery {
     * @throws IOException
     * @throws StoreException
     */
-   public String search(JSONObject pattern, String[] participantIds, String[] transcriptTypes, boolean mainParticipant, boolean aligned, Integer matchesPerTranscript)
+   public String search(JsonObject pattern, String[] participantIds, String[] transcriptTypes, boolean mainParticipant, boolean aligned, Integer matchesPerTranscript)
     throws IOException, StoreException {
       
       cancelling = false;
@@ -1730,13 +1731,13 @@ public class LabbcatView implements GraphStoreQuery {
       response.checkForErrors(); // throws a ResponseException on error
       
       // extract the threadId from model.threadId
-      JSONObject model = (JSONObject)response.getModel();
+      JsonObject model = (JsonObject)response.getModel();
       return model.getString("threadId");
    } // end of search()
    
    /**
     * Gets a list of tokens that were matched by
-    * {@link #search(JSONObject,String[],String[],boolean,boolean,Integer)}.
+    * {@link #search(JsonObject,String[],String[],boolean,boolean,Integer)}.
     * <p>If the task is still running, then this function will wait for it to finish.
     * <p>This means calls can be stacked like this:
     *  <pre>Matches[] matches = labbcat.getMatches(
@@ -1744,15 +1745,15 @@ public class LabbcatView implements GraphStoreQuery {
     *        new PatternBuilder().addMatchLayer("orthography", "and").build(),
     *        participantIds, true), 1);</pre>
     * @param threadId A task ID returned by
-    * {@link #search(JSONObject,String[],String[],boolean,boolean,Integer)}.
+    * {@link #search(JsonObject,String[],String[],boolean,boolean,Integer)}.
     * @param wordsContext Number of words context to include in the <q>Before Match</q>
     * and <q>After Match</q> columns in the results.
     * @return A list of IDs that can be used to identify utterances/tokens that were matched by
-    * {@link #search(JSONObject,String[],String[],boolean,boolean,Integer)}, or null if
+    * {@link #search(JsonObject,String[],String[],boolean,boolean,Integer)}, or null if
     * the task was cancelled. 
     * @throws IOException
     * @throws StoreException
-    * @see #search(JSONObject,String[],String[],boolean,boolean,Integer)}
+    * @see #search(JsonObject,String[],String[],boolean,boolean,Integer)}
     */
    public Match[] getMatches(String threadId, int wordsContext)
       throws IOException, StoreException {      
@@ -1761,7 +1762,7 @@ public class LabbcatView implements GraphStoreQuery {
 
    /**
     * Gets a list of tokens that were matched by
-    * {@link #search(JSONObject,String[],String[],boolean,boolean,Integer)}.
+    * {@link #search(JsonObject,String[],String[],boolean,boolean,Integer)}.
     * <p>If the task is still running, then this function will wait for it to finish.
     * <p>This means calls can be stacked like this:
     *  <pre>Matches[] matches = labbcat.getMatches(
@@ -1769,17 +1770,17 @@ public class LabbcatView implements GraphStoreQuery {
     *        new PatternBuilder().addMatchLayer("orthography", "and").build(),
     *        participantIds, true), 1);</pre>
     * @param threadId A task ID returned by 
-    * {@link #search(JSONObject,String[],String[],boolean,boolean,Integer)}.
+    * {@link #search(JsonObject,String[],String[],boolean,boolean,Integer)}.
     * @param wordsContext Number of words context to include in the <q>Before Match</q>
     * and <q>After Match</q> columns in the results.
     * @param pageLength The maximum number of matches to return, or null to return all.
     * @param pageNumber The zero-based page number to return, or null to return the first page.
     * @return A list of IDs that can be used to identify utterances/tokens that were matched by
-    * {@link #search(JSONObject,String[],String[],boolean,boolean,Integer)}, or null if
+    * {@link #search(JsonObject,String[],String[],boolean,boolean,Integer)}, or null if
     * the task was cancelled. 
     * @throws IOException
     * @throws StoreException
-    * @see #search(JSONObject,String[],String[],boolean,boolean,Integer)}
+    * @see #search(JsonObject,String[],String[],boolean,boolean,Integer)}
     */
    public Match[] getMatches(String threadId, int wordsContext, Integer pageLength, Integer pageNumber)
       throws IOException, StoreException {
@@ -1802,14 +1803,14 @@ public class LabbcatView implements GraphStoreQuery {
       response.checkForErrors(); // throws a ResponseException on error
       
       // extract the MatchIds from model
-      JSONObject model = (JSONObject)response.getModel();
-      JSONArray array = model.getJSONArray("matches");
+      JsonObject model = (JsonObject)response.getModel();
+      JsonArray array = model.getJsonArray("matches");
       Vector<Match> matches = new Vector<Match>();
       if (array != null)
       {
-         for (int i = 0; i < array.length(); i++)
+         for (int i = 0; i < array.size(); i++)
          {
-            matches.add(new Match(array.getJSONObject(i)));
+            matches.add(new Match(array.getJsonObject(i)));
          }
       }
       
@@ -1822,16 +1823,16 @@ public class LabbcatView implements GraphStoreQuery {
     * <pre> Matches[] matches = labbcat.getMatches(
     *     labbcat.search(pattern, participantIds, mainParticipant), 
     *     wordsContext);</pre>
-    * <p>As with {@link #search(JSONObject,String[],String[],boolean,boolean,Integer)} the
+    * <p>As with {@link #search(JsonObject,String[],String[],boolean,boolean,Integer)} the
     * <var>pattern</var> must 
     * match the structure of the search matrix in the browser interface of LaBB-CAT.
     * <p>The PatternBuilder class is designed to make constructing valid patterns easier:
     * <pre> // words starting with 'ps...'
-    * JSONObject pattern = new PatternBuilder().addMatchLayer("orthography", "ps.*").build();
+    * JsonObject pattern = new PatternBuilder().addMatchLayer("orthography", "ps.*").build();
     * 
     * // the word 'the' followed immediately or with one intervening word by
     * // a hapax legomenon (word with a frequency of 1) that doesn't start with a vowel
-    * JSONObject pattern2 = new PatternBuilder()
+    * JsonObject pattern2 = new PatternBuilder()
     *    .addColumn()
     *    .addMatchLayer("orthography", "the")
     *    .addColumn()
@@ -1854,13 +1855,13 @@ public class LabbcatView implements GraphStoreQuery {
     * @param wordsContext Number of words context to include in the <q>Before Match</q>
     * and <q>After Match</q> columns in the results.
     * @return A list of IDs that can be used to identify utterances/tokens that were matched by
-    * {@link #search(JSONObject,String[],String[],boolean,boolean,Integer)}, or null if
+    * {@link #search(JsonObject,String[],String[],boolean,boolean,Integer)}, or null if
     * the task was cancelled. 
     * @throws IOException
     * @throws StoreException
     * @see #getMatches(String,int)}
     */
-   public Match[] getMatches(JSONObject pattern, String[] participantIds, String[] transcriptTypes, boolean mainParticipant, boolean aligned, Integer matchesPerTranscript, int wordsContext)
+   public Match[] getMatches(JsonObject pattern, String[] participantIds, String[] transcriptTypes, boolean mainParticipant, boolean aligned, Integer matchesPerTranscript, int wordsContext)
     throws IOException, StoreException {
       
       String threadId = search(
@@ -1879,16 +1880,16 @@ public class LabbcatView implements GraphStoreQuery {
     * <pre> Matches[] matches = labbcat.getMatches(
     *     labbcat.search(pattern, participantIds, mainParticipant), 
     *     wordsContext);</pre>
-    * <p>As with {@link #search(JSONObject,String[],String[],boolean,boolean,Integer)} the
+    * <p>As with {@link #search(JsonObject,String[],String[],boolean,boolean,Integer)} the
     * <var>pattern</var> must 
     * match the structure of the search matrix in the browser interface of LaBB-CAT.
     * <p>The PatternBuilder class is designed to make constructing valid patterns easier:
     * <pre> // words starting with 'ps...'
-    * JSONObject pattern = new PatternBuilder().addMatchLayer("orthography", "ps.*").build();
+    * JsonObject pattern = new PatternBuilder().addMatchLayer("orthography", "ps.*").build();
     * 
     * // the word 'the' followed immediately or with one intervening word by
     * // a hapax legomenon (word with a frequency of 1) that doesn't start with a vowel
-    * JSONObject pattern2 = new PatternBuilder()
+    * JsonObject pattern2 = new PatternBuilder()
     *    .addColumn()
     *    .addMatchLayer("orthography", "the")
     *    .addColumn()
@@ -1912,13 +1913,13 @@ public class LabbcatView implements GraphStoreQuery {
     * and <q>After Match</q> columns in the results.
     * @param maxMatches The maximum number of matches to return, or null to return all.
     * @return A list of IDs that can be used to identify utterances/tokens that were matched by
-    * {@link #search(JSONObject,String[],String[],boolean,boolean,Integer)}, or null if
+    * {@link #search(JsonObject,String[],String[],boolean,boolean,Integer)}, or null if
     * the task was cancelled. 
     * @throws IOException
     * @throws StoreException
     * @see #getMatches(String,int)}
     */
-   public Match[] getMatches(JSONObject pattern, String[] participantIds, String[] transcriptTypes, boolean mainParticipant, boolean aligned, Integer matchesPerTranscript, int wordsContext, Integer maxMatches)
+   public Match[] getMatches(JsonObject pattern, String[] participantIds, String[] transcriptTypes, boolean mainParticipant, boolean aligned, Integer matchesPerTranscript, int wordsContext, Integer maxMatches)
     throws IOException, StoreException {
       
       String threadId = search(
@@ -2015,17 +2016,17 @@ public class LabbcatView implements GraphStoreQuery {
          response.checkForErrors(); // throws a ResponseException on error
          
          // extract the MatchIds from model
-         JSONArray model = (JSONArray)response.getModel();
+         JsonArray model = (JsonArray)response.getModel();
          int annotationsPerMatch = layerIds.length*annotationsPerLayer;
          Annotation[][] result = new Annotation[matchIds.length][annotationsPerMatch];
          for (int m = 0; m < matchIds.length; m++) {
-            JSONArray annotations = model.getJSONArray(m);
+            JsonArray annotations = model.getJsonArray(m);
             for (int a = 0; a < annotationsPerMatch; a++)
             {
                Annotation annotation = null;
                if (!annotations.isNull(a))
                {
-                  annotation = new Annotation(annotations.getJSONObject(a));
+                  annotation = (Annotation)new Annotation().fromJson(annotations.getJsonObject(a));
                }
                result[m][a] = annotation;
             } // next annotation
@@ -2374,11 +2375,11 @@ public class LabbcatView implements GraphStoreQuery {
          response = new Response(request.get(), verbose);
          response.checkForErrors(); // throws a StoreException on error
          if (response.isModelNull()) return null;
-         JSONArray array = (JSONArray)response.getModel();
+         JsonArray array = (JsonArray)response.getModel();
          Vector<SerializationDescriptor> descriptors = new Vector<SerializationDescriptor>();
          if (array != null) {
-            for (int i = 0; i < array.length(); i++) {
-               descriptors.add(new SerializationDescriptor(array.getJSONObject(i)));
+            for (int i = 0; i < array.size(); i++) {
+               descriptors.add(new SerializationDescriptor(array.getJsonObject(i)));
             }
          }
          return descriptors.toArray(new SerializationDescriptor[0]);
@@ -2405,11 +2406,11 @@ public class LabbcatView implements GraphStoreQuery {
          response = new Response(request.get(), verbose);
          response.checkForErrors(); // throws a StoreException on error
          if (response.isModelNull()) return null;
-         JSONArray array = (JSONArray)response.getModel();
+         JsonArray array = (JsonArray)response.getModel();
          Vector<SerializationDescriptor> descriptors = new Vector<SerializationDescriptor>();
          if (array != null) {
-            for (int i = 0; i < array.length(); i++) {
-               descriptors.add(new SerializationDescriptor(array.getJSONObject(i)));
+            for (int i = 0; i < array.size(); i++) {
+               descriptors.add(new SerializationDescriptor(array.getJsonObject(i)));
             }
          }
          return descriptors.toArray(new SerializationDescriptor[0]);
@@ -2434,8 +2435,8 @@ public class LabbcatView implements GraphStoreQuery {
          response = new Response(request.get(), verbose);
          response.checkForErrors(); // throws a StoreException on error
          if (response.isModelNull()) return null;
-         JSONObject model = (JSONObject)response.getModel();
-         return model.optString("value");
+         JsonObject model = (JsonObject)response.getModel();
+         return model.getString("value");
       } catch(ResponseException rx) {
          if (rx.getResponse().getHttpStatus() == HttpURLConnection.HTTP_NOT_FOUND) return null;
          throw rx;
@@ -2458,7 +2459,7 @@ public class LabbcatView implements GraphStoreQuery {
          response = new Response(request.get(), verbose);
          response.checkForErrors(); // throws a StoreException on error
          if (response.isModelNull()) return null;
-         JSONObject model = (JSONObject)response.getModel();
+         JsonObject model = (JsonObject)response.getModel();
          return new User(model);
       } catch(IOException x) {
          throw new StoreException("Could not get response.", x);

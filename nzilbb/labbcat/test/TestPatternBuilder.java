@@ -26,7 +26,7 @@ import org.junit.*;
 import static org.junit.Assert.*;
 
 import nzilbb.labbcat.*;
-import org.json.JSONObject;
+import javax.json.JsonObject;
 
 /**
  * Unit tests for PatternBuilder.
@@ -35,14 +35,14 @@ public class TestPatternBuilder {
    
    @Test public void basicPattern()
       throws Exception {
-      JSONObject pattern = new PatternBuilder().addMatchLayer("orthography", "and").build();
+      JsonObject pattern = new PatternBuilder().addMatchLayer("orthography", "and").build();
       assertEquals("{\"columns\":[{\"layers\":{\"orthography\":{\"pattern\":\"and\"}}}]}",
                    pattern.toString());
    } 
 
    @Test public void multiLayerPattern()
       throws Exception {
-      JSONObject pattern = new PatternBuilder()
+      JsonObject pattern = new PatternBuilder()
          .addColumn()
          .addMatchLayer("orthography", "the")
          .addColumn()

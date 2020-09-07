@@ -21,10 +21,13 @@
 //
 package nzilbb.labbcat;
 
-import java.io.IOException;
 import java.io.File;
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import javax.json.Json;
+import javax.json.JsonArray;
+import javax.json.JsonObject;
 import nzilbb.ag.Annotation;
 import nzilbb.ag.Graph;
 import nzilbb.ag.GraphNotFoundException;
@@ -32,8 +35,6 @@ import nzilbb.ag.GraphStore;
 import nzilbb.ag.PermissionException;
 import nzilbb.ag.StoreException;
 import nzilbb.labbcat.http.*;
-import org.json.JSONArray;
-import org.json.JSONObject;
 
 /**
  * Client-side implementation of 
@@ -345,8 +346,8 @@ public class LabbcatEdit extends LabbcatView implements GraphStore
       response.checkForErrors(); // throws a ResponseException on error
 
       // extract the threadId from model.result.id
-      JSONObject model = (JSONObject)response.getModel();
-      JSONObject result = model.getJSONObject("result");
+      JsonObject model = (JsonObject)response.getModel();
+      JsonObject result = model.getJsonObject("result");
       return result.getString(transcript.getName());
    } // end of newTranscript()
 
@@ -373,8 +374,8 @@ public class LabbcatEdit extends LabbcatView implements GraphStore
       response.checkForErrors(); // throws a ResponseException on error
       
       // extract the threadId from model.result.id
-      JSONObject model = (JSONObject)response.getModel();
-      JSONObject result = model.getJSONObject("result");
+      JsonObject model = (JsonObject)response.getModel();
+      JsonObject result = model.getJsonObject("result");
       return result.getString(transcript.getName());
    } // end of updateTranscript()
    
