@@ -90,10 +90,10 @@ public class Role {
     * @return A JSON serialization of the object.
     */
    public JsonObject toJson() {
-      return Json.createObjectBuilder()
-         .add("role_id", roleId)
-         .add("description", description)
-         .build();
+      JsonObjectBuilder json = Json.createObjectBuilder();
+      if (roleId != null) json = json.add("role_id", roleId);
+      if (description != null) json = json.add("description", description);
+      return json.build();
    } // end of toJSON()
    
 } // end of class Role

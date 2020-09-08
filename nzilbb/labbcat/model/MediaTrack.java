@@ -109,11 +109,11 @@ public class MediaTrack {
     * @return A JSON serialization of the object.
     */
    public JsonObject toJson() {
-      return Json.createObjectBuilder()
-         .add("suffix", suffix)
-         .add("description", description)
-         .add("display_order", displayOrder)
-         .build();
+      JsonObjectBuilder json = Json.createObjectBuilder();
+      if (suffix != null) json = json.add("suffix", suffix);
+      if (description != null) json = json.add("description", description);
+      json.add("display_order", displayOrder);
+      return json.build();
    } // end of toJSON()
    
 } // end of class MediaTrack

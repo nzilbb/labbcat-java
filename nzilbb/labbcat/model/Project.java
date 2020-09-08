@@ -110,11 +110,11 @@ public class Project {
     * @return A JSON serialization of the object.
     */
    public JsonObject toJson() {
-      return Json.createObjectBuilder()
-         .add("project_id", projectId)
-         .add("project", project)
-         .add("description", description)
-         .build();
+      JsonObjectBuilder json = Json.createObjectBuilder()
+         .add("project_id", projectId);
+      if (project != null) json = json.add("project", project);
+      if (description != null) json = json.add("description", description);
+      return json.build();
    } // end of toJSON()
    
 } // end of class Project

@@ -102,10 +102,10 @@ public class User
             roleArray = roleArray.add(role);
          } // next role
       }
-      return Json.createObjectBuilder()
-         .add("user", user)
-         .add("roles", roleArray)
-         .build();
+      JsonObjectBuilder json = Json.createObjectBuilder();
+      if (user != null) json = json.add("user", user);
+      json = json.add("roles", roleArray);
+      return json.build();
    } // end of toJSON()
 
 } // end of class User

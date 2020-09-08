@@ -147,12 +147,14 @@ public class RolePermission {
     * @return A JSON serialization of the object.
     */
    public JsonObject toJson() {
-      return Json.createObjectBuilder()
-         .add("role_id", roleId)
-         .add("entity", entity)
-         .add("attribute_name", layerId == null?null:layerId.replaceAll("^transcript_",""))
-         .add("value_pattern", valuePattern)
-         .build();
+      JsonObjectBuilder json = Json.createObjectBuilder();
+      if (roleId != null) json = json.add("role_id", roleId);
+      if (entity != null) json = json.add("entity", entity);
+      if (layerId != null) {
+         json = json.add("attribute_name", layerId.replaceAll("^transcript_",""));
+      }
+      if (valuePattern != null) json = json.add("value_pattern", valuePattern);
+      return json.build();
    } // end of toJSON()
    
 } // end of class Role

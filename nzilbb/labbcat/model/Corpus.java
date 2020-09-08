@@ -129,12 +129,12 @@ public class Corpus {
     * @return A JSON serialization of the object.
     */
    public JsonObject toJson() {
-      return Json.createObjectBuilder()
-         .add("corpus_id", corpusId)
-         .add("corpus_name", name)
-         .add("corpus_language", language)
-         .add("corpus_description", description)
-         .build();
+      JsonObjectBuilder json = Json.createObjectBuilder()
+         .add("corpus_id", corpusId);
+      if (name != null) json = json.add("corpus_name", name);
+      if (language != null) json = json.add("corpus_language", language);
+      if (description != null) json = json.add("corpus_description", description);
+      return json.build();
    } // end of toJSON()
 
 } // end of class Corpus
