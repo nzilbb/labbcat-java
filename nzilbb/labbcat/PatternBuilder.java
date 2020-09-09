@@ -31,7 +31,7 @@ import javax.json.JsonObjectBuilder;
 
 /**
  * Helper class for building layered search patterns for
- * {@link LabbcatView#search(JSONObject,String[],String[],boolean,boolean,Integer)}.
+ * {@link LabbcatView#search(JsonObject,String[],String[],boolean,boolean,Integer)}.
  * <p>e.g.
  * <pre>// words starting with 'ps...'
  *  JSONObject pattern = new PatternBuilder().addMatchLayer("orthography", "ps.*").build();
