@@ -299,7 +299,7 @@ public class LabbcatAdmin extends LabbcatEdit implements GraphStoreAdministratio
       try {
          HttpRequestPost request = post("api/admin/corpora")
             .setHeader("Accept", "application/json");
-         if (verbose) System.out.println("createCorpus -> " + request);
+         if (verbose) System.out.println("createCorpus -> " + request + " : " + corpus.toJson());
          response = new Response(request.post(corpus.toJson()), verbose);
          response.checkForErrors(); // throws a StoreException on error
          if (response.isModelNull()) return null;
