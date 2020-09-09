@@ -1,3 +1,7 @@
+# 20200909.2039
+
+- Uses javax.json.* instead of org.json.*
+
 # 20200826.1513
 
 - New LabbcatAdmin CRUD operations for
