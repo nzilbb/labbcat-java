@@ -556,7 +556,7 @@ public class TestLabbcatView {
                             subset.length, fragments.length);
                
                for (int m = 0; m < upTo; m++) {
-                  assertNotNull("Non-null sized file: " + subset[m],
+                  assertNotNull("Non-null file: " + subset[m],
                                 fragments[m]);
                   assertTrue("Non-zero sized file: " + subset[m],
                              fragments[m].length() > 0);

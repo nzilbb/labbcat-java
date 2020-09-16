@@ -2234,7 +2234,7 @@ public class LabbcatView implements GraphStoreQuery {
          if (cancelling) break;
          if (transcriptIds[i] == null || startOffsets[i] == null || endOffsets[i] == null) continue;
 
-         URL url = makeUrl("convertfragment");
+         URL url = makeUrl("api/serialize/fragment");
          HttpRequestGet request = new HttpRequestGet(url, getRequiredHttpAuthorization())
             .setUserAgent()
             .setHeader("Accept", mimeType)
