@@ -1037,4 +1037,32 @@ public class LabbcatAdmin extends LabbcatEdit implements GraphStoreAdministratio
          throw new StoreException("Could not get response.", x);
       }
    } // end of updateSystemAttribute()
+
+   /**
+    * Saves the store's information document.
+    * @param html An HTML document with information about the corpus as a whole.
+    * @throws StoreException, PermissionException
+    * @see StoreQuery#getInfo()
+    */
+   public void updateInfo(String html) throws StoreException, PermissionException {
+      try{
+         HttpRequestPost request = put("api/admin/info")
+            .setHeader("Accept", "application/json");
+         if (verbose) System.out.println("unpdateInfo -> " + request);
+         response = new Response(request.post(html), verbose);
+         response.checkForErrors(); // throws a StoreException on error
+      } catch(IOException x) {
+         throw new StoreException("Could not get response.", x);
+      }
+   } // end of updateInfo()
+
+   // TODO uploadAnnotator
+   // TODO installAnnotator
+   // TODO uninstallAnnotator
+   // TODO newAnnotatorTask
+   // TODO getAnnotatorTasks
+   // TODO getAnnotatorTaskParameters
+   // TODO saveAnnotatorTaskDescription
+   // TODO saveAnnotatorTaskParameters
+   // TODO deleteAnnotatorTask
 } // end of class LabbcatAdmin

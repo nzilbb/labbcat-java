@@ -737,6 +737,23 @@ public class TestLabbcatAdmin {
      }
    }
 
+   @Test public void updateInfo() throws Exception {
+      String originalInfo = labbcat.getInfo();
+      assertNotNull("There is info", originalInfo);
+
+      try {
+         // update it
+         String changedInfo = originalInfo + " <div>unit-test</div>";
+         labbcat.updateInfo(changedInfo);
+         
+         String newInfo = labbcat.getInfo();
+         assertEquals("Updated info correct", changedInfo, newInfo);         
+         
+      } finally {
+         labbcat.updateInfo(originalInfo);
+      }
+   }
+
    @Test public void saveTranscriptTypeOptions() throws Exception {
       Layer originalTranscriptType = labbcat.getLayer("transcript_type");
       assertNotNull("There's a transcript_type layer",

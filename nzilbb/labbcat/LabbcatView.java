@@ -523,6 +523,33 @@ public class LabbcatView implements GraphStoreQuery {
    }
    
    /**
+    * Gets the store's information document.
+    * @return An HTML document providing information about the corpus.
+    * @throws StoreException If an error occurs.
+    * @throws PermissionException If the operation is not permitted.
+    */
+   public String getInfo()
+      throws StoreException, PermissionException {
+      
+      try {
+         URL url = makeUrl("api/info");
+         HttpRequestGet request = new HttpRequestGet(url, getRequiredHttpAuthorization())
+            .setUserAgent().setLanguage(language).setHeader("Accept", "text/html");
+         if (verbose) System.out.println("getInfo -> " + request);
+         HttpURLConnection connection = request.get();
+         if (connection.getResponseCode() != HttpURLConnection.HTTP_OK) {
+            throw new StoreException(
+               "Error " + connection.getResponseCode()
+               + " " + connection.getResponseMessage() + " - " + request);
+         } else {
+            return IO.InputStreamToString(connection.getInputStream());
+         } // response ok
+      } catch(IOException x) {
+         throw new StoreException("Could not get response.", x);
+      }
+   }
+   
+   /**
     * Gets a list of layer IDs (annotation 'types').
     * @return A list of layer IDs.
     * @throws StoreException If an error occurs.
@@ -2419,6 +2446,36 @@ public class LabbcatView implements GraphStoreQuery {
       }
    }
 
+   /**
+    * Lists the descriptors of all registered annotators.
+    * <p> Annotators are modules that perform automated annotation of transcripts.
+    * @return A list of the descriptors of all registered annotators.
+    * @throws StoreException If an error prevents the descriptors from being listed.
+    * @throws PermissionException If listing the deserializers is not permitted.
+    */
+/*   public AnnotatorDescriptor[] getAnnotatorDescriptors() // TODO
+      throws StoreException, PermissionException {
+      try {
+         URL url = url("getAnnotatorDescriptors");
+         HttpRequestGet request = new HttpRequestGet(url, getRequiredHttpAuthorization()) 
+            .setUserAgent().setLanguage(language).setHeader("Accept", "application/json");
+         if (verbose) System.out.println("getDeserializerDescriptors -> " + request);
+         response = new Response(request.get(), verbose);
+         response.checkForErrors(); // throws a StoreException on error
+         if (response.isModelNull()) return null;
+         JsonArray array = (JsonArray)response.getModel();
+         Vector<AnnotatorDescriptor> descriptors = new Vector<AnnotatorDescriptor>();
+         if (array != null) {
+            for (int i = 0; i < array.size(); i++) {
+               descriptors.add(new AnnotatorDescriptor(array.getJsonObject(i)));
+            }
+         }
+         return descriptors.toArray(new AnnotatorDescriptor[0]);
+      } catch(IOException x) {
+         throw new StoreException("Could not get response.", x);
+      }
+   }
+*/
    /**
     * Gets the value of the given system attribute.
     * @param attribute Name of the attribute.

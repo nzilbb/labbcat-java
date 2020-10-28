@@ -110,6 +110,13 @@ public class TestLabbcatView {
                    labbcatUrl, id);
    }
 
+   @Test public void getInfo()
+      throws Exception {
+      String info = labbcat.getInfo();
+      assertNotNull("There is info", info);
+      System.out.println("Corpus info: " + info);
+   }
+
    @Test public void getLayerIds() throws Exception {
       String[] ids = labbcat.getLayerIds();
       //for (String id : ids) System.out.println("layer " + id);

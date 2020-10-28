@@ -350,6 +350,18 @@ public class HttpRequestPost {
    }
    
    /**
+    * posts the requests to the server, with all the cookies and parameters that were added
+    * @return input stream with the server response
+    * @throws IOException
+    */
+   public HttpURLConnection post(String body) throws IOException {
+      
+      write(body);
+      os.close();
+      return connection;
+   }
+   
+   /**
     * posts the requests to the server, with all the cookies and parameters that were
     * added before (if any), and with parameters that are passed in the argument 
     * @param parameters request parameters
