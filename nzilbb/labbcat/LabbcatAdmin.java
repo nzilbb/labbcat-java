@@ -42,6 +42,7 @@ import nzilbb.labbcat.model.Project;
 import nzilbb.labbcat.model.Role;
 import nzilbb.labbcat.model.RolePermission;
 import nzilbb.labbcat.model.SystemAttribute;
+import nzilbb.labbcat.model.User;
 
 /**
  * Client-side implementation of 
@@ -1056,6 +1057,142 @@ public class LabbcatAdmin extends LabbcatEdit implements GraphStoreAdministratio
       }
    } // end of updateInfo()
 
+   /**
+    * Creates a new user record.
+    * @param user The user details to save.
+    * @return The user just created.
+    * @throws StoreException, PermissionException
+    * @see #readUsers()
+    * @see #readUsers(Integer,Integer)
+    * @see #updateUser(User)
+    * @see #deleteUser(User)
+    * @see #deleteUser(String)
+    */
+   public User createUser(User user) throws StoreException, PermissionException {
+      try {
+         HttpRequestPost request = post("api/admin/users")
+            .setHeader("Accept", "application/json");
+         if (verbose) System.out.println("createUser -> " + request + user.toJson());
+         response = new Response(request.post(user.toJson()), verbose);
+         response.checkForErrors(); // throws a StoreException on error
+         if (response.isModelNull()) return null;
+         return new User((JsonObject)response.getModel());
+      } catch(IOException x) {
+         throw new StoreException("Could not get response.", x);
+      }
+   } // end of createUser()
+
+   /**
+    * Reads a list of user records.
+    * @return A list of users.
+    * @throws StoreException, PermissionException
+    * @see #createUser(User)
+    * @see #readUsers(Integer,Integer)
+    * @see #updateUser(User)
+    * @see #deleteUser(User)
+    * @see #deleteUser(String)
+    */
+   public User[] readUsers() throws StoreException, PermissionException {
+      return readUsers(null, null);
+   }
+   
+   /**
+    * Reads a list of user records.
+    * @param pageNumber The zero-based  page of records to return (if null, all records
+    * will be returned). 
+    * @param pageLength The length of pages (if null, the default page length is 20).
+    * @return A list of users.
+    * @throws StoreException, PermissionException
+    * @see #createUser(User)
+    * @see #readUsers()
+    * @see #updateUser(User)
+    * @see #deleteUser(User)
+    * @see #deleteUser(String)
+    */
+   public User[] readUsers(Integer pageNumber, Integer pageLength)
+      throws StoreException, PermissionException {
+      try {
+         HttpRequestGet request = get("api/admin/users")
+            .setHeader("Accept", "application/json");
+         if (pageLength != null) request.setParameter("pageNumber", pageLength);
+         if (pageNumber != null) request.setParameter("pageLength", pageNumber);
+         if (verbose) System.out.println("readUsers -> " + request);
+         response = new Response(request.get(), verbose);
+         response.checkForErrors(); // throws a StoreException on error
+         if (response.isModelNull()) return null;
+         JsonArray array = (JsonArray)response.getModel();
+         Vector<User> users = new Vector<User>();
+         if (array != null) {
+            for (int i = 0; i < array.size(); i++) {
+               users.add(new User(array.getJsonObject(i)));
+            }
+         }
+         return users.toArray(new User[0]);
+      } catch(IOException x) {
+         throw new StoreException("Could not get response.", x);
+      }
+   } // end of readUsers()
+   
+   /**
+    * Updates an existing user record.
+    * @param user The user details to save.
+    * @return The user just updated.
+    * @throws StoreException, PermissionException
+    * @see #createUser(User)
+    * @see #readUsers()
+    * @see #readUsers(Integer,Integer)
+    * @see #deleteUser(User)
+    * @see #deleteUser(String)
+    */
+   public User updateUser(User user) throws StoreException, PermissionException {
+      try{
+         HttpRequestPost request = put("api/admin/users")
+            .setHeader("Accept", "application/json");
+         if (verbose) System.out.println("updateUser -> " + request);
+         response = new Response(request.post(user.toJson()), verbose);
+         response.checkForErrors(); // throws a StoreException on error
+         if (response.isModelNull()) return null;
+         return new User((JsonObject)response.getModel());
+      } catch(IOException x) {
+         throw new StoreException("Could not get response.", x);
+      }
+   } // end of updateUser()
+   
+   /**
+    * Deletes an existing user record.
+    * @param user The user to delete.
+    * @throws StoreException, PermissionException
+    * @see #createUser(User)
+    * @see #readUsers()
+    * @see #readUsers(Integer,Integer)
+    * @see #updateUser(User)
+    * @see #deleteUser(String)
+    */
+   public void deleteUser(User user) throws StoreException, PermissionException {
+      deleteUser(user.getUser());
+   }
+   
+   /**
+    * Deletes an existing user record.
+    * @param name The name/ID of the user to delete.
+    * @throws StoreException, PermissionException
+    * @see #createUser(User)
+    * @see #readUsers()
+    * @see #readUsers(Integer,Integer)
+    * @see #updateUser(User)
+    * @see #deleteUser(User)
+    */
+   public void deleteUser(String name) throws StoreException, PermissionException {
+      try{
+         HttpRequestPost request = delete("api/admin/users/" + name);
+         if (verbose) System.out.println("deleteUser -> " + request);
+         response = new Response(request.post(), verbose);
+         response.checkForErrors(); // throws a StoreException on error
+      } catch(IOException x) {
+         throw new StoreException("Could not get response.", x);
+      }
+   } // end of updateUser()
+   
    // TODO uploadAnnotator
    // TODO installAnnotator
    // TODO uninstallAnnotator

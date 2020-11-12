@@ -802,6 +802,102 @@ public class TestLabbcatAdmin {
          }
       }
    }
+   
+   @Test public void newUserUpdateUserAndDeleteUser() throws Exception {
+      Role testRole = new Role()
+         .setRoleId("unit-test")
+         .setDescription("Temporary role for unit testing");
+      labbcat.createRole(testRole);
+
+      String[] roles = { testRole.getRoleId() };
+      User originalUser = new User()
+         .setUser("unit-test")
+         .setEmail("unit-test@tld.org")
+         .setResetPassword(true)
+         .setRoles(roles);
+      
+      try {
+         User newUser = labbcat.createUser(originalUser);
+         assertNotNull("User returned", newUser);
+         assertEquals("ID correct",
+                      originalUser.getUser(), newUser.getUser());
+         assertEquals("Email correct",
+                      originalUser.getEmail(), newUser.getEmail());
+         assertEquals("Reset Password correct",
+                      originalUser.getResetPassword(), newUser.getResetPassword());
+         assertArrayEquals("Roles correct",
+                      originalUser.getRoles(), newUser.getRoles());
+         
+         try {
+            labbcat.createUser(originalUser);
+            fail("Can't create a user with existing ID");
+         }
+         catch(Exception exception) {}
+         
+         User[] users = labbcat.readUsers();
+         // ensure the user exists
+         assertTrue("There's at least one user", users.length >= 1);
+         boolean found = false;
+         for (User c : users) {
+            if (c.getUser().equals(originalUser.getUser())) {
+               found = true;
+               break;
+            }
+         }
+         assertTrue("User was added", found);
+
+         // update it
+         String[] editedRoles = { "view" };
+         User updatedUser = new User()
+            .setUser("unit-test")
+            .setEmail("new@tld.org")
+            .setResetPassword(true)
+            .setRoles(roles);
+         
+         User changedUser = labbcat.updateUser(updatedUser);
+         assertNotNull("User returned", changedUser);
+         assertEquals("ID correct",
+                      updatedUser.getUser(), changedUser.getUser());
+         assertEquals("Email correct",
+                      updatedUser.getEmail(), changedUser.getEmail());
+         assertEquals("Reset Password correct",
+                      updatedUser.getResetPassword(), changedUser.getResetPassword());
+         assertArrayEquals("Roles correct",
+                      updatedUser.getRoles(), changedUser.getRoles());
+
+         // delete it
+         labbcat.deleteUser(originalUser.getUser());
+
+         User[] usersAfter = labbcat.readUsers();
+         // ensure the user no longer exists
+         boolean foundAfter = false;
+         for (User c : usersAfter) {
+            if (c.getUser().equals(originalUser.getUser())) {
+               foundAfter = true;
+               break;
+            }
+         }
+         assertFalse("User is gone", foundAfter);
+
+         try {
+            // can't delete it again
+            labbcat.deleteUser(originalUser);
+            fail("Can't delete user that doesn't exist");
+         } catch(Exception exception) {
+         }
+         
+      } finally {
+         // ensure it's not there
+         try {
+            labbcat.deleteUser(originalUser);
+         } catch(Exception exception) {}
+         // remove the test role
+         try {
+            labbcat.deleteRole(testRole);
+         } catch(Exception exception) {}         
+     }
+   }
+
    public static void main(String args[]) {
       org.junit.runner.JUnitCore.main("nzilbb.labbcat.test.TestLabbcatAdmin");
    }
