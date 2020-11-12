@@ -1043,7 +1043,7 @@ public class LabbcatAdmin extends LabbcatEdit implements GraphStoreAdministratio
     * Saves the store's information document.
     * @param html An HTML document with information about the corpus as a whole.
     * @throws StoreException, PermissionException
-    * @see StoreQuery#getInfo()
+    * @see LabbcatView#getInfo()
     */
    public void updateInfo(String html) throws StoreException, PermissionException {
       try{
@@ -1174,7 +1174,7 @@ public class LabbcatAdmin extends LabbcatEdit implements GraphStoreAdministratio
    
    /**
     * Deletes an existing user record.
-    * @param name The name/ID of the user to delete.
+    * @param user The ID of the user to delete.
     * @throws StoreException, PermissionException
     * @see #createUser(User)
     * @see #readUsers()
@@ -1182,9 +1182,9 @@ public class LabbcatAdmin extends LabbcatEdit implements GraphStoreAdministratio
     * @see #updateUser(User)
     * @see #deleteUser(User)
     */
-   public void deleteUser(String name) throws StoreException, PermissionException {
+   public void deleteUser(String user) throws StoreException, PermissionException {
       try{
-         HttpRequestPost request = delete("api/admin/users/" + name);
+         HttpRequestPost request = delete("api/admin/users/" + user);
          if (verbose) System.out.println("deleteUser -> " + request);
          response = new Response(request.post(), verbose);
          response.checkForErrors(); // throws a StoreException on error
