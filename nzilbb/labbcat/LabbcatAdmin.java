@@ -28,6 +28,7 @@ import java.util.Vector;
 import javax.json.Json;
 import javax.json.JsonArray;
 import javax.json.JsonObject;
+import javax.json.JsonObjectBuilder;
 import nzilbb.ag.GraphStoreAdministration;
 import nzilbb.ag.Layer;
 import nzilbb.ag.PermissionException;
@@ -171,32 +172,6 @@ public class LabbcatAdmin extends LabbcatEdit implements GraphStoreAdministratio
    }
    
    /**
-    * <em>NOT YET IMPLEMENTED</em> - Gets the deserializer for the given MIME type.
-    * @param mimeType The MIME type.
-    * @return The deserializer for the given MIME type, or null if none is registered.
-    * @throws StoreException If an error prevents the operation.
-    * @throws PermissionException If the operation is not permitted.
-    */
-   public GraphDeserializer deserializerForMimeType(String mimeType)
-      throws StoreException, PermissionException {
-      
-      throw new StoreException("Not implemented");
-   }
-
-   /**
-    * <em>NOT YET IMPLEMENTED</em> - Gets the deserializer for the given file suffix (extension).
-    * @param suffix The file extension.
-    * @return The deserializer for the given suffix, or null if none is registered.
-    * @throws StoreException If an error prevents the operation.
-    * @throws PermissionException If the operation is not permitted.
-    */
-   public GraphDeserializer deserializerForFilesSuffix(String suffix)
-      throws StoreException, PermissionException {
-      
-      throw new StoreException("Not implemented");
-   }
-
-   /**
     * <em>NOT YET IMPLEMENTED</em> - Registers a transcript serializer.
     * @param serializer The serializer to register.
     * @throws StoreException If an error prevents the operation.
@@ -227,32 +202,6 @@ public class LabbcatAdmin extends LabbcatEdit implements GraphStoreAdministratio
     * @throws PermissionException If the operation is not permitted.
     */
    public SerializationDescriptor[] getSerializerDescriptors()
-      throws StoreException, PermissionException {
-      
-      throw new StoreException("Not implemented");
-   }
-   
-   /**
-    * <em>NOT YET IMPLEMENTED</em> - Gets the serializer for the given MIME type.
-    * @param mimeType The MIME type.
-    * @return The serializer for the given MIME type, or null if none is registered.
-    * @throws StoreException If an error prevents the operation.
-    * @throws PermissionException If the operation is not permitted.
-    */
-   public GraphSerializer serializerForMimeType(String mimeType)
-      throws StoreException, PermissionException {
-      
-      throw new StoreException("Not implemented");
-   }
-
-   /**
-    * <em>NOT YET IMPLEMENTED</em> - Gets the serializer for the given file suffix (extension).
-    * @param suffix The file extension.
-    * @return The serializer for the given suffix, or null if none is registered.
-    * @throws StoreException If an error prevents the operation.
-    * @throws PermissionException If the operation is not permitted.
-    */
-   public GraphSerializer serializerForFilesSuffix(String suffix)
       throws StoreException, PermissionException {
       
       throw new StoreException("Not implemented");
@@ -1187,6 +1136,31 @@ public class LabbcatAdmin extends LabbcatEdit implements GraphStoreAdministratio
          HttpRequestPost request = delete("api/admin/users/" + user);
          if (verbose) System.out.println("deleteUser -> " + request);
          response = new Response(request.post(), verbose);
+         response.checkForErrors(); // throws a StoreException on error
+      } catch(IOException x) {
+         throw new StoreException("Could not get response.", x);
+      }
+   } // end of updateUser()
+   
+   /**
+    * Sets a given user's password.
+    * @param user The ID of the user to update.
+    * @param password The new password.
+    * @param resetPassword Whether the user must reset their password when they next log in.
+    * @throws StoreException If an error occurs, e.g. the user does not exist.
+    * @throws PermissionException If the current user does not have the 'admin' role.
+    */
+   public void setPassword(String user, String password, boolean resetPassword)
+      throws StoreException, PermissionException {
+      try{
+         HttpRequestPost request = put("api/admin/password")
+            .setHeader("Accept", "application/json");
+         if (verbose) System.out.println("updateUser -> " + request);
+         JsonObjectBuilder json = Json.createObjectBuilder();
+         if (user != null) json.add("user", user);
+         if (password != null) json.add("password", password);
+         json.add("resetPassword", resetPassword); 
+         response = new Response(request.post(json.build()), verbose);
          response.checkForErrors(); // throws a StoreException on error
       } catch(IOException x) {
          throw new StoreException("Could not get response.", x);

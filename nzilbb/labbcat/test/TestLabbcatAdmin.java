@@ -803,7 +803,7 @@ public class TestLabbcatAdmin {
       }
    }
    
-   @Test public void newUserUpdateUserAndDeleteUser() throws Exception {
+   @Test public void newUserUpdateUserDeleteUserAndChangePassword() throws Exception {
       Role testRole = new Role()
          .setRoleId("unit-test")
          .setDescription("Temporary role for unit testing");
@@ -865,6 +865,9 @@ public class TestLabbcatAdmin {
          assertArrayEquals("Roles correct",
                       updatedUser.getRoles(), changedUser.getRoles());
 
+         // change password
+         labbcat.setPassword(originalUser.getUser(), new java.util.Date().toString(), true);
+
          // delete it
          labbcat.deleteUser(originalUser.getUser());
 
@@ -883,6 +886,13 @@ public class TestLabbcatAdmin {
             // can't delete it again
             labbcat.deleteUser(originalUser);
             fail("Can't delete user that doesn't exist");
+         } catch(Exception exception) {
+         }
+         
+         try {
+            // can't set password again
+            labbcat.setPassword(originalUser.getUser(), new java.util.Date().toString(), true);
+            fail("Can't set passord for user that doesn't exist");
          } catch(Exception exception) {
          }
          
