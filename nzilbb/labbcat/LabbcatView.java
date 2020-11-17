@@ -55,6 +55,8 @@ import nzilbb.ag.MediaTrackDefinition;
 import nzilbb.ag.PermissionException;
 import nzilbb.ag.Schema;
 import nzilbb.ag.StoreException;
+import nzilbb.ag.serialize.GraphDeserializer;
+import nzilbb.ag.serialize.GraphSerializer;
 import nzilbb.ag.serialize.SerializationDescriptor;
 import nzilbb.labbcat.http.*;
 import nzilbb.labbcat.model.Match;
@@ -2444,6 +2446,58 @@ public class LabbcatView implements GraphStoreQuery {
       } catch(IOException x) {
          throw new StoreException("Could not get response.", x);
       }
+   }
+
+   /**
+    * <em>NOT YET IMPLEMENTED</em> - Gets the serializer for the given file suffix (extension).
+    * @param suffix The file extension.
+    * @return The serializer for the given suffix, or null if none is registered.
+    * @throws StoreException If an error prevents the operation.
+    * @throws PermissionException If the operation is not permitted.
+    */
+   public GraphSerializer serializerForFilesSuffix(String suffix)
+      throws StoreException, PermissionException {
+      
+      throw new StoreException("Not implemented");
+   }
+   
+   /**
+    * <em>NOT YET IMPLEMENTED</em> - Gets the deserializer for the given MIME type.
+    * @param mimeType The MIME type.
+    * @return The deserializer for the given MIME type, or null if none is registered.
+    * @throws StoreException If an error prevents the operation.
+    * @throws PermissionException If the operation is not permitted.
+    */
+   public GraphDeserializer deserializerForMimeType(String mimeType)
+      throws StoreException, PermissionException {
+      
+      throw new StoreException("Not implemented");
+   }
+
+   /**
+    * <em>NOT YET IMPLEMENTED</em> - Gets the deserializer for the given file suffix (extension).
+    * @param suffix The file extension.
+    * @return The deserializer for the given suffix, or null if none is registered.
+    * @throws StoreException If an error prevents the operation.
+    * @throws PermissionException If the operation is not permitted.
+    */
+   public GraphDeserializer deserializerForFilesSuffix(String suffix)
+      throws StoreException, PermissionException {
+      
+      throw new StoreException("Not implemented");
+   }
+
+   /**
+    * <em>NOT YET IMPLEMENTED</em> - Gets the serializer for the given MIME type.
+    * @param mimeType The MIME type.
+    * @return The serializer for the given MIME type, or null if none is registered.
+    * @throws StoreException If an error prevents the operation.
+    * @throws PermissionException If the operation is not permitted.
+    */
+   public GraphSerializer serializerForMimeType(String mimeType)
+      throws StoreException, PermissionException {
+      
+      throw new StoreException("Not implemented");
    }
 
    /**
