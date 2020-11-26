@@ -297,12 +297,16 @@ public class TestLabbcatEdit {
          assertEquals("Transcript is still in the store",
                       1, labbcat.countMatchingTranscriptIds("id = '"+transcript.getName()+"'"));
       } finally {
-         // delete it
-         labbcat.deleteTranscript(transcript.getName());
-         
-         // ensure the transcript no longer exists
-         assertEquals("Transcript has been deleted from the store",
-                      0, labbcat.countMatchingTranscriptIds("id = '"+transcript.getName()+"'"));
+         try {
+            // delete it
+            labbcat.deleteTranscript(transcript.getName());
+            
+            // ensure the transcript no longer exists
+            assertEquals("Transcript has been deleted from the store",
+                         0, labbcat.countMatchingTranscriptIds("id = '"+transcript.getName()+"'"));
+         } catch (Exception x) {
+            System.err.println("Unexpectedly can't delete test transcript: " + x);
+         }
       }
    }
 

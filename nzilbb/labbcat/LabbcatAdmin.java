@@ -208,8 +208,33 @@ public class LabbcatAdmin extends LabbcatEdit implements GraphStoreAdministratio
    }
    
    /**
-    * Saves changes to a layer, or adds a new layer.
-    * @param layer A new or modified layer definition.
+    * Adds a new layer.
+    * @param layer A new layer definition.
+    * @return The resulting layer definition.
+    * @throws StoreException If an error prevents the operation.
+    * @throws PermissionException If the operation is not permitted.
+    */
+   public Layer newLayer(Layer layer) throws StoreException, PermissionException {
+      try {
+         HttpRequestPost request = new HttpRequestPost(
+            adminUrl("newLayer"), getRequiredHttpAuthorization())
+            .setUserAgent().setLanguage(language)
+            .setHeader("Accept", "application/json");
+         if (verbose) System.out.println("newLayer -> " + request + " : " + layer.toJson());
+         response = new Response(request.post(layer.toJson()), verbose);
+         response.checkForErrors(); // throws a StoreException on error
+         if (response.isModelNull()) return null;
+         Layer result = new Layer();
+         result.fromJson(response.getModel().toString());
+         return result;
+      } catch(IOException x) {
+         throw new StoreException("Could not get response.", x);
+      }
+   }
+
+   /**
+    * Saves changes to a layer.
+    * @param layer A modified layer definition.
     * @return The resulting layer definition.
     * @throws StoreException If an error prevents the operation.
     * @throws PermissionException If the operation is not permitted.
@@ -231,9 +256,30 @@ public class LabbcatAdmin extends LabbcatEdit implements GraphStoreAdministratio
          throw new StoreException("Could not get response.", x);
       }
    }
-      
-   // Other methods:
 
+   /**
+    * Deletes the given layer, and all associated annotations.
+    * @param id The ID layer to delete.
+    * @throws StoreException If an error prevents the transcript from being saved.
+    * @throws PermissionException If saving the transcript is not permitted.
+    */
+   public void deleteLayer(String id) throws StoreException, PermissionException {
+      try {
+         URL url = adminUrl("deleteLayer");
+         HttpRequestPost request = new HttpRequestPost(url, getRequiredHttpAuthorization())
+            .setUserAgent()
+            .setHeader("Accept", "application/json")
+            .setParameter("id", id);
+         if (verbose) System.out.println("deleteLayer -> " + request);
+         response = new Response(request.post(), verbose);
+         response.checkForErrors(); // throws a StoreException on error
+      } catch(IOException x) {
+         throw new StoreException("Could not get response.", x);
+      }
+   }
+   
+   // Other methods:
+   
    /**
     * Creates a new corpus record.
     * @param corpus The corpus details to save.

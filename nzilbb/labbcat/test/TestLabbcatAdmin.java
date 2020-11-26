@@ -32,6 +32,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import nzilbb.ag.Anchor;
 import nzilbb.ag.Annotation;
+import nzilbb.ag.Constants;
 import nzilbb.ag.Layer;
 import nzilbb.ag.MediaFile;
 import nzilbb.ag.MediaTrackDefinition;
@@ -799,6 +800,144 @@ public class TestLabbcatAdmin {
             labbcat.saveLayer(originalTranscriptType);
          } catch(Exception exception) {
             System.out.println("ERROR restoring title: " + exception);
+         }
+      }
+   }
+   
+   @Test public void newSaveDeleteLayer() throws Exception {
+      Layer testLayer = new Layer("unit-test", "Unit test layer")
+         .setParentId("transcript") // TODO change to "word"
+         .setAlignment(Constants.ALIGNMENT_NONE)
+         .setPeers(true)
+         .setPeersOverlap(true)
+         .setParentIncludes(true)
+         .setSaturated(true)
+         .setType(Constants.TYPE_STRING);
+      // TODO validLabels
+
+      try {
+         labbcat.getLayer(testLayer.getId());
+         fail("Test layer doesn't already exist: " + testLayer.getId());
+      } catch (StoreException x) {
+      }
+      try {
+
+         // create the layer
+         Layer newLayer = labbcat.newLayer(testLayer);
+         assertNotNull("new layer returned", newLayer);
+         assertEquals("created ID",
+                      newLayer.getId(), testLayer.getId());
+         assertEquals("created Description",
+                      newLayer.getDescription(), testLayer.getDescription());
+         assertEquals("created parent",
+                      newLayer.getParentId(), testLayer.getParentId());
+         assertEquals("created alignment",
+                      newLayer.getAlignment(), testLayer.getAlignment());
+         assertEquals("created peers",
+                      newLayer.getPeers(), testLayer.getPeers());
+         assertEquals("created peersOverlap",
+                      newLayer.getPeersOverlap(), testLayer.getPeersOverlap());
+         assertEquals("created parentIncludes",
+                      newLayer.getParentIncludes(), testLayer.getParentIncludes());
+         assertEquals("created saturated",
+                      newLayer.getSaturated(), testLayer.getSaturated());
+         assertEquals("created Type",
+                      newLayer.getType(), testLayer.getType());
+         // TODO validLabels
+
+         // ensure it exists
+         newLayer = labbcat.getLayer(testLayer.getId());
+         assertNotNull("new layer returned", newLayer);
+         assertEquals("created ID",
+                      newLayer.getId(), testLayer.getId());
+         assertEquals("created Description",
+                      newLayer.getDescription(), testLayer.getDescription());
+         assertEquals("created parent",
+                      newLayer.getParentId(), testLayer.getParentId());
+         assertEquals("created alignment",
+                      newLayer.getAlignment(), testLayer.getAlignment());
+         assertEquals("created peers",
+                      newLayer.getPeers(), testLayer.getPeers());
+         assertEquals("created peersOverlap",
+                      newLayer.getPeersOverlap(), testLayer.getPeersOverlap());
+         assertEquals("created parentIncludes",
+                      newLayer.getParentIncludes(), testLayer.getParentIncludes());
+         assertEquals("created saturated",
+                      newLayer.getSaturated(), testLayer.getSaturated());
+         assertEquals("created Type",
+                      newLayer.getType(), testLayer.getType());
+         // TODO validLabels
+
+         // edit it
+         testLayer.setDescription("Changed description")
+            .setParentId("turns") // this shouldn't be updated
+            .setAlignment(Constants.ALIGNMENT_INTERVAL)
+            .setPeers(false)
+            .setPeersOverlap(false)
+            .setParentIncludes(false)
+            .setSaturated(false)
+            .setType(Constants.TYPE_NUMBER);
+         // TODO validLabels
+         newLayer = labbcat.saveLayer(testLayer);
+         assertNotNull("new layer returned", newLayer);
+         assertEquals("saved ID",
+                      newLayer.getId(), testLayer.getId());
+         assertEquals("saved Description",
+                      newLayer.getDescription(), testLayer.getDescription());
+         assertEquals("parent not saved",
+                      newLayer.getParentId(), "transcript"); // TODO change to word
+         assertEquals("saved alignment",
+                      newLayer.getAlignment(), testLayer.getAlignment());
+         assertEquals("saved peers",
+                      newLayer.getPeers(), testLayer.getPeers());
+         assertEquals("saved peersOverlap",
+                      newLayer.getPeersOverlap(), testLayer.getPeersOverlap());
+         assertEquals("saved parentIncludes",
+                      newLayer.getParentIncludes(), testLayer.getParentIncludes());
+         assertEquals("saved saturated",
+                      newLayer.getSaturated(), testLayer.getSaturated());
+         assertEquals("saved Type",
+                      newLayer.getType(), testLayer.getType());
+         // TODO validLabels
+         
+         // ensure changes are saved
+         newLayer = labbcat.getLayer(testLayer.getId());
+         assertNotNull("new layer returned", newLayer);
+         assertEquals("saved ID",
+                      newLayer.getId(), testLayer.getId());
+         assertEquals("saved Description",
+                      newLayer.getDescription(), testLayer.getDescription());
+         assertEquals("parent not saved",
+                      newLayer.getParentId(), "transcript"); // TODO change to word
+         assertEquals("saved alignment",
+                      newLayer.getAlignment(), testLayer.getAlignment());
+         assertEquals("saved peers",
+                      newLayer.getPeers(), testLayer.getPeers());
+         assertEquals("saved peersOverlap",
+                      newLayer.getPeersOverlap(), testLayer.getPeersOverlap());
+         assertEquals("saved parentIncludes",
+                      newLayer.getParentIncludes(), testLayer.getParentIncludes());
+         assertEquals("saved saturated",
+                      newLayer.getSaturated(), testLayer.getSaturated());
+         assertEquals("saved Type",
+                      newLayer.getType(), testLayer.getType());
+         // TODO validLabels
+
+         // delete it
+         labbcat.deleteLayer(testLayer.getId());
+
+         // ensure it's been deleted
+         try {
+            labbcat.getLayer(testLayer.getId());
+            fail("Should not be able to get layer that has been deleted: " + testLayer.getId());
+         } catch (StoreException x) {
+         }
+         
+      } finally {
+         // ensure layer is deleted
+         try {
+            labbcat.deleteLayer(testLayer.getId());
+         } catch(Exception exception) {
          }
       }
    }
