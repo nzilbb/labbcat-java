@@ -123,12 +123,12 @@ public class TestLabbcatView {
       assertTrue("Some IDs are returned",
                  ids.length > 0);
       Set<String> idSet = Arrays.asList(ids).stream().collect(Collectors.toSet());
-      assertTrue("Has transcript layer",
-                 idSet.contains("transcript"));
+      assertTrue("Has word layer",
+                 idSet.contains("word"));
       assertTrue("Has turns layer",
-                 idSet.contains("turns"));
+                 idSet.contains("turn"));
       assertTrue("Has utterances layer",
-                 idSet.contains("utterances"));
+                 idSet.contains("utterance"));
       assertTrue("Has transcript_type layer",
                  idSet.contains("transcript_type"));
    }
@@ -141,12 +141,12 @@ public class TestLabbcatView {
       Set<Object> idSet = Arrays.asList(layers).stream()
          .map(l->l.getId())
          .collect(Collectors.toSet());
-      assertTrue("Has transcript layer",
-                 idSet.contains("transcript"));
+      assertTrue("Has word layer",
+                 idSet.contains("word"));
       assertTrue("Has turns layer",
-                 idSet.contains("turns"));
+                 idSet.contains("turn"));
       assertTrue("Has utterances layer",
-                 idSet.contains("utterances"));
+                 idSet.contains("utterance"));
       assertTrue("Has transcript_type layer",
                  idSet.contains("transcript_type"));
    }

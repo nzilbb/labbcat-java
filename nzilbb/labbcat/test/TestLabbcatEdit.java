@@ -119,8 +119,8 @@ public class TestLabbcatEdit {
       assertTrue("getLayerIds: Some IDs are returned",
                  ids.length > 0);
       Set<String> idSet = Arrays.asList(ids).stream().collect(Collectors.toSet());
-      assertTrue("getLayerIds: Has transcript layer",
-                 idSet.contains("transcript"));
+      assertTrue("getLayerIds: Has word layer",
+                 idSet.contains("word"));
 
       Layer[] layers = labbcat.getLayers();
       //for (String id : ids) System.out.println("layer " + id);

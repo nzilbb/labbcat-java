@@ -127,8 +127,8 @@ public class TestLabbcatAdmin {
       assertTrue("getLayerIds: Some IDs are returned",
                  ids.length > 0);
       Set<String> idSet = Arrays.asList(ids).stream().collect(Collectors.toSet());
-      assertTrue("getLayerIds: Has transcript layer",
-                 idSet.contains("transcript"));
+      assertTrue("getLayerIds: Has word layer",
+                 idSet.contains("word"));
 
       Layer[] layers = labbcat.getLayers();
       //for (String id : ids) System.out.println("layer " + id);
@@ -806,7 +806,7 @@ public class TestLabbcatAdmin {
    
    @Test public void newSaveDeleteLayer() throws Exception {
       Layer testLayer = new Layer("unit-test", "Unit test layer")
-         .setParentId("transcript") // TODO change to "word"
+         .setParentId("word")
          .setAlignment(Constants.ALIGNMENT_NONE)
          .setPeers(true)
          .setPeersOverlap(true)
@@ -885,7 +885,7 @@ public class TestLabbcatAdmin {
          assertEquals("saved Description",
                       newLayer.getDescription(), testLayer.getDescription());
          assertEquals("parent not saved",
-                      newLayer.getParentId(), "transcript"); // TODO change to word
+                      newLayer.getParentId(), "word");
          assertEquals("saved alignment",
                       newLayer.getAlignment(), testLayer.getAlignment());
          assertEquals("saved peers",
@@ -908,7 +908,7 @@ public class TestLabbcatAdmin {
          assertEquals("saved Description",
                       newLayer.getDescription(), testLayer.getDescription());
          assertEquals("parent not saved",
-                      newLayer.getParentId(), "transcript"); // TODO change to word
+                      newLayer.getParentId(), "word");
          assertEquals("saved alignment",
                       newLayer.getAlignment(), testLayer.getAlignment());
          assertEquals("saved peers",
