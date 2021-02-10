@@ -1,6 +1,6 @@
 /* 
  * Javadoc style sheet
- * Modifed 2020-01-24 by robert: change colour scheme.
+ * Modifed 2020-01-24 by robert: change colour scheme, add footer styles.
  */
 
 @import url('resources/fonts/dejavu.css');
@@ -907,4 +907,10 @@ table.striped > tbody > tr > th {
 }
 figure img {
     max-width: 90vw;
+}
+
+.legalCopy img { /* CC-BY-SA logo */
+    vertical-align:middle;
+    height:40px;
+    display: inline-block;
 }
