@@ -417,7 +417,7 @@ public class TestLabbcatView {
    @Test(expected = StoreException.class) public void searchInvalidPattern()
       throws Exception {
       String threadId = labbcat.search(
-         Json.createObjectBuilder().build(), null, null, false, false, null);
+         Json.createObjectBuilder().build(), null, null, false, false, null, null);
    }
 
    @Test public void searchAndCancelTask()
@@ -430,7 +430,7 @@ public class TestLabbcatView {
                         .add("orthography", Json.createObjectBuilder()
                              .add("pattern", ".*")))))
          .build();
-      String threadId = labbcat.search(pattern, null, null, false, false, null);
+      String threadId = labbcat.search(pattern, null, null, false, false, null, null);
       labbcat.cancelTask(threadId);
    }
 
@@ -444,7 +444,7 @@ public class TestLabbcatView {
 
       // all instances of "and"
       JsonObject pattern = new PatternBuilder().addMatchLayer("orthography", "and").build();
-      String threadId = labbcat.search(pattern, participantId, null, false, false, null);
+      String threadId = labbcat.search(pattern, participantId, null, false, false, null, null);
       try {
          TaskStatus task = labbcat.waitForTask(threadId, 30);
          // if the task is still running, it's taking too long, so cancel it
@@ -482,6 +482,19 @@ public class TestLabbcatView {
       }
    }
 
+   @Test public void searchExcludingOverlappingSpeech()
+      throws Exception {
+
+      // all instances of "mmm", which are frequently used in overlapping speech
+      JsonObject pattern = new PatternBuilder().addMatchLayer("orthography", "mmm").build();
+      Match[] includingOverlapping = labbcat.getMatches(
+         pattern, null, null, false, false, null, null, 0);
+      Match[] excludingOverlapping = labbcat.getMatches(
+         pattern, null, null, false, false, null, 5, 0);
+      assertTrue("There are fewer matches when overlapping speech is excluded",
+                 includingOverlapping.length > excludingOverlapping.length);
+   }
+
    @Test public void getSoundFragments()
       throws Exception {
       // get a participant ID to use
@@ -492,7 +505,7 @@ public class TestLabbcatView {
 
       // all instances of "and"
       JsonObject pattern = new PatternBuilder().addMatchLayer("orthography", "and").build();
-      String threadId = labbcat.search(pattern, participantId, null, false, false, null);
+      String threadId = labbcat.search(pattern, participantId, null, false, false, null, null);
       try {
          TaskStatus task = labbcat.waitForTask(threadId, 30);
          // if the task is still running, it's taking too long, so cancel it
@@ -539,7 +552,7 @@ public class TestLabbcatView {
 
       // all instances of "and"
       JsonObject pattern = new PatternBuilder().addMatchLayer("orthography", "and").build();
-      String threadId = labbcat.search(pattern, participantId, null, false, false, null);
+      String threadId = labbcat.search(pattern, participantId, null, false, false, null, null);
       try {
          TaskStatus task = labbcat.waitForTask(threadId, 30);
          // if the task is still running, it's taking too long, so cancel it

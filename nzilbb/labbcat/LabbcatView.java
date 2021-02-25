@@ -1,5 +1,5 @@
 //
-// Copyright 2020 New Zealand Institute of Language, Brain and Behaviour, 
+// Copyright 2020-2021 New Zealand Institute of Language, Brain and Behaviour, 
 // University of Canterbury
 // Written by Robert Fromont - robert.fromont@canterbury.ac.nz
 //
@@ -81,9 +81,9 @@ import nzilbb.util.MonitorableSeries;
  * String[] documents = labbcat.{@link #getTranscriptIdsInCorpus(String) getTranscriptIdsInCorpus}(corpora[0]);
  * // search for tokens of "and"
  * Matches[] matches = labbcat.{@link #getMatches(String,int) getMatches}(
- *     labbcat.{@link #search(JsonObject,String[],String[],boolean,boolean,Integer) search}(
+ *     labbcat.{@link #search(JsonObject,String[],String[],boolean,boolean,Integer,Integer) search}(
  *        new {@link PatternBuilder}().addMatchLayer("orthography", "and").build(),
- *        participantIds, null, true, false, null), 1);
+ *        participantIds, null, true, false, null, 5), 1);
  * </pre>
  * @author Robert Fromont robert@fromont.net.nz
  */
@@ -189,9 +189,10 @@ public class LabbcatView implements GraphStoreQuery {
     * @see #getMinLabbcatVersion()
     * @see #setMinLabbcatVersion(String)
     */
-   protected String minLabbcatVersion = "20200812.1253";
+   protected String minLabbcatVersion = "20210210.2032";
    /**
-    * Getter for {@link #minLabbcatVersion}: Minimum server version required for this API to work properly.
+    * Getter for {@link #minLabbcatVersion}: Minimum server version required for this API
+    * to work properly. 
     * @return Minimum server version required for this API to work properly.
     */
    public String getMinLabbcatVersion() { return minLabbcatVersion; }
@@ -221,15 +222,18 @@ public class LabbcatView implements GraphStoreQuery {
     * @see #getLanguage()
     * @see #setLanguage(String)
     */
-   protected String language;
+   protected String language;   
    /**
-    * Getter for {@link #language}: The language code for server message localization, e.g. "es-AR" for Argentine Spanish.
+    * Getter for {@link #language}: The language code for server message localization,
+    * e.g. "es-AR" for Argentine Spanish.
     * @return The language code for server message localization, e.g. "es-AR" for Argentine Spanish.
     */
-   public String getLanguage() { return language; }
+   public String getLanguage() { return language; }   
    /**
-    * Setter for {@link #language}: The language code for server message localization, e.g. "es-AR" for Argentine Spanish.
-    * @param newLanguage The language code for server message localization, e.g. "es-AR" for Argentine Spanish.
+    * Setter for {@link #language}: The language code for server message localization,
+    * e.g. "es-AR" for Argentine Spanish. 
+    * @param newLanguage The language code for server message localization, e.g. "es-AR"
+    * for Argentine Spanish. 
     */
    public LabbcatView setLanguage(String newLanguage) { language = newLanguage; return this; }
    // Methods:
@@ -713,7 +717,8 @@ public class LabbcatView implements GraphStoreQuery {
     * Gets the participant record specified by the given identifier.
     * @param id The ID of the participant, which could be their name or their database annotation
     * ID. 
-    * @return An annotation representing the participant, or null if the participant was not found.
+    * @return An annotation representing the participant, or null if the participant was
+    * not found.
     * @throws StoreException
     * @throws PermissionException
     */
@@ -794,7 +799,8 @@ public class LabbcatView implements GraphStoreQuery {
     * @throws StoreException If an error occurs.
     * @throws PermissionException If the operation is not permitted.
     */
-   public String[] getMatchingParticipantIds(String expression, Integer pageLength, Integer pageNumber)
+   public String[] getMatchingParticipantIds(
+      String expression, Integer pageLength, Integer pageNumber)
       throws StoreException, PermissionException {
       
       try {
@@ -996,7 +1002,8 @@ public class LabbcatView implements GraphStoreQuery {
     * @throws StoreException If an error occurs.
     * @throws PermissionException If the operation is not permitted.
     */
-   public String[] getMatchingTranscriptIds(String expression, Integer pageLength, Integer pageNumber, String order)
+   public String[] getMatchingTranscriptIds(
+      String expression, Integer pageLength, Integer pageNumber, String order)
       throws StoreException, PermissionException {
       
       try {
@@ -1081,7 +1088,8 @@ public class LabbcatView implements GraphStoreQuery {
     * @throws StoreException If an error occurs.
     * @throws PermissionException If the operation is not permitted.
     */
-   public Annotation[] getMatchingAnnotations(String expression, Integer pageLength, Integer pageNumber)
+   public Annotation[] getMatchingAnnotations(
+      String expression, Integer pageLength, Integer pageNumber)
       throws StoreException, PermissionException {
       
       try {
@@ -1146,7 +1154,8 @@ public class LabbcatView implements GraphStoreQuery {
     * @throws PermissionException If the operation is not permitted.
     * @throws GraphNotFoundException If the transcript was not found in the store.
     */
-   public Annotation[] getAnnotations(String id, String layerId, Integer pageLength, Integer pageNumber)
+   public Annotation[] getAnnotations(
+      String id, String layerId, Integer pageLength, Integer pageNumber)
       throws StoreException, PermissionException, GraphNotFoundException {
       
       try {
@@ -1192,7 +1201,9 @@ public class LabbcatView implements GraphStoreQuery {
     * @throws StoreException If an error occurs.
     * @throws PermissionException If the operation is not permitted.
     */
-   public void getMatchAnnotations(Iterator<String> matchIds, String[] layerIds, int targetOffset, int annotationsPerLayer, Consumer<Annotation[]> consumer)
+   public void getMatchAnnotations(
+      Iterator<String> matchIds, String[] layerIds, int targetOffset, int annotationsPerLayer,
+      Consumer<Annotation[]> consumer)
       throws StoreException, PermissionException {
       
       throw new StoreException("Not implemented");
@@ -1432,7 +1443,8 @@ public class LabbcatView implements GraphStoreQuery {
     * @throws PermissionException If the operation is not permitted.
     * @throws GraphNotFoundException If the transcript was not found in the store.
     */
-   public String getMedia(String id, String trackSuffix, String mimeType, Double startOffset, Double endOffset) 
+   public String getMedia(
+      String id, String trackSuffix, String mimeType, Double startOffset, Double endOffset) 
       throws StoreException, PermissionException, GraphNotFoundException {
       
       try {
@@ -1719,6 +1731,8 @@ public class LabbcatView implements GraphStoreQuery {
     * confidence &ge; 50, false to search include un-aligned words as well. 
     * @param matchesPerTranscript Optional maximum number of matches per transcript to
     * return. <tt>null</tt> means all matches.
+    * @param overlapThreshold Optional percentage overlap with other utterances before
+    * simultaneous speech is excluded. <tt>null</tt> means include all overlapping utterances.
     * @return The threadId of the resulting task, which can be passed in to
     * {@link #getMatches(String,int)}, {@link #taskStatus(String)},
     * {@link #waitForTask(String,int)}, etc.
@@ -1727,7 +1741,10 @@ public class LabbcatView implements GraphStoreQuery {
     * @throws IOException
     * @throws StoreException
     */
-   public String search(JsonObject pattern, String[] participantIds, String[] transcriptTypes, boolean mainParticipant, boolean aligned, Integer matchesPerTranscript)
+   public String search(
+      JsonObject pattern, String[] participantIds, String[] transcriptTypes,
+      boolean mainParticipant, boolean aligned, Integer matchesPerTranscript,
+      Integer overlapThreshold)
     throws IOException, StoreException {
       
       cancelling = false;
@@ -1754,6 +1771,9 @@ public class LabbcatView implements GraphStoreQuery {
       if (transcriptTypes != null) {
          request.setParameter("transcript_type", transcriptTypes);
       }
+      if (overlapThreshold != null) {
+         request.setParameter("overlap_threshold", overlapThreshold);
+      }
       
       if (verbose) System.out.println("search -> " + request);
       response = new Response(request.get(), verbose);
@@ -1766,23 +1786,23 @@ public class LabbcatView implements GraphStoreQuery {
    
    /**
     * Gets a list of tokens that were matched by
-    * {@link #search(JsonObject,String[],String[],boolean,boolean,Integer)}.
+    * {@link #search(JsonObject,String[],String[],boolean,boolean,Integer,Integer)}.
     * <p>If the task is still running, then this function will wait for it to finish.
     * <p>This means calls can be stacked like this:
     *  <pre>Matches[] matches = labbcat.getMatches(
     *     labbcat.search(
     *        new PatternBuilder().addMatchLayer("orthography", "and").build(),
-    *        participantIds, true), 1);</pre>
+    *        participantIds, true, true, null, null), 1);</pre>
     * @param threadId A task ID returned by
-    * {@link #search(JsonObject,String[],String[],boolean,boolean,Integer)}.
+    * {@link #search(JsonObject,String[],String[],boolean,boolean,Integer,Integer)}.
     * @param wordsContext Number of words context to include in the <q>Before Match</q>
     * and <q>After Match</q> columns in the results.
     * @return A list of IDs that can be used to identify utterances/tokens that were matched by
-    * {@link #search(JsonObject,String[],String[],boolean,boolean,Integer)}, or null if
+    * {@link #search(JsonObject,String[],String[],boolean,boolean,Integer,Integer)}, or null if
     * the task was cancelled. 
     * @throws IOException
     * @throws StoreException
-    * @see #search(JsonObject,String[],String[],boolean,boolean,Integer)}
+    * @see #search(JsonObject,String[],String[],boolean,boolean,Integer,Integer)}
     */
    public Match[] getMatches(String threadId, int wordsContext)
       throws IOException, StoreException {      
@@ -1791,27 +1811,28 @@ public class LabbcatView implements GraphStoreQuery {
 
    /**
     * Gets a list of tokens that were matched by
-    * {@link #search(JsonObject,String[],String[],boolean,boolean,Integer)}.
+    * {@link #search(JsonObject,String[],String[],boolean,boolean,Integer,Integer)}.
     * <p>If the task is still running, then this function will wait for it to finish.
     * <p>This means calls can be stacked like this:
     *  <pre>Matches[] matches = labbcat.getMatches(
     *     labbcat.search(
     *        new PatternBuilder().addMatchLayer("orthography", "and").build(),
-    *        participantIds, true), 1);</pre>
+    *        participantIds, true, false, null, 5), 1);</pre>
     * @param threadId A task ID returned by 
-    * {@link #search(JsonObject,String[],String[],boolean,boolean,Integer)}.
+    * {@link #search(JsonObject,String[],String[],boolean,boolean,Integer,Integer)}.
     * @param wordsContext Number of words context to include in the <q>Before Match</q>
     * and <q>After Match</q> columns in the results.
     * @param pageLength The maximum number of matches to return, or null to return all.
     * @param pageNumber The zero-based page number to return, or null to return the first page.
     * @return A list of IDs that can be used to identify utterances/tokens that were matched by
-    * {@link #search(JsonObject,String[],String[],boolean,boolean,Integer)}, or null if
+    * {@link #search(JsonObject,String[],String[],boolean,boolean,Integer,Integer)}, or null if
     * the task was cancelled. 
     * @throws IOException
     * @throws StoreException
-    * @see #search(JsonObject,String[],String[],boolean,boolean,Integer)}
+    * @see #search(JsonObject,String[],String[],boolean,boolean,Integer,Integer)}
     */
-   public Match[] getMatches(String threadId, int wordsContext, Integer pageLength, Integer pageNumber)
+   public Match[] getMatches(
+      String threadId, int wordsContext, Integer pageLength, Integer pageNumber)
       throws IOException, StoreException {
       
       // ensure it's finished
@@ -1850,9 +1871,10 @@ public class LabbcatView implements GraphStoreQuery {
     * Searches for tokens that match the givem pattern and returns a list of matches.
     * <p>This is similar to invoking:
     * <pre> Matches[] matches = labbcat.getMatches(
-    *     labbcat.search(pattern, participantIds, mainParticipant), 
+    *     labbcat.search(pattern, participantIds, mainParticipant, aligned,
+    *                    matchesPerTranscript, overlapThreshold),
     *     wordsContext);</pre>
-    * <p>As with {@link #search(JsonObject,String[],String[],boolean,boolean,Integer)} the
+    * <p>As with {@link #search(JsonObject,String[],String[],boolean,boolean,Integer,Integer)} the
     * <var>pattern</var> must 
     * match the structure of the search matrix in the browser interface of LaBB-CAT.
     * <p>The PatternBuilder class is designed to make constructing valid patterns easier:
@@ -1881,20 +1903,26 @@ public class LabbcatView implements GraphStoreQuery {
     * confidence &ge; 50, false to search include un-aligned words as well. 
     * @param matchesPerTranscript Optional maximum number of matches per transcript to
     * return. <tt>null</tt> means all matches.
+    * @param overlapThreshold Optional percentage overlap with other utterances before
+    * simultaneous speech is excluded. <tt>null</tt> means include all overlapping utterances.
     * @param wordsContext Number of words context to include in the <q>Before Match</q>
     * and <q>After Match</q> columns in the results.
     * @return A list of IDs that can be used to identify utterances/tokens that were matched by
-    * {@link #search(JsonObject,String[],String[],boolean,boolean,Integer)}, or null if
+    * {@link #search(JsonObject,String[],String[],boolean,boolean,Integer,Integer)}, or null if
     * the task was cancelled. 
     * @throws IOException
     * @throws StoreException
     * @see #getMatches(String,int)}
     */
-   public Match[] getMatches(JsonObject pattern, String[] participantIds, String[] transcriptTypes, boolean mainParticipant, boolean aligned, Integer matchesPerTranscript, int wordsContext)
+   public Match[] getMatches(
+      JsonObject pattern, String[] participantIds, String[] transcriptTypes,
+      boolean mainParticipant, boolean aligned, Integer matchesPerTranscript,
+      Integer overlapThreshold, int wordsContext)
     throws IOException, StoreException {
       
       String threadId = search(
-         pattern, participantIds, transcriptTypes, mainParticipant, aligned, matchesPerTranscript);
+         pattern, participantIds, transcriptTypes, mainParticipant, aligned, matchesPerTranscript,
+         overlapThreshold);
       try {
          return  getMatches(threadId, wordsContext);
       } finally { // release the task to save server resources
@@ -1907,9 +1935,10 @@ public class LabbcatView implements GraphStoreQuery {
     * <var>maxMatches</var> matches. 
     * <p>This is similar to invoking:
     * <pre> Matches[] matches = labbcat.getMatches(
-    *     labbcat.search(pattern, participantIds, mainParticipant), 
+    *     labbcat.search(pattern, participantIds, mainParticipant, aligned,
+    *                    matchesPerTranscript, overlapThreshold), 
     *     wordsContext);</pre>
-    * <p>As with {@link #search(JsonObject,String[],String[],boolean,boolean,Integer)} the
+    * <p>As with {@link #search(JsonObject,String[],String[],boolean,boolean,Integer,Integer)} the
     * <var>pattern</var> must 
     * match the structure of the search matrix in the browser interface of LaBB-CAT.
     * <p>The PatternBuilder class is designed to make constructing valid patterns easier:
@@ -1938,21 +1967,27 @@ public class LabbcatView implements GraphStoreQuery {
     * confidence &ge; 50, false to search include un-aligned words as well. 
     * @param matchesPerTranscript Optional maximum number of matches per transcript to
     * return. <tt>null</tt> means all matches.
+    * @param overlapThreshold Optional percentage overlap with other utterances before
+    * simultaneous speech is excluded. <tt>null</tt> means include all overlapping utterances.
     * @param wordsContext Number of words context to include in the <q>Before Match</q>
     * and <q>After Match</q> columns in the results.
     * @param maxMatches The maximum number of matches to return, or null to return all.
     * @return A list of IDs that can be used to identify utterances/tokens that were matched by
-    * {@link #search(JsonObject,String[],String[],boolean,boolean,Integer)}, or null if
+    * {@link #search(JsonObject,String[],String[],boolean,boolean,Integer,Integer)}, or null if
     * the task was cancelled. 
     * @throws IOException
     * @throws StoreException
     * @see #getMatches(String,int)}
     */
-   public Match[] getMatches(JsonObject pattern, String[] participantIds, String[] transcriptTypes, boolean mainParticipant, boolean aligned, Integer matchesPerTranscript, int wordsContext, Integer maxMatches)
+   public Match[] getMatches(
+      JsonObject pattern, String[] participantIds, String[] transcriptTypes,
+      boolean mainParticipant, boolean aligned, Integer matchesPerTranscript,
+      Integer overlapThreshold, int wordsContext, Integer maxMatches)
     throws IOException, StoreException {
       
       String threadId = search(
-         pattern, participantIds, transcriptTypes, mainParticipant, aligned, matchesPerTranscript);
+         pattern, participantIds, transcriptTypes, mainParticipant, aligned, matchesPerTranscript,
+         overlapThreshold);
       try {
          return  getMatches(threadId, wordsContext, maxMatches, 0);
       } finally { // release the task to save server resources
@@ -1983,7 +2018,8 @@ public class LabbcatView implements GraphStoreQuery {
     * @throws StoreException
     * @see #getMatches(String,int)}
     */
-   public Annotation[][] getMatchAnnotations(Match[] matches, String[] layerIds, int targetOffset, int annotationsPerLayer)
+   public Annotation[][] getMatchAnnotations(
+      Match[] matches, String[] layerIds, int targetOffset, int annotationsPerLayer)
       throws IOException, StoreException {
       
       String[] matchIds = new String[matches.length];
@@ -2014,7 +2050,8 @@ public class LabbcatView implements GraphStoreQuery {
     * @throws StoreException
     * @see #getMatches(String,int)}
     */
-   public Annotation[][] getMatchAnnotations(String[] matchIds, String[] layerIds, int targetOffset, int annotationsPerLayer)
+   public Annotation[][] getMatchAnnotations(
+      String[] matchIds, String[] layerIds, int targetOffset, int annotationsPerLayer)
       throws IOException, StoreException {
       
       cancelling = false;
@@ -2116,7 +2153,9 @@ public class LabbcatView implements GraphStoreQuery {
     * @throws IOException
     * @throws StoreException
     */
-   public File[] getSoundFragments(String[] transcriptIds, Double[] startOffsets, Double[] endOffsets, Integer sampleRate, File dir)
+   public File[] getSoundFragments(
+      String[] transcriptIds, Double[] startOffsets, Double[] endOffsets, Integer sampleRate,
+      File dir)
       throws IOException, StoreException {
       
       if (transcriptIds.length != startOffsets.length || transcriptIds.length != endOffsets.length) {
@@ -2237,7 +2276,9 @@ public class LabbcatView implements GraphStoreQuery {
     * @throws IOException
     * @throws StoreException
     */
-   public File[] getFragments(String[] transcriptIds, Double[] startOffsets, Double[] endOffsets, String[] layerIds, String mimeType, File dir)
+   public File[] getFragments(
+      String[] transcriptIds, Double[] startOffsets, Double[] endOffsets, String[] layerIds,
+      String mimeType, File dir)
     throws IOException, StoreException {
       
       if (transcriptIds.length != startOffsets.length || transcriptIds.length != endOffsets.length) {
