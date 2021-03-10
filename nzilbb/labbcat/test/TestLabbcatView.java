@@ -317,6 +317,21 @@ public class TestLabbcatView {
                    participantId, participant.getLabel()); // not getId()
    }
 
+   @Test public void getParticipantWithAttributes() throws Exception {
+      // find a participant ID to use
+      String[] ids = labbcat.getParticipantIds();
+      // for (String id : ids) System.out.println("participant " + id);
+      assertTrue("Some participant IDs exist",
+                 ids.length > 0);
+      String participantId = ids[0];
+      String[] attributes = { "participant_gender" };
+      Annotation participant = labbcat.getParticipant(participantId, attributes);
+      assertEquals("Correct participant",
+                   participantId, participant.getLabel()); // not getId()
+      assertTrue("Includes attribute",
+                 participant.getAnnotations(attributes[0]).size() > 0);
+   }
+
    @Test public void countMatchingAnnotations() throws Exception {
       int count = labbcat.countMatchingAnnotations(
          "layer.id == 'orthography' && label == 'and'");
