@@ -307,6 +307,29 @@ public class LabbcatEdit extends LabbcatView implements GraphStore
       }
    }
 
+   /**
+    * Deletes the given participant, and all associated meta-data.
+    * @param id The ID participant to delete.
+    * @throws StoreException If an error prevents the transcript from being saved.
+    * @throws PermissionException If saving the transcript is not permitted.
+    * @throws GraphNotFoundException If the transcript doesn't exist.
+    */
+   public void deleteParticipant(String id)
+      throws StoreException, PermissionException, GraphNotFoundException {
+      try {
+         URL url = editUrl("deleteParticipant");
+         HttpRequestPost request = new HttpRequestPost(url, getRequiredHttpAuthorization())
+            .setUserAgent()
+            .setHeader("Accept", "application/json")
+            .setParameter("id", id);
+         if (verbose) System.out.println("deleteParticipant -> " + request);
+         response = new Response(request.post(), verbose);
+         response.checkForErrors(); // throws a StoreException on error
+      } catch(IOException x) {
+         throw new StoreException("Could not get response.", x);
+      }
+   }
+
    // Other methods:
    
    /**

@@ -258,7 +258,9 @@ public class TestLabbcatEdit {
       }
    }
 
-   @Test public void newTranscriptUpdateTranscriptAndDeleteTranscript() throws Exception {
+   @Test public void newTranscriptUpdateTranscriptDeleteTranscriptAndDeleteParticipant()
+      throws Exception {
+      
       // first get a corpus and transcript type
       String[] ids = labbcat.getCorpusIds();
       // for (String id : ids) System.out.println("corpus " + id);
@@ -269,8 +271,18 @@ public class TestLabbcatEdit {
       String transcriptType = typeLayer.getValidLabels().keySet().iterator().next();
 
       File transcript = new File("nzilbb/labbcat/test/nzilbb.labbcat.test.txt");
+      String participantId = "UnitTester";
       assertTrue("Test transcript exists", transcript.exists());
       try {
+
+         // ensure transcript/participant don't already exist
+         try {
+            labbcat.deleteTranscript(transcript.getName());
+         } catch(ResponseException exception) {}
+         try {
+            labbcat.deleteParticipant(participantId);
+         } catch(ResponseException exception) {}
+         
          String threadId = labbcat.newTranscript(
             transcript, null, null, transcriptType, corpus, "test");
          
@@ -280,9 +292,11 @@ public class TestLabbcatEdit {
          
          labbcat.releaseTask(threadId);
          
-         // ensure the transcript exists
+         // ensure the transcript/participant exist
          assertEquals("Transcript is in the store",
                       1, labbcat.countMatchingTranscriptIds("id = '"+transcript.getName()+"'"));
+         assertEquals("Participant is in the store",
+                      1, labbcat.countMatchingParticipantIds("id = '"+participantId+"'"));
 
          // re-upload it
          threadId = labbcat.updateTranscript(transcript);
@@ -298,12 +312,15 @@ public class TestLabbcatEdit {
                       1, labbcat.countMatchingTranscriptIds("id = '"+transcript.getName()+"'"));
       } finally {
          try {
-            // delete it
+            // delete transcript/participant
             labbcat.deleteTranscript(transcript.getName());
+            labbcat.deleteParticipant(participantId);
             
-            // ensure the transcript no longer exists
+            // ensure the transcript/participant no longer exist
             assertEquals("Transcript has been deleted from the store",
                          0, labbcat.countMatchingTranscriptIds("id = '"+transcript.getName()+"'"));
+            assertEquals("Participant has been deleted from the store",
+                         0, labbcat.countMatchingParticipantIds("id = '"+participantId+"'"));
          } catch (Exception x) {
             System.err.println("Unexpectedly can't delete test transcript: " + x);
          }
