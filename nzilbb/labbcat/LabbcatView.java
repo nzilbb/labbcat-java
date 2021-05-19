@@ -2365,13 +2365,11 @@ public class LabbcatView implements GraphStoreQuery {
    public File getTranscriptAttributes(String[] transcriptIds, String[] layerIds) 
       throws IOException, StoreException {
       
-      URL url = makeUrl("transcripts");
+      URL url = makeUrl("api/attributes");
       HttpRequestPost request = new HttpRequestPost(url, getRequiredHttpAuthorization())
          .setUserAgent()
          .setHeader("Accept", "text/csv")
-         .setParameter("todo", "export")
-         .setParameter("exportType", "csv")
-         .setParameter("layer", "graph")
+         .setParameter("layer", "transcript")
          .setParameter("id", transcriptIds)
          .setParameter("layer", layerIds);
       if (verbose) System.out.println("getTranscriptAttributes -> " + request);
