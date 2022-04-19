@@ -1042,7 +1042,7 @@ public class LabbcatAdmin extends LabbcatEdit implements GraphStoreAdministratio
     */
    public void updateInfo(String html) throws StoreException, PermissionException {
       try{
-         HttpRequestPost request = put("api/admin/info")
+         HttpRequestPost request = put("doc/")
             .setHeader("Accept", "application/json");
          if (verbose) System.out.println("unpdateInfo -> " + request);
          response = new Response(request.post(html), verbose);

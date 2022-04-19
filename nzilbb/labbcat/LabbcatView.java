@@ -1,5 +1,5 @@
 //
-// Copyright 2020-2021 New Zealand Institute of Language, Brain and Behaviour, 
+// Copyright 2020-2022 New Zealand Institute of Language, Brain and Behaviour, 
 // University of Canterbury
 // Written by Robert Fromont - robert.fromont@canterbury.ac.nz
 //
@@ -55,6 +55,7 @@ import nzilbb.ag.MediaTrackDefinition;
 import nzilbb.ag.PermissionException;
 import nzilbb.ag.Schema;
 import nzilbb.ag.StoreException;
+import nzilbb.ag.automation.util.AnnotatorDescriptor;
 import nzilbb.ag.serialize.GraphDeserializer;
 import nzilbb.ag.serialize.GraphSerializer;
 import nzilbb.ag.serialize.SerializationDescriptor;
@@ -2572,7 +2573,14 @@ public class LabbcatView implements GraphStoreQuery {
      }
      }
 */
-
+  
+  /**
+   * Lists descriptors of all transcribers that are installed.
+   * @return A list of descriptors of all transcribers that are installed.
+   */
+  public AnnotatorDescriptor[] getTranscriberDescriptors() {
+    return new AnnotatorDescriptor[0]; // TODO not implemented
+  }
 
   /**
    * Gets the value of the given system attribute.

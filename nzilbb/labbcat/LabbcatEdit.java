@@ -203,6 +203,50 @@ public class LabbcatEdit extends LabbcatView implements GraphStore
   }
 
   /**
+   * Identifies a list of annotations that match a particular pattern, and tags them on
+   * the given layer with the given label. If the specified layer ID does not allow peers,
+   * all existing tags will be deleted. Otherwise, tagging does not affect any existing tags on
+   * the matching annotations.
+   * @param expression An expression that determines which annotations match.
+   * <p> The expression language is loosely based on JavaScript; expressions such as the
+   * following can be used: 
+   * <ul>
+   *  <li><code>layer.id == 'orthography' &amp;&amp; label == 'the'</code></li>
+   *  <li><code>first('language').label == 'en' &amp;&amp; layer.id == 'orthography'
+   *       &amp;&amp; label == 'word'</code></li> 
+   * </ul>
+   * <p><em>NB</em> all expressions must match by either id or layer.id.
+   * @param layerId The layer ID of the resulting annotation.
+   * @param label The label of the resulting annotation.
+   * @param confidence The confidence rating.
+   * @return The number of new annotations added.
+   * @throws StoreException If an error occurs.
+   * @throws PermissionException If the operation is not permitted.
+   */
+  public int tagMatchingAnnotations(
+    String expression, String layerId, String label, Integer confidence)
+    throws StoreException, PermissionException {
+    
+    try {
+      URL url = editUrl("tagMatchingAnnotations");
+      HttpRequestPost request = new HttpRequestPost(url, getRequiredHttpAuthorization())
+        .setUserAgent()
+        .setHeader("Accept", "application/json")
+        .setParameter("expression", expression)
+        .setParameter("layerId", layerId)
+        .setParameter("label", label)
+        .setParameter("confidence", confidence);
+      if (verbose) System.out.println("tagMatchingAnnotations -> " + request);
+      response = new Response(request.post().getInputStream(), verbose);
+      response.checkForErrors(); // throws a StoreException on error
+      if (response.isModelNull()) return 0;
+      return (Integer)response.getModel();
+    } catch(IOException x) {
+      throw new StoreException("Could not get response.", x);
+    }
+  }  
+
+  /**
    * Destroys the annotation with the given ID.
    * @param id The ID of the transcript.
    * @param annotationId The annotation's ID.
@@ -401,5 +445,39 @@ public class LabbcatEdit extends LabbcatView implements GraphStore
     JsonObject result = model.getJsonObject("result");
     return result.getString(transcript.getName());
   } // end of updateTranscript()
+  
+  /**
+   * Deletes all annotations that match a particular pattern
+   * @param expression An expression that determines which annotations match.
+   * <p> The expression language is loosely based on JavaScript; expressions such as the
+   * following can be used: 
+   * <ul>
+   *  <li><code>layer.id == 'pronunciation' 
+   *       &amp;&amp; first('orthography').label == 'the'</code></li>
+   *  <li><code>first('language').label == 'en' &amp;&amp; layer.id == 'pronunciation' 
+   *       &amp;&amp; first('orthography').label == 'the'</code></li> 
+   * </ul>
+   * <p><em>NB</em> all expressions must match by either id or layer.id.
+   * @return The number of new annotations deleted.
+   * @throws StoreException If an error occurs.
+   * @throws PermissionException If the operation is not permitted.
+   */
+  public int deleteMatchingAnnotations(String expression)
+    throws StoreException, PermissionException {
+    try {
+      URL url = editUrl("deleteMatchingAnnotations");
+      HttpRequestPost request = new HttpRequestPost(url, getRequiredHttpAuthorization())
+        .setUserAgent()
+        .setHeader("Accept", "application/json")
+        .setParameter("expression", expression);
+      if (verbose) System.out.println("deleteMatchingAnnotations -> " + request);
+      response = new Response(request.post(), verbose);
+      response.checkForErrors(); // throws a StoreException on error
+      if (response.isModelNull()) return 0;
+      return (Integer)response.getModel();
+    } catch(IOException x) {
+      throw new StoreException("Could not get response.", x);
+    }
+  }
    
 } // end of class LabbcatEdit
