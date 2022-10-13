@@ -20,12 +20,11 @@
 //    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
 
-package nzilbb.labbcat.test;
+package nzilbb.labbcat;
 	      
 import org.junit.*;
 import static org.junit.Assert.*;
 
-import nzilbb.labbcat.*;
 import javax.json.JsonObject;
 
 /**

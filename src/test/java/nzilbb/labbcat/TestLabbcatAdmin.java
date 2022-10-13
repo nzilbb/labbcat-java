@@ -20,7 +20,7 @@
 //    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
 
-package nzilbb.labbcat.test;
+package nzilbb.labbcat;
 	      
 import org.junit.*;
 import static org.junit.Assert.*;
@@ -43,7 +43,6 @@ import nzilbb.ag.Layer;
 import nzilbb.ag.MediaFile;
 import nzilbb.ag.MediaTrackDefinition;
 import nzilbb.ag.StoreException;
-import nzilbb.labbcat.*;
 import nzilbb.labbcat.model.*;
 import nzilbb.util.IO;
 
@@ -1145,7 +1144,6 @@ public class TestLabbcatAdmin {
         "LayerDictionaryEntry has no entries again " + entries.get("LayerDictionaryEntry"),
         0, entries.get("LayerDictionaryEntry").size());
 
-      labbcat.setVerbose(true);
       labbcat.deleteLexicon("unit-test");
 
       // lexicon not there any more

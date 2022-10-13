@@ -45,6 +45,7 @@ import javax.json.Json;
 import javax.json.JsonArray;
 import javax.json.JsonNumber;
 import javax.json.JsonObject;
+import javax.json.JsonString;
 import javax.swing.JOptionPane;
 import javax.swing.JPasswordField;
 import nzilbb.ag.Anchor;
@@ -526,7 +527,7 @@ public class LabbcatView implements GraphStoreQuery {
       response = new Response(request.get(), verbose);
       response.checkForErrors(); // throws a StoreException on error
       if (response.isModelNull()) return null;
-      return response.getModel().toString();
+      return ((JsonString)response.getModel()).getString();
     } catch(IOException x) {
       throw new StoreException("Could not get response.", x);
     }
