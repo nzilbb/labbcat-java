@@ -1270,63 +1270,63 @@ public class LabbcatAdmin extends LabbcatEdit implements GraphStoreAdministratio
     File file, String lexicon, String fieldDelimiter, String fieldNames,
     String quote, String comment, boolean skipFirstLine)
     throws StoreException {
-      URL url = makeUrl("edit/annotator/ext/FlatLexiconTagger/loadLexicon");
-      if (quote == null) quote = "";
-      if (comment == null) comment = "";
-      if (lexicon == null) lexicon = file.getName();
+    URL url = makeUrl("edit/annotator/ext/FlatLexiconTagger/loadLexicon");
+    if (quote == null) quote = "";
+    if (comment == null) comment = "";
+    if (lexicon == null) lexicon = file.getName();
+    try {
+      postRequest = new HttpRequestPostMultipart(url, getRequiredHttpAuthorization())
+        .setUserAgent()
+        //.setHeader("Accept", "application/json")
+        .setParameter("lexicon", lexicon)
+        .setParameter("fieldDelimiter", fieldDelimiter)
+        .setParameter("quote", quote)
+        .setParameter("comment", comment)
+        .setParameter("fieldNames", fieldNames)
+        .setParameter("skipFirstLine", skipFirstLine)
+        .setParameter("file", file);
+      if (verbose) System.out.println("loadLexicon -> " + postRequest);
+      HttpURLConnection connection = postRequest.post();
       try {
-        postRequest = new HttpRequestPostMultipart(url, getRequiredHttpAuthorization())
-          .setUserAgent()
-          //.setHeader("Accept", "application/json")
-          .setParameter("lexicon", lexicon)
-          .setParameter("fieldDelimiter", fieldDelimiter)
-          .setParameter("quote", quote)
-          .setParameter("comment", comment)
-          .setParameter("fieldNames", fieldNames)
-          .setParameter("skipFirstLine", skipFirstLine)
-          .setParameter("file", file);
-        if (verbose) System.out.println("loadLexicon -> " + postRequest);
-        HttpURLConnection connection = postRequest.post();
-        try {
-          String response = IO.InputStreamToString​(connection.getInputStream());
-          if (verbose) System.out.println("response: " + response);
-        } catch(IOException exception) {
-          String error = IO.InputStreamToString​(connection.getErrorStream());
-          if (verbose) System.out.println("ERROR: " + error);
-          throw new StoreException(
-            exception.getMessage() + ": " + error);
-        }
-        
-        // the server loads the lexicon asynchronously, wait for it to finish
-        boolean running = true;
-        String status = "Uploading";
-        int percentComplete = 0;
-        URL runningUrl = makeUrl("edit/annotator/ext/FlatLexiconTagger/getRunning");
-        URL statusUrl = makeUrl("edit/annotator/ext/FlatLexiconTagger/getStatus");
-        URL percentCompleteUrl = makeUrl(
-          "edit/annotator/ext/FlatLexiconTagger/getPercentComplete");
-        while(running) {
-          try { Thread.sleep(1000); } catch(Exception x) {}
-          running = IO.InputStreamToString​(
-            new HttpRequestGet(runningUrl, getRequiredHttpAuthorization()).get().getInputStream())
-            .equalsIgnoreCase("true");
-          status = IO.InputStreamToString​(
-            new HttpRequestGet(statusUrl, getRequiredHttpAuthorization()).get().getInputStream());
-          percentComplete = Integer.parseInt(
-            IO.InputStreamToString​(
-              new HttpRequestGet(percentCompleteUrl, getRequiredHttpAuthorization()).get()
-              .getInputStream()));
-          if (verbose) {
-            System.out.println("status: " + percentComplete + "% " + status + " - " + running);
-          }
-        }
-        if (verbose) System.out.println("Finished.");
-        if (percentComplete < 100) {
-          throw new StoreException(status);
-        }
-      } catch (IOException x) {
-        throw new StoreException("Could not get response.", x);
+        String response = IO.InputStreamToString​(connection.getInputStream());
+        if (verbose) System.out.println("response: " + response);
+      } catch(IOException exception) {
+        String error = IO.InputStreamToString​(connection.getErrorStream());
+        if (verbose) System.out.println("ERROR: " + error);
+        throw new StoreException(
+          exception.getMessage() + ": " + error);
       }
+        
+      // the server loads the lexicon asynchronously, wait for it to finish
+      boolean running = true;
+      String status = "Uploading";
+      int percentComplete = 0;
+      URL runningUrl = makeUrl("edit/annotator/ext/FlatLexiconTagger/getRunning");
+      URL statusUrl = makeUrl("edit/annotator/ext/FlatLexiconTagger/getStatus");
+      URL percentCompleteUrl = makeUrl(
+        "edit/annotator/ext/FlatLexiconTagger/getPercentComplete");
+      while(running) {
+        try { Thread.sleep(1000); } catch(Exception x) {}
+        running = IO.InputStreamToString​(
+          new HttpRequestGet(runningUrl, getRequiredHttpAuthorization()).get().getInputStream())
+          .equalsIgnoreCase("true");
+        status = IO.InputStreamToString​(
+          new HttpRequestGet(statusUrl, getRequiredHttpAuthorization()).get().getInputStream());
+        percentComplete = Integer.parseInt(
+          IO.InputStreamToString​(
+            new HttpRequestGet(percentCompleteUrl, getRequiredHttpAuthorization()).get()
+            .getInputStream()));
+        if (verbose) {
+          System.out.println("status: " + percentComplete + "% " + status + " - " + running);
+        }
+      }
+      if (verbose) System.out.println("Finished.");
+      if (percentComplete < 100) {
+        throw new StoreException(status);
+      }
+    } catch (IOException x) {
+      throw new StoreException("Could not get response.", x);
+    }
   } // end of loadLexicon()
   
   /**
