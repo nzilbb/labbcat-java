@@ -7,6 +7,7 @@
   <groupId>nzilbb</groupId>
   <artifactId>nzilbb.labbcat</artifactId>
   <version>1.0.0</version>
+  <packaging>jar</packaging>
 
   <name>nzilbb.labbcat</name>
   <description>Client library for communicating with LaBB-CAT corpus servers.</description>
@@ -73,7 +74,6 @@
               <Implementation-Vendor>New Zealand Institute of Language, Brain and Behaviour</Implementation-Vendor>
             </manifestEntries>
           </archive>
-          <outputDirectory>../bin</outputDirectory>
         </configuration>
       </plugin>
       

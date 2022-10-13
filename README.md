@@ -18,10 +18,10 @@ this one.
 
 ## Build targets
 
-- `ant` - builds bin/nzilbb.labbcat.jar
-- `ant test` - runs unit tests, which requires a running LaBB-CAT server to work; you
+- `mvn package` - builds target/nzilbb.labbcat-n.n.n.jar
+- `mvn test` - runs unit tests, which requires a running LaBB-CAT server to work; you
    must set the URL/credentials in the unit test files in nzilbb/labbcat/test/ 
-- `ant javadoc` - produces JavaDoc API documentation.
+- `mvn site` - produces JavaDoc API documentation.
 
 ## Usage
 
