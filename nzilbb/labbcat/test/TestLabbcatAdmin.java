@@ -1,5 +1,5 @@
 //
-// Copyright 2020 New Zealand Institute of Language, Brain and Behaviour, 
+// Copyright 2020-2022 New Zealand Institute of Language, Brain and Behaviour, 
 // University of Canterbury
 // Written by Robert Fromont - robert.fromont@canterbury.ac.nz
 //
@@ -26,9 +26,15 @@ import org.junit.*;
 import static org.junit.Assert.*;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.net.URL;
 import java.net.MalformedURLException;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.Vector;
 import java.util.stream.Collectors;
 import nzilbb.ag.Anchor;
 import nzilbb.ag.Annotation;
@@ -39,6 +45,7 @@ import nzilbb.ag.MediaTrackDefinition;
 import nzilbb.ag.StoreException;
 import nzilbb.labbcat.*;
 import nzilbb.labbcat.model.*;
+import nzilbb.util.IO;
 
 /**
  * Unit tests for LabbcatAdmin.
@@ -1046,8 +1053,173 @@ public class TestLabbcatAdmin {
          } catch(Exception exception) {}         
      }
    }
+  
+   @Test public void layerDictionaryManagement() throws Exception {
+     File lexiconPath = new File(getDir(), "lexicon.txt");
 
-   public static void main(String args[]) {
-      org.junit.runner.JUnitCore.main("nzilbb.labbcat.test.TestLabbcatAdmin");
+     try {
+       // upload a lexicon
+       labbcat.loadLexicon(lexiconPath, "unit-test", ",", "word,definition", null, null, false);
+
+       String[] targetEntries = { "test-word", "DictionaryEntry", "LayerDictionaryEntry" };
+       File csv = labbcat.getDictionaryEntries(
+         "FlatFileDictionary", "unit-test:word->definition", targetEntries);
+       Map<String,List<String>> entries = readEntries(csv);
+       assertEquals("Word has two entries " + entries.get("test-word"),
+                    2, entries.get("test-word").size());
+       assertEquals("First entry correct",
+                    "test-word-1", entries.get("test-word").get(0));
+       assertEquals("Second entry correct",
+                    "test-word-2", entries.get("test-word").get(1));
+       assertEquals("DictionaryEntry has no entries " + entries.get("DictionaryEntry"),
+                    0, entries.get("DictionaryEntry").size());
+       assertEquals("LayerDictionaryEntry has no entries " + entries.get("LayerDictionaryEntry"),
+                    0, entries.get("LayerDictionaryEntry").size());
+            
+       // get annotator descriptor TODO
+       // descriptor = labbcat.getAnnotatorDescriptor("FlatLexiconTagger")
+       // self.assertIsNotNone(descriptor, "There is a descriptor")
+       // for key in ["annotatorId", "info", "extApiInfo"]:
+       //     with self.subTest(key=key):
+       //         self.assertIn(key, descriptor, "Has " + key)
+       
+       // test annotatorExt
+       String lexiconListJSON = labbcat.annotatorExt("FlatLexiconTagger", "listLexicons");
+       // JsonArray lexiconList = Json.createReader(new StringReader(lexiconListJSON)).readArray();
+       assertTrue("Has unit-text lexicon: " + lexiconListJSON,
+                  lexiconListJSON.indexOf("\"unit-test\"") >= 0);
+       labbcat.addDictionaryEntry(
+         "FlatFileDictionary", "unit-test:word->definition", "DictionaryEntry", "new-entry-1");
+        
+       // now there's a definition
+       csv = labbcat.getDictionaryEntries(
+         "FlatFileDictionary", "unit-test:word->definition", targetEntries);
+       entries = readEntries(csv);
+       assertEquals("DictionaryEntry has one entries " + entries.get("DictionaryEntry"),
+                    1, entries.get("DictionaryEntry").size());
+       assertEquals("DictionaryEntry entry is correct",
+                    "new-entry-1", entries.get("DictionaryEntry").get(0));
+            
+       labbcat.removeDictionaryEntry(
+         "FlatFileDictionary", "unit-test:word->definition", "DictionaryEntry", null);
+       
+       // now there's no definition
+       csv = labbcat.getDictionaryEntries(
+         "FlatFileDictionary", "unit-test:word->definition", targetEntries);
+       entries = readEntries(csv);
+       assertEquals("DictionaryEntry has no entries again " + entries.get("DictionaryEntry"),
+                    0, entries.get("DictionaryEntry").size());
+            
+       // newLayer...
+      Layer testLayer = new Layer("unit-test", "Unit test layer")
+         .setParentId("word")
+         .setAlignment(Constants.ALIGNMENT_NONE)
+         .setPeers(true)
+         .setPeersOverlap(true)
+         .setParentIncludes(true)
+         .setSaturated(true)
+         .setType(Constants.TYPE_STRING);
+      testLayer.put("layer_manager_id", "FlatFileDictionary");
+      testLayer.put(
+        "extra",
+        "tokenLayerId=orthography&tagLayerId=test&dictionary=unit-test:word->definition");
+      labbcat.newLayer(testLayer);
+            
+      labbcat.addLayerDictionaryEntry("unit-test", "LayerDictionaryEntry", "new-layer-entry-1");
+            
+       // now there's a definition
+       csv = labbcat.getDictionaryEntries(
+         "FlatFileDictionary", "unit-test:word->definition", targetEntries);
+       entries = readEntries(csv);
+       assertEquals("LayerDictionaryEntry has one entries " + entries.get("LayerDictionaryEntry"),
+                    1, entries.get("LayerDictionaryEntry").size());
+       assertEquals("LayerDictionaryEntry entry is correct",
+                    "new-layer-entry-1", entries.get("LayerDictionaryEntry").get(0));
+       labbcat.removeLayerDictionaryEntry("unit-test", "LayerDictionaryEntry", null);
+            
+       // now there's no definition
+       csv = labbcat.getDictionaryEntries(
+         "FlatFileDictionary", "unit-test:word->definition", targetEntries);
+       entries = readEntries(csv);
+       assertEquals(
+         "LayerDictionaryEntry has no entries again " + entries.get("LayerDictionaryEntry"),
+         0, entries.get("LayerDictionaryEntry").size());
+
+       labbcat.setVerbose(true);
+       labbcat.deleteLexicon("unit-test");
+
+       // lexicon not there any more
+       lexiconListJSON = labbcat.annotatorExt("FlatLexiconTagger", "listLexicons");
+       assertTrue("unit-test lexicon is gone: " + lexiconListJSON,
+                  lexiconListJSON.indexOf("\"unit-test\"") < 0);
+            
+       // there are no entries
+       try {
+         csv = labbcat.getDictionaryEntries(
+           "FlatFileDictionary", "unit-test:word->definition", targetEntries);
+         csv.delete();
+         fail("Getting entries for deleted lexicon should fail");
+       } catch (ResponseException x) {
+       }
+     } finally {
+       try {
+         labbcat.deleteLayer("unit-test");
+       } catch(Exception exception) {
+         System.err.println(""+exception);
+       }
+     }
    }
+  
+  /**
+   * Reads a CSV file into a map of lists, and then deletes the file.
+   * @param csv Dictionary file.
+   * @return A map of keys to values.
+   * @throws IOException
+   */
+  public Map<String,List<String>> readEntries(File csv) throws Exception {
+    // load csv file into map
+    String csvString = IO.InputStreamToString​(new FileInputStream(csv));
+    Map<String,List<String>> entries = new HashMap<String,List<String>>();
+    for (String line : csvString.split("\n")) {
+      if (line.length() > 0) {
+        Vector<String> values = new Vector<String>(Arrays.asList(line.split(",")));
+        String key = values.remove(0);
+        entries.put(key, values);
+      }
+    } // next line
+    csv.delete();
+    return entries;
+  } // end of readEntries()
+
+  /**
+   * Directory for text files.
+   * @see #getDir()
+   * @see #setDir(File)
+   */
+  protected File fDir;
+  /**
+   * Getter for {@link #fDir}: Directory for text files.
+   * @return Directory for text files.
+   */
+  public File getDir() { 
+    if (fDir == null) {
+      try {
+        URL urlThisClass = getClass().getResource(getClass().getSimpleName() + ".class");
+        File fThisClass = new File(urlThisClass.toURI());
+        fDir = fThisClass.getParentFile();
+      } catch(Throwable t) {
+        System.out.println("" + t);
+      }
+    }
+    return fDir; 
+  }
+  /**
+   * Setter for {@link #fDir}: Directory for text files.
+   * @param fNewDir Directory for text files.
+   */
+  public void setDir(File fNewDir) { fDir = fNewDir; }
+  
+  public static void main(String args[]) {
+    org.junit.runner.JUnitCore.main("nzilbb.labbcat.test.TestLabbcatAdmin");
+  }
 }

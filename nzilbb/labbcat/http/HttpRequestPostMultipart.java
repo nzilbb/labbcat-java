@@ -350,7 +350,7 @@ public class HttpRequestPostMultipart {
    public HttpRequestPostMultipart setParameter(String name, File file) throws IOException {
       
       if (file == null) return this; //20100520 robert.fromont@canterbury.ac.nz 
-      setParameter(name, file.getPath(), new FileInputStream(file));
+      setParameter(name, file.getName(), new FileInputStream(file));
       return this;
    }
    

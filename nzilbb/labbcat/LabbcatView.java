@@ -35,7 +35,10 @@ import java.util.Base64;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
+import java.util.Vector;
 import java.util.Vector;
 import java.util.function.Consumer;
 import javax.json.Json;
@@ -2628,5 +2631,82 @@ public class LabbcatView implements GraphStoreQuery {
       throw new StoreException("Could not get response.", x);
     }
   } // end of getUserInfo()
+
+  /**
+   * List dictionaries available.
+   * @return A map of layer manager IDs to lists of dictionary IDs.
+   * @throws StoreException
+   */
+  public Map<String,List<String>> getDictionaries() throws StoreException {
+    try {
+      HttpRequestGet request = get("dictionaries") 
+        .setHeader("Accept", "application/json");
+      if (verbose) System.out.println("getDictionaries -> " + request);
+      response = new Response(request.get(), verbose);
+      response.checkForErrors(); // throws a StoreException on error
+      if (response.isModelNull()) return null;
+      JsonObject model = (JsonObject)response.getModel();
+      Map<String,List<String>> layerManagerDictionaries = new TreeMap<String,List<String>>();
+      for (String layerManagerId : model.keySet()) {
+        List<String> ids = new Vector<String>();
+        JsonArray array = model.getJsonArray(layerManagerId);
+        for (int i = 0; i < array.size(); i++) {
+          ids.add(array.getString(i));
+        }
+        layerManagerDictionaries.put(layerManagerId, ids);
+      }
+      return layerManagerDictionaries;
+    } catch(IOException x) {
+      throw new StoreException("Could not get response.", x);
+    }
+  } // end of getDictionaries()
+  
+  /**
+   * Lookup entries in a dictionary.
+   * @param managerId
+   * @param dictionaryId
+   * @param keys
+   * @return A CSV file with the entries, which it is the caller's
+   * responsibility to delete once processing is finished.
+   * @throws StoreException
+   */
+  public File getDictionaryEntries(
+    String managerId, String dictionaryId, String[] keys) throws StoreException {
+    
+    // save keys to file
+    File uploadfile = null;
+    try {
+      uploadfile = File.createTempFile("getDictionaryEntries_",".csv");
+      PrintWriter csv = new PrintWriter(uploadfile);
+      for (String key : keys) csv.println(key);
+      csv.close();
+    } catch(IOException x) {
+      throw new StoreException("Could not save keys to local file.", x);
+    }
+    
+    URL url = makeUrl("dictionary");
+    try {
+      postRequest = new HttpRequestPostMultipart(url, getRequiredHttpAuthorization())
+        .setUserAgent()
+        .setHeader("Accept", "text/csv")
+        .setParameter("managerId", managerId)
+        .setParameter("dictionaryId", dictionaryId)
+        .setParameter("uploadfile", uploadfile);
+      if (verbose) System.out.println("getDictionaryEntries -> " + postRequest);
+      HttpURLConnection connection = postRequest.post();
+      if (connection.getResponseCode() != HttpURLConnection.HTTP_OK) {
+        response = new Response(connection, verbose);
+        response.checkForErrors(); // throws a ResponseException on error
+      }
+      
+      // use the name given by the server, if any
+      File csv = File.createTempFile("getTranscriptAttributes_",".csv");
+      csv.deleteOnExit();
+      IO.SaveUrlConnectionToFile(connection, csv);
+      return csv;
+    } catch (IOException x) {
+      throw new StoreException("Could not get response.", x);
+    }
+  } // end of getDictionaryEntries()
 
 } // end of class LabbcatView

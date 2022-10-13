@@ -23,8 +23,17 @@ package nzilbb.labbcat;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.URLEncoder;
+import java.util.Arrays;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeMap;
+import java.util.TreeSet;
+import java.util.stream.Collectors;
 import javax.json.Json;
 import javax.json.JsonArray;
 import javax.json.JsonObject;
@@ -35,6 +44,7 @@ import nzilbb.ag.GraphStore;
 import nzilbb.ag.PermissionException;
 import nzilbb.ag.StoreException;
 import nzilbb.labbcat.http.*;
+import nzilbb.util.IO;
 
 /**
  * Client-side implementation of 
@@ -479,5 +489,184 @@ public class LabbcatEdit extends LabbcatView implements GraphStore
       throw new StoreException("Could not get response.", x);
     }
   }
-   
+  
+  /**
+   * Adds an entry to a layer dictionary.
+   * <p> This function adds a new entry to the dictionary that manages a given layer, and
+   * updates all affected tokens in the corpus. Words can have multiple entries.
+   * @param layerId The ID of the layer with a dictionary configured to manage it.
+   * @param key The key (word) in the dictionary to add an entry for.
+   * @param entry The value (definition) for the given key.
+   * @throws StoreException
+   */
+  public void addLayerDictionaryEntry(String layerId, String key, String entry)
+    throws StoreException {
+    try {
+      HttpRequestPost request = post("api/edit/dictionary/add")
+        .setHeader("Accept", "application/json")
+        .setParameter("layerId", layerId)
+        .setParameter("key", key)
+        .setParameter("entry", entry);
+      if (verbose) System.out.println("addLayerDictionaryEntry -> " + request);
+      response = new Response(request.post(), verbose);
+      response.checkForErrors(); // throws a StoreException on error
+    } catch(IOException x) {
+      throw new StoreException("Could not get response.", x);
+    }
+  } // end of addLayerDictionaryEntry()  
+  
+  /**
+   * Removes an entry from a layer dictionary.
+   * <p> This function removes an existing entry from the dictionary that manages a given
+   * layer, and updates all affected tokens in the corpus. Words can have multiple entries.
+   * @param layerId The ID of the layer with a dictionary configured to manage it.
+   * @param key The key (word) in the dictionary to remove an entry for.
+   * @param entry The value (definition) to remove, or null to remove all the entries for
+   * <var>key</var>. 
+   * @throws StoreException
+   */
+  public void removeLayerDictionaryEntry(String layerId, String key, String entry)
+    throws StoreException {
+    try {
+      HttpRequestPost request = post("api/edit/dictionary/remove")
+        .setHeader("Accept", "application/json")
+        .setParameter("layerId", layerId)
+        .setParameter("key", key);
+      if (entry != null) request.setParameter("entry", entry);
+      if (verbose) System.out.println("addLayerDictionaryEntry -> " + request);
+      response = new Response(request.post(), verbose);
+      response.checkForErrors(); // throws a StoreException on error
+    } catch(IOException x) {
+      throw new StoreException("Could not get response.", x);
+    }
+  } // end of removeLayerDictionaryEntry()
+  
+  /**
+   * Adds an entry to a dictionary.
+   * <p> This function adds a new entry to the given dictionary. Words can have multiple entries.
+   * @param managerId The layer manager ID of the dictionary, as returned by
+   * {@link LabbcatView#getDictionaries()}
+   * @param dictionaryId The ID of the dictionary, as returned by
+   * {@link LabbcatView#getDictionaries()}
+   * @param key The key (word) in the dictionary to add an entry for.
+   * @param entry The value (definition) for the given key.
+   * @throws StoreException
+   */
+  public void addDictionaryEntry(String managerId, String dictionaryId, String key, String entry)
+    throws StoreException {
+    try {
+      HttpRequestPost request = post("api/edit/dictionary/add")
+        .setHeader("Accept", "application/json")
+        .setParameter("layerManagerId", managerId)
+        .setParameter("dictionaryId", dictionaryId)
+        .setParameter("key", key)
+        .setParameter("entry", entry);
+      if (verbose) System.out.println("addLayerDictionaryEntry -> " + request);
+      response = new Response(request.post(), verbose);
+      response.checkForErrors(); // throws a StoreException on error
+    } catch(IOException x) {
+      throw new StoreException("Could not get response.", x);
+    }
+  } // end of addDictionaryEntry()
+  
+  /**
+   * Removes an entry from a dictionary.
+   * <p> This function removes an existing entry from the given dictionary. Words can have
+   * multiple entries.
+   * @param managerId The layer manager ID of the dictionary, as returned by
+   * {@link LabbcatView#getDictionaries()}
+   * @param dictionaryId The ID of the dictionary, as returned by
+   * {@link LabbcatView#getDictionaries()}
+   * @param key The key (word) in the dictionary to remove an entry for.
+   * @param entry The value (definition) to remove, or None to remove all the entries for key.
+   * @throws StoreException
+   */
+  public void removeDictionaryEntry(
+    String managerId, String dictionaryId, String key, String entry) throws StoreException {
+    try {
+      HttpRequestPost request = post("api/edit/dictionary/remove")
+        .setHeader("Accept", "application/json")
+        .setParameter("layerManagerId", managerId)
+        .setParameter("dictionaryId", dictionaryId)
+        .setParameter("key", key);
+      if (entry != null) request.setParameter("entry", entry);
+      if (verbose) System.out.println("addLayerDictionaryEntry -> " + request);
+      response = new Response(request.post(), verbose);
+      response.checkForErrors(); // throws a StoreException on error
+    } catch(IOException x) {
+      throw new StoreException("Could not get response.", x);
+    }
+  } // end of removeDictionaryEntry()
+  
+  /**
+   * Retrieve an annotator's given "ext" resource.
+   * <p> Retrieve a given resource from an annotator's "ext" web app. Annotators are modules
+   * that perform different annotation tasks, and can optionally implement functionality for
+   * providing extra data or extending functionality in an annotator-specific way. If the
+   * annotator implements an "ext" web app, it can provide resources and implement a
+   * mechanism for iterrogating the annotator. This function provides a mechanism for
+   * accessing these resources via python.
+   * <p> Details about the resources available for a given annotator are available by
+   * calling {@link #getAnnotatorDescriptor(String)} and checking "hasExtWebapp" attribute
+   * to ensure an 'ext' webapp is implemented, and checking details the "extApiInfo" attribute.
+   * @param annotatorId ID of the annotator to interrogate.
+   * @param resource The name of the file to retrieve or instance method (function) to
+   * invoke. Possible values for this depend on the specific annotator being interrogated.
+   * @return The resource requested.
+   * @throws StoreException
+   */
+  public String annotatorExt(String annotatorId, String resource)
+    throws StoreException {
+    return annotatorExt(annotatorId, resource, null);
+  }
+  /**
+   * Retrieve an annotator's given "ext" resource.
+   * <p> Retrieve a given resource from an annotator's "ext" web app. Annotators are modules
+   * that perform different annotation tasks, and can optionally implement functionality for
+   * providing extra data or extending functionality in an annotator-specific way. If the
+   * annotator implements an "ext" web app, it can provide resources and implement a
+   * mechanism for iterrogating the annotator. This function provides a mechanism for
+   * accessing these resources via python.
+   * <p> Details about the resources available for a given annotator are available by
+   * calling {@link #getAnnotatorDescriptor(String)} and checking "hasExtWebapp" attribute
+   * to ensure an 'ext' webapp is implemented, and checking details the "extApiInfo" attribute.
+   * @param annotatorId ID of the annotator to interrogate.
+   * @param resource The name of the file to retrieve or instance method (function) to
+   * invoke. Possible values for this depend on the specific annotator being interrogated.
+   * @param parameters Optional list of ordered parameters for the instance method (function).
+   * @return The resource requested.
+   * @throws StoreException
+   */
+  public String annotatorExt(String annotatorId, String resource, String[] parameters)
+    throws StoreException {
+    try {
+      String queryString = "";
+      if (parameters != null && parameters.length > 0) {
+        queryString = "?" + Arrays.stream(parameters)
+          .map(p->{
+              try {
+                return URLEncoder.encode(p, "UTF-8");
+              } catch(UnsupportedEncodingException exception) { return ""; }
+            })
+          .collect(Collectors.joining(","));
+      }
+      HttpRequestGet request = get(
+        "edit/annotator/ext/"
+        +URLEncoder.encode(annotatorId, "UTF-8")
+        +"/"+URLEncoder.encode(resource, "UTF-8")
+        +queryString)
+        .setHeader("Accept", "text/plain");
+      if (verbose) System.out.println("annotatorExt -> " + request);
+      HttpURLConnection connection = request.get();
+      int httpStatus = connection.getResponseCode();
+      if (verbose) System.out.println("HTTP status: " + connection.getResponseCode());
+      if (httpStatus != HttpURLConnection.HTTP_OK) {
+        throw new StoreException(IO.InputStreamToString(connection.getErrorStream()));
+      }
+      return IO.InputStreamToString(connection.getInputStream());
+    } catch(IOException x) {
+      throw new StoreException("Could not get response.", x);
+    }
+  } // end of annotatorExt()
+
 } // end of class LabbcatEdit

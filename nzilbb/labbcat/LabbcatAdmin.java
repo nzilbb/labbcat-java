@@ -21,9 +21,12 @@
 //
 package nzilbb.labbcat;
 
+import java.io.File;
 import java.io.IOException;
+import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.URLEncoder;
 import java.util.Vector;
 import javax.json.Json;
 import javax.json.JsonArray;
@@ -44,6 +47,7 @@ import nzilbb.labbcat.model.Role;
 import nzilbb.labbcat.model.RolePermission;
 import nzilbb.labbcat.model.SystemAttribute;
 import nzilbb.labbcat.model.User;
+import nzilbb.util.IO;
 
 /**
  * Client-side implementation of 
@@ -227,6 +231,30 @@ public class LabbcatAdmin extends LabbcatEdit implements GraphStoreAdministratio
       Layer result = new Layer();
       result.fromJson(response.getModel().toString());
       return result;
+    } catch(IOException x) {
+      throw new StoreException("Could not get response.", x);
+    }
+  }
+  
+  /**
+   * Generates annotations on a given layer for all transcripts in the corpus.
+   * @param layerId The ID of the layer to generate annotations for.
+   * @return The thread ID of the the running generation task.
+   * @throws StoreException If an error prevents the operation.
+   * @throws PermissionException If the operation is not permitted.
+   */
+  public String generateLayer(String layerId) throws StoreException, PermissionException {
+    try {
+      HttpRequestPost request = post("admin/layers/regenerate")
+        .setHeader("Accept", "application/json")
+        .setParameter(layerId, layerId)
+        .setParameter("sure", "true");
+      if (verbose) System.out.println("generateLayer -> " + request);
+      response = new Response(request.post(), verbose);
+      response.checkForErrors(); // throws a StoreException on error
+      // extract the threadId from model.threadId
+      JsonObject model = (JsonObject)response.getModel();
+      return model.getString("threadId");
     } catch(IOException x) {
       throw new StoreException("Could not get response.", x);
     }
@@ -1212,7 +1240,119 @@ public class LabbcatAdmin extends LabbcatEdit implements GraphStoreAdministratio
       throw new StoreException("Could not get response.", x);
     }
   } // end of updateUser()
-   
+  
+  /**
+   * Upload a flat lexicon file for lexical tagging.
+   * <p> By default LaBB-CAT includes a layer manager called the Flat Lexicon Tagger, which can
+   * be configured to annotate words with data from a dictionary loaded from a plain text
+   * file (e.g. a CSV file). The file must have a 'flat' structure in the sense that it's a
+   * simple list of dictionary entries with a fixed number of columns/fields, rather than
+   * having a complex structure.
+   * @param file The lexicon file.
+   * @param lexicon The name for the resulting lexicon. If the named lexicon already exists,
+   * it will be completely replaced with the contents of the file (i.e. all existing
+   * entries will be deleted befor adding new entries from the file). e.g. 'cmudict'
+   * @param fieldDelimiter The character used to delimit fields in the file.
+   * If this is " - ", rows are split on only the *first* space,  in line with common
+   * dictionary formats. e.g. ',' for Comma Separated Values (CSV) files.
+   * @param fieldNames A list of field names, delimited by fieldDelimiter,
+   * e.g. 'Word,Pronunciation'.
+   * @param quote The character used to quote field values (if any),
+   * e.g. '"'.
+   * @param comment The character used to indicate a line is a comment (not an entry) (if any)
+   * e.g. '#'.
+   * @param skipFirstLine Whether to ignore the first line of the file (because it
+   * contains field names).
+   * @throws StoreException If the lexicon could not be loaded.
+   * @see #deleteLexicon(String)
+   */
+  public void loadLexicon(
+    File file, String lexicon, String fieldDelimiter, String fieldNames,
+    String quote, String comment, boolean skipFirstLine)
+    throws StoreException {
+      URL url = makeUrl("edit/annotator/ext/FlatLexiconTagger/loadLexicon");
+      if (quote == null) quote = "";
+      if (comment == null) comment = "";
+      if (lexicon == null) lexicon = file.getName();
+      try {
+        postRequest = new HttpRequestPostMultipart(url, getRequiredHttpAuthorization())
+          .setUserAgent()
+          //.setHeader("Accept", "application/json")
+          .setParameter("lexicon", lexicon)
+          .setParameter("fieldDelimiter", fieldDelimiter)
+          .setParameter("quote", quote)
+          .setParameter("comment", comment)
+          .setParameter("fieldNames", fieldNames)
+          .setParameter("skipFirstLine", skipFirstLine)
+          .setParameter("file", file);
+        if (verbose) System.out.println("loadLexicon -> " + postRequest);
+        HttpURLConnection connection = postRequest.post();
+        try {
+          String response = IO.InputStreamToString​(connection.getInputStream());
+          if (verbose) System.out.println("response: " + response);
+        } catch(IOException exception) {
+          String error = IO.InputStreamToString​(connection.getErrorStream());
+          if (verbose) System.out.println("ERROR: " + error);
+          throw new StoreException(
+            exception.getMessage() + ": " + error);
+        }
+        
+        // the server loads the lexicon asynchronously, wait for it to finish
+        boolean running = true;
+        String status = "Uploading";
+        int percentComplete = 0;
+        URL runningUrl = makeUrl("edit/annotator/ext/FlatLexiconTagger/getRunning");
+        URL statusUrl = makeUrl("edit/annotator/ext/FlatLexiconTagger/getStatus");
+        URL percentCompleteUrl = makeUrl(
+          "edit/annotator/ext/FlatLexiconTagger/getPercentComplete");
+        while(running) {
+          try { Thread.sleep(1000); } catch(Exception x) {}
+          running = IO.InputStreamToString​(
+            new HttpRequestGet(runningUrl, getRequiredHttpAuthorization()).get().getInputStream())
+            .equalsIgnoreCase("true");
+          status = IO.InputStreamToString​(
+            new HttpRequestGet(statusUrl, getRequiredHttpAuthorization()).get().getInputStream());
+          percentComplete = Integer.parseInt(
+            IO.InputStreamToString​(
+              new HttpRequestGet(percentCompleteUrl, getRequiredHttpAuthorization()).get()
+              .getInputStream()));
+          if (verbose) {
+            System.out.println("status: " + percentComplete + "% " + status + " - " + running);
+          }
+        }
+        if (verbose) System.out.println("Finished.");
+        if (percentComplete < 100) {
+          throw new StoreException(status);
+        }
+      } catch (IOException x) {
+        throw new StoreException("Could not get response.", x);
+      }
+  } // end of loadLexicon()
+  
+  /**
+   * Delete a previously loaded lexicon.
+   * @param lexicon
+   * @throws StoreException
+   * @see #loadLexicon(File,String,String,String,String,String,boolean)
+   */
+  public void deleteLexicon(String lexicon) throws StoreException {
+    try {
+      HttpRequestGet request = get(
+        "edit/annotator/ext/FlatLexiconTagger/deleteLexicon?"
+        +URLEncoder.encode(lexicon, "UTF-8"))
+        .setHeader("Accept", "text/plain");
+      if (verbose) System.out.println("deleteLexicon -> " + request);
+      HttpURLConnection connection = request.get();
+      int httpStatus = connection.getResponseCode();
+      if (verbose) System.out.println("HTTP status: " + connection.getResponseCode());
+      if (httpStatus != HttpURLConnection.HTTP_OK) {
+        throw new StoreException(connection.getResponseMessage());
+      }
+    } catch(IOException x) {
+      throw new StoreException("Could not get response.", x);
+    }
+  } // end of deleteLexicon()
+
   // TODO uploadAnnotator
   // TODO installAnnotator
   // TODO uninstallAnnotator
