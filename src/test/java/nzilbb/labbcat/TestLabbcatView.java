@@ -27,6 +27,7 @@ import static org.junit.Assert.*;
 
 import java.io.File;
 import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.Set;
@@ -672,8 +673,36 @@ public class TestLabbcatView {
       assertNotNull("Roles returned", user.getRoles());
       assertTrue("There are roles", user.getRoles().length > 0);
    }
+  
+  /**
+   * Directory for text files.
+   * @see #getDir()
+   * @see #setDir(File)
+   */
+  protected File fDir;
+  /**
+   * Getter for {@link #fDir}: Directory for text files.
+   * @return Directory for text files.
+   */
+  public File getDir() { 
+    if (fDir == null) {
+      try {
+        URL urlThisClass = getClass().getResource(getClass().getSimpleName() + ".class");
+        File fThisClass = new File(urlThisClass.toURI());
+        fDir = fThisClass.getParentFile();
+      } catch(Throwable t) {
+        System.out.println("" + t);
+      }
+    }
+    return fDir; 
+  }
+  /**
+   * Setter for {@link #fDir}: Directory for text files.
+   * @param fNewDir Directory for text files.
+   */
+  public void setDir(File fNewDir) { fDir = fNewDir; }
    
    public static void main(String args[]) {
-      org.junit.runner.JUnitCore.main("nzilbb.labbcat.test.TestLabbcatView");
+      org.junit.runner.JUnitCore.main("nzilbb.labbcat.TestLabbcatView");
    }
 }

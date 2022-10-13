@@ -27,6 +27,7 @@ import static org.junit.Assert.*;
 
 import java.io.File;
 import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.Arrays;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -269,7 +270,7 @@ public class TestLabbcatEdit {
       assertTrue("There is at least one transcript type", typeLayer.getValidLabels().size() > 0);
       String transcriptType = typeLayer.getValidLabels().keySet().iterator().next();
 
-      File transcript = new File("nzilbb/labbcat/test/nzilbb.labbcat.test.txt");
+      File transcript = new File(getDir(), "nzilbb.labbcat.test.txt");
       String participantId = "UnitTester";
       assertTrue("Test transcript exists", transcript.exists());
       try {
@@ -325,8 +326,36 @@ public class TestLabbcatEdit {
          }
       }
    }
+  
+  /**
+   * Directory for text files.
+   * @see #getDir()
+   * @see #setDir(File)
+   */
+  protected File fDir;
+  /**
+   * Getter for {@link #fDir}: Directory for text files.
+   * @return Directory for text files.
+   */
+  public File getDir() { 
+    if (fDir == null) {
+      try {
+        URL urlThisClass = getClass().getResource(getClass().getSimpleName() + ".class");
+        File fThisClass = new File(urlThisClass.toURI());
+        fDir = fThisClass.getParentFile();
+      } catch(Throwable t) {
+        System.out.println("" + t);
+      }
+    }
+    return fDir; 
+  }
+  /**
+   * Setter for {@link #fDir}: Directory for text files.
+   * @param fNewDir Directory for text files.
+   */
+  public void setDir(File fNewDir) { fDir = fNewDir; }
 
    public static void main(String args[]) {
-      org.junit.runner.JUnitCore.main("nzilbb.labbcat.test.TestLabbcatEdit");
+      org.junit.runner.JUnitCore.main("nzilbb.labbcat.TestLabbcatEdit");
    }
 }

@@ -1218,6 +1218,6 @@ public class TestLabbcatAdmin {
   public void setDir(File fNewDir) { fDir = fNewDir; }
   
   public static void main(String args[]) {
-    org.junit.runner.JUnitCore.main("nzilbb.labbcat.test.TestLabbcatAdmin");
+    org.junit.runner.JUnitCore.main("nzilbb.labbcat.TestLabbcatAdmin");
   }
 }

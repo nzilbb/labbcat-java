@@ -26,6 +26,7 @@ import javax.json.JsonArray;
 import javax.json.JsonArrayBuilder;
 import javax.json.JsonObject;
 import javax.json.JsonObjectBuilder;
+import javax.json.JsonString;
 
 /**
  * Project record.
@@ -99,7 +100,7 @@ public class Project {
     */
    public Project(JsonObject json) {      
       if (json.containsKey("project_id")) {
-         projectId = Integer.parseInt(json.get("project_id").toString());
+        projectId = json.getInt("project_id", -1);
       }
       project = json.getString("project");
       description = json.getString("description");

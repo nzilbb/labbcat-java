@@ -24,6 +24,7 @@ package nzilbb.labbcat.model;
 import javax.json.Json;
 import javax.json.JsonArray;
 import javax.json.JsonArrayBuilder;
+import javax.json.JsonNumber;
 import javax.json.JsonObject;
 import javax.json.JsonObjectBuilder;
 import javax.json.JsonValue;
@@ -117,7 +118,7 @@ public class Corpus {
     */
    public Corpus(JsonObject json) {
       if (json.containsKey("corpus_id")) {
-         corpusId = Integer.parseInt(json.get("corpus_id").toString());
+        corpusId = json.getInt("corpus_id", -1);
       }
       name = json.getString("corpus_name");
       language = json.getString("corpus_language");
