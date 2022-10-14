@@ -51,7 +51,7 @@ import nzilbb.util.IO;
 
 /**
  * Client-side implementation of 
- * <a href="https://nzilbb.github.io/ag/javadoc/nzilbb/ag/GraphStoreAdministration.html">nzilbb.ag.GraphStoreAdminitration</a>.
+ * <a href="https://nzilbb.github.io/ag/apidocs/nzilbb/ag/GraphStoreAdministration.html">nzilbb.ag.GraphStoreAdminitration</a>.
  * <p>This class inherits the <em>read-write</em> operations of {@link LabbcatEdit}
  * and adds some administration operations, including definition of layers,
  * registration of converters, etc., i.e. those that can be performed by users with

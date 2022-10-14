@@ -48,7 +48,7 @@ import nzilbb.util.IO;
 
 /**
  * Client-side implementation of 
- * <a href="https://nzilbb.github.io/ag/javadoc/nzilbb/ag/GraphStore.html">nzilbb.ag.GraphStore</a>.
+ * <a href="https://nzilbb.github.io/ag/apidocs/nzilbb/ag/GraphStore.html">nzilbb.ag.GraphStore</a>.
  * <p>This class inherits the <em>read-only</em> operations of {@link LabbcatView}
  * and adds some <em>write</em> operations for updating data, i.e. those that can be
  * performed by users with <q>edit</q> permission.
@@ -297,7 +297,7 @@ public class LabbcatEdit extends LabbcatView implements GraphStore
    * <em>NOT YET IMPLEMENTED</em> - Saves the given media for the given transcript
    * @param id The transcript ID
    * @param trackSuffix The track suffix of the media
-   *  - see <a href="https://nzilbb.github.io/ag/javadoc/nzilbb/ag/MediaTrackDefinition.html#suffix">MediaTrackDefinition.suffix</a>}.
+   *  - see <a href="https://nzilbb.github.io/ag/apidocs/nzilbb/ag/MediaTrackDefinition.html#suffix">MediaTrackDefinition.suffix</a>}.
    * @param mediaUrl A URL to the media content.
    * @throws StoreException If an error prevents the media from being saved.
    * @throws PermissionException If saving the media is not permitted.

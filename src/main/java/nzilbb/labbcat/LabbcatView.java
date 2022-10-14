@@ -73,7 +73,7 @@ import nzilbb.util.MonitorableSeries;
 
 /**
  * Client-side implementation of 
- * <a href="https://nzilbb.github.io/ag/javadoc/nzilbb/ag/GraphStoreQuery.html">nzilbb.ag.GraphStoreQuery</a>.
+ * <a href="https://nzilbb.github.io/ag/apidocs/nzilbb/ag/GraphStoreQuery.html">nzilbb.ag.GraphStoreQuery</a>.
  * <p>This class provides only <em>read-only</em> operations, i.e. those that can be
  * performed by users with <q>view</q> permission. 
  * <p> e.g.
