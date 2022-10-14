@@ -758,11 +758,11 @@ public class LabbcatView implements GraphStoreQuery {
    *  <li><code>labels('corpus').includes('CC')</code></li>
    *  <li><code>labels('participant_languages').includes('en')</code></li>
    *  <li><code>labels('transcript_language').includes('en')</code></li>
-   *  <li><code>!/Ada.+/.test(id) &amp;&amp; my('corpus').label == 'CC'</code></li>
-   *  <li><code>list('transcript_rating').length &gt; 2</code></li>
-   *  <li><code>list('participant_rating').length = 0</code></li>
+   *  <li><code>!/Ada.+/.test(id) &amp;&amp; first('corpus').label == 'CC'</code></li>
+   *  <li><code>all('transcript_rating').length &gt; 2</code></li>
+   *  <li><code>all('participant_rating').length = 0</code></li>
    *  <li><code>!annotators('transcript_rating').includes('labbcat')</code></li>
-   *  <li><code>my('participant_gender').label == 'NA'</code></li>
+   *  <li><code>first('participant_gender').label == 'NA'</code></li>
    * </ul>
    * @return The number of matching participants.
    * @throws StoreException If an error occurs.
@@ -795,11 +795,11 @@ public class LabbcatView implements GraphStoreQuery {
    *  <li><code>labels('corpus').includes('CC')</code></li>
    *  <li><code>labels('participant_languages').includes('en')</code></li>
    *  <li><code>labels('transcript_language').includes('en')</code></li>
-   *  <li><code>!/Ada.+/.test(id) &amp;&amp; my('corpus').label == 'CC'</code></li>
-   *  <li><code>list('transcript_rating').length &gt; 2</code></li>
-   *  <li><code>list('participant_rating').length = 0</code></li>
+   *  <li><code>!/Ada.+/.test(id) &amp;&amp; first('corpus').label == 'CC'</code></li>
+   *  <li><code>all('transcript_rating').length &gt; 2</code></li>
+   *  <li><code>all('participant_rating').length = 0</code></li>
    *  <li><code>!annotators('transcript_rating').includes('labbcat')</code></li>
-   *  <li><code>my('participant_gender').label == 'NA'</code></li>
+   *  <li><code>first('participant_gender').label == 'NA'</code></li>
    * </ul>
    * @param pageLength The maximum number of IDs to return, or null to return all.
    * @param pageNumber The zero-based page number to return, or null to return the first page.
@@ -940,19 +940,19 @@ public class LabbcatView implements GraphStoreQuery {
    * the following can be used: 
    *  <li><code>/Ada.+/.test(id)</code></li>
    *  <li><code>labels('participant').includes('Robert')</code></li>
-   *  <li><code>('CC', 'IA', 'MU').includes(my('corpus').label)</code></li>
-   *  <li><code>my('episode').label == 'Ada Aitcheson'</code></li>
-   *  <li><code>my('transcript_scribe').label == 'Robert'</code></li>
-   *  <li><code>my('participant_languages').label == 'en'</code></li>
-   *  <li><code>my('noise').label == 'bell'</code></li>
+   *  <li><code>('CC', 'IA', 'MU').includes(first('corpus').label)</code></li>
+   *  <li><code>first('episode').label == 'Ada Aitcheson'</code></li>
+   *  <li><code>first('transcript_scribe').label == 'Robert'</code></li>
+   *  <li><code>first('participant_languages').label == 'en'</code></li>
+   *  <li><code>first('noise').label == 'bell'</code></li>
    *  <li><code>labels('transcript_languages').includes('en')</code></li>
    *  <li><code>labels('participant_languages').includes('en')</code></li>
    *  <li><code>labels('noise').includes('bell')</code></li>
-   *  <li><code>list('transcript_languages').length gt; 1</code></li>
-   *  <li><code>list('participant_languages').length gt; 1</code></li>
-   *  <li><code>list('transcript').length gt; 100</code></li>
+   *  <li><code>all('transcript_languages').length gt; 1</code></li>
+   *  <li><code>all('participant_languages').length gt; 1</code></li>
+   *  <li><code>all('transcript').length gt; 100</code></li>
    *  <li><code>annotators('transcript_rating').includes('Robert')</code></li>
-   *  <li><code>!/Ada.+/.test(id) &amp;&amp; my('corpus').label == 'CC' &amp;&amp;
+   *  <li><code>!/Ada.+/.test(id) &amp;&amp; first('corpus').label == 'CC' &amp;&amp;
    * labels('participant').includes('Robert')</code></li> 
    * </ul>
    * @return The number of matching transcripts.
@@ -987,19 +987,19 @@ public class LabbcatView implements GraphStoreQuery {
    * the following can be used:
    *  <li><code>/Ada.+/.test(id)</code></li>
    *  <li><code>labels('participant').includes('Robert')</code></li>
-   *  <li><code>('CC', 'IA', 'MU').includes(my('corpus').label)</code></li>
-   *  <li><code>my('episode').label == 'Ada Aitcheson'</code></li>
-   *  <li><code>my('transcript_scribe').label == 'Robert'</code></li>
-   *  <li><code>my('participant_languages').label == 'en'</code></li>
-   *  <li><code>my('noise').label == 'bell'</code></li>
+   *  <li><code>('CC', 'IA', 'MU').includes(first('corpus').label)</code></li>
+   *  <li><code>first('episode').label == 'Ada Aitcheson'</code></li>
+   *  <li><code>first('transcript_scribe').label == 'Robert'</code></li>
+   *  <li><code>first('participant_languages').label == 'en'</code></li>
+   *  <li><code>first('noise').label == 'bell'</code></li>
    *  <li><code>labels('transcript_languages').includes('en')</code></li>
    *  <li><code>labels('participant_languages').includes('en')</code></li>
    *  <li><code>labels('noise').includes('bell')</code></li>
-   *  <li><code>list('transcript_languages').length gt; 1</code></li>
-   *  <li><code>list('participant_languages').length gt; 1</code></li>
-   *  <li><code>list('transcript').length gt; 100</code></li>
+   *  <li><code>all('transcript_languages').length gt; 1</code></li>
+   *  <li><code>all('participant_languages').length gt; 1</code></li>
+   *  <li><code>all('transcript').length gt; 100</code></li>
    *  <li><code>annotators('transcript_rating').includes('Robert')</code></li>
-   *  <li><code>!/Ada.+/.test(id) &amp;&amp; my('corpus').label == 'CC' &amp;&amp;
+   *  <li><code>!/Ada.+/.test(id) &amp;&amp; first('corpus').label == 'CC' &amp;&amp;
    * labels('participant').includes('Robert')</code></li> 
    * </ul>
    * @param pageLength The maximum number of IDs to return, or null to return all.
@@ -1046,7 +1046,7 @@ public class LabbcatView implements GraphStoreQuery {
    * <ul>
    *  <li><code>id == 'ew_0_456'</code></li>
    *  <li><code>!/th[aeiou].&#47;/.test(label)</code></li>
-   *  <li><code>my('participant').label == 'Robert' &amp;&amp; my('utterances').start.offset ==
+   *  <li><code>first('participant').label == 'Robert' &amp;&amp; first('utterances').start.offset ==
    * 12.345</code></li> 
    *  <li><code>graph.id == 'AdaAicheson-01.trs' &amp;&amp; layer.id == 'orthography'
    * &amp;&amp; start.offset &gt; 10.5</code></li> 
@@ -1082,7 +1082,7 @@ public class LabbcatView implements GraphStoreQuery {
    * <ul>
    *  <li><code>id == 'ew_0_456'</code></li>
    *  <li><code>!/th[aeiou].&#47;/.test(label)</code></li>
-   *  <li><code>my('participant').label == 'Robert' &amp;&amp; my('utterances').start.offset ==
+   *  <li><code>first('participant').label == 'Robert' &amp;&amp; first('utterances').start.offset ==
    * 12.345</code></li> 
    *  <li><code>graph.id == 'AdaAicheson-01.trs' &amp;&amp; layer.id == 'orthography'
    * &amp;&amp; start.offset 
