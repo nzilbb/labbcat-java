@@ -63,6 +63,13 @@ import nzilbb.ag.automation.util.AnnotatorDescriptor;
 import nzilbb.ag.serialize.GraphDeserializer;
 import nzilbb.ag.serialize.GraphSerializer;
 import nzilbb.ag.serialize.SerializationDescriptor;
+import nzilbb.ag.serialize.SerializationException;
+import nzilbb.ag.serialize.SerializationParametersMissingException;
+import nzilbb.ag.serialize.SerializerNotConfiguredException;
+import nzilbb.ag.serialize.json.JSONSerialization;
+import nzilbb.ag.serialize.util.NamedStream;
+import nzilbb.ag.serialize.util.Utility;
+import nzilbb.configure.ParameterSet;
 import nzilbb.labbcat.http.*;
 import nzilbb.labbcat.model.Match;
 import nzilbb.labbcat.model.MatchId;
@@ -423,7 +430,9 @@ public class LabbcatView implements GraphStoreQuery {
 
   /**
    * Constructs a URL for the given resource.
-   * @param resource The resource, which must be URLEncoded if necessary.
+   * @param resource The resource, which must be URLEncoded if necessary. This can be a
+   * full URL (e.g. as returned by {@link #getMedia(String,String,String,Double,Double)})
+   * as long as from the same LaBB-CAT instance.
    * @return A URL for the given resource.
    * @throws StoreException If the URL is malformed.
    */
@@ -628,7 +637,19 @@ public class LabbcatView implements GraphStoreQuery {
    */
   public Schema getSchema()
     throws StoreException, PermissionException {
-    throw new StoreException("Not implemented");
+      
+    try {
+      URL url = url("getSchema");
+      HttpRequestGet request = new HttpRequestGet(url, getRequiredHttpAuthorization()) 
+        .setUserAgent().setLanguage(language).setHeader("Accept", "application/json");
+      if (verbose) System.out.println("getSchema -> " + request);
+      response = new Response(request.get(), verbose);
+      response.checkForErrors(); // throws a StoreException on error
+      if (response.isModelNull()) return null;
+      return (Schema)new Schema().fromJson((JsonObject)response.getModel());
+    } catch(IOException x) {
+      throw new StoreException("Could not get response.", x);
+    }
   }
 
   /**
@@ -1253,7 +1274,7 @@ public class LabbcatView implements GraphStoreQuery {
   }
 
   /**
-   * <em>NOT YET IMPLEMENTED</em> - Gets a transcript given its ID.
+   * Gets a transcript given its ID.
    * @param id The given transcript ID.
    * @return The identified transcript.
    * @throws StoreException If an error occurs.
@@ -1262,11 +1283,11 @@ public class LabbcatView implements GraphStoreQuery {
    */
   public Graph getTranscript(String id) 
     throws StoreException, PermissionException, GraphNotFoundException {
-    throw new StoreException("Not implemented");
+    return getTranscript(id, null);
   }
 
   /**
-   * <em>NOT YET IMPLEMENTED</em> - Gets a transcript given its ID, containing only the given layers.
+   * Gets a transcript given its ID, containing only the given layers.
    * @param id The given transcript ID.
    * @param layerIds The IDs of the layers to load, or null if only transcript data is required.
    * @return The identified transcript.
@@ -1276,7 +1297,44 @@ public class LabbcatView implements GraphStoreQuery {
    */
   public Graph getTranscript(String id, String[] layerIds) 
     throws StoreException, PermissionException, GraphNotFoundException {
-    throw new StoreException("Not implemented");
+    try {
+      URL url = url("getTranscript");
+      HttpRequestGet request = new HttpRequestGet(url, getRequiredHttpAuthorization()) 
+        .setUserAgent().setLanguage(language).setHeader("Accept", "application/json")
+        .setParameter("id", id)
+        .setParameter("layerIds", layerIds);
+      if (verbose) System.out.println("getTranscript -> " + request);
+
+      HttpURLConnection connection = request.get();
+      if (connection.getResponseCode() != HttpURLConnection.HTTP_OK) {
+        if (connection.getResponseCode() != HttpURLConnection.HTTP_NOT_FOUND) {
+          throw new StoreException(
+            "Error " + connection.getResponseCode()
+            + " " + connection.getResponseMessage() + " - " + request);
+        } 
+        return null;
+      } else { // deserialize the model      
+        Schema schema = getSchema();
+        // JSONSerialization can parse directly from the result stream
+        JSONSerialization deserializer = new JSONSerialization();
+        deserializer.configure(deserializer.configure(new ParameterSet(), schema), schema);
+        ParameterSet parameters = deserializer.load(
+          Utility.OneNamedStreamArray(
+            new NamedStream(connection.getInputStream(), id, "application/json")), schema);
+        deserializer.setParameters(parameters); // run with default values
+        Graph[] graphs = deserializer.deserialize();
+        if (graphs.length == 0) return null;
+        return graphs[0];
+      }
+    } catch(SerializationParametersMissingException x) {
+      throw new StoreException("Could not parse response.", x);
+    } catch(SerializerNotConfiguredException x) {
+      throw new StoreException("Could not parse response.", x);
+    } catch(SerializationException x) {
+      throw new StoreException("Could not parse response.", x);
+    } catch(IOException x) {
+      throw new StoreException("Could not get response.", x);
+    }
   }
 
   /**
@@ -1429,7 +1487,77 @@ public class LabbcatView implements GraphStoreQuery {
       response = new Response(request.get(), verbose);
       response.checkForErrors(); // throws a StoreException on error
       if (response.isModelNull()) return null;
-      return response.getModel().toString();
+      return ((JsonString)response.getModel()).getString();
+    } catch(IOException x) {
+      throw new StoreException("Could not get response.", x);
+    }
+  }
+
+  /**
+   * Gets a given media track for a given transcript.
+   * <p> This method calls {@link #getMedia(String,String,String)} and then downloads
+   * the media of the given URL to a file.
+   * @param id The transcript ID.
+   * @param trackSuffix The track suffix of the media - see {@link MediaTrackDefinition#suffix}.
+   * @param mimeType The MIME type of the media, which may include parameters for type
+   * conversion, e.g. "text/wav; samplerate=16000".
+   * @param dir A directory in which the files should be stored, or null for a temporary
+   * folder.  If specified, and the directory doesn't exist, it will be created. 
+   * @return A file containing the given media, or null if the given media doesn't
+   * exist. The caller is responsible for deleting this file once processing is complete.
+   * @throws StoreException If an error occurs.
+   * @throws PermissionException If the operation is not permitted.
+   * @throws GraphNotFoundException If the transcript was not found in the store.
+   */
+  public File getMediaFile(String id, String trackSuffix, String mimeType, File dir) 
+    throws StoreException, PermissionException, GraphNotFoundException {
+
+    try {
+      boolean tempDir = false;
+      if (dir == null) {
+        dir = File.createTempFile("getSoundFragments_", "_wav");
+        dir.delete();
+        dir.mkdir();
+        dir.deleteOnExit();
+        tempDir = true;
+      }
+      
+      // get the URL of the media
+      HttpRequestGet request = get(getMedia(id, trackSuffix, mimeType))
+        .setHeader("Accept", mimeType);
+      if (verbose) System.out.println("getMediaFile -> " + request);
+      
+      HttpURLConnection connection = request.get();
+      if (connection.getResponseCode() != HttpURLConnection.HTTP_OK) {
+        if (connection.getResponseCode() != HttpURLConnection.HTTP_NOT_FOUND) {
+          throw new StoreException(
+            "Error " + connection.getResponseCode()
+            + " " + connection.getResponseMessage() + " - " + request);
+        } 
+        return null;
+      } else {
+        File file = null;
+        // use the name given by the server, if any
+        String contentDisposition = connection.getHeaderField("content-disposition");
+        if (contentDisposition != null) {
+          // something like attachment; filename=blah.wav
+          int equals = contentDisposition.indexOf("=");
+          if (equals > 0) {
+            String fileName = contentDisposition.substring(equals + 1);
+            if (fileName.length() > 0) file = new File(dir, fileName);
+          }
+        }
+        if (file == null) { // no name was suggested
+          // invent a name
+          file = new File(
+            dir, IO.WithoutExtension(id)
+            + "." + mimeType.replaceAll(".*/","")); // audio/wav -> wav
+        }
+        if (tempDir) file.deleteOnExit();
+        IO.SaveUrlConnectionToFile(connection, file);
+        return file;
+      } // response ok
+
     } catch(IOException x) {
       throw new StoreException("Could not get response.", x);
     }
@@ -1468,7 +1596,7 @@ public class LabbcatView implements GraphStoreQuery {
       response = new Response(request.get(), verbose);
       response.checkForErrors(); // throws a StoreException on error
       if (response.isModelNull()) return null;
-      return response.getModel().toString();
+      return ((JsonString)response.getModel()).getString();
     } catch(IOException x) {
       throw new StoreException("Could not get response.", x);
     }

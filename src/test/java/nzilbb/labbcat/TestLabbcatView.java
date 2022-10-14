@@ -39,9 +39,11 @@ import javax.json.JsonObjectBuilder;
 import javax.json.JsonArrayBuilder;
 import nzilbb.ag.Anchor;
 import nzilbb.ag.Annotation;
+import nzilbb.ag.Graph;
 import nzilbb.ag.Layer;
 import nzilbb.ag.MediaFile;
 import nzilbb.ag.MediaTrackDefinition;
+import nzilbb.ag.Schema;
 import nzilbb.ag.StoreException;
 import nzilbb.ag.serialize.SerializationDescriptor;
 import nzilbb.labbcat.model.*;
@@ -278,7 +280,30 @@ public class TestLabbcatView {
                       anchorIds.length, anchors.length);
       }
    }
-   
+
+   @Test public void getSchema() throws Exception {
+      Schema schema = labbcat.getSchema();
+      assertNotNull("A schema was returned",
+                    schema);
+      assertEquals("Schema has word layer set correctly",
+                   "word", schema.getWordLayerId());
+   }
+
+   @Test public void getTranscript() throws Exception {
+      String[] ids = labbcat.getMatchingTranscriptIds("/AP511.+\\.eaf/.test(id)", 1, 0);
+      assertTrue("Some graph IDs are returned",
+                 ids.length > 0);
+      String graphId = ids[0];
+      String[] layers = {"word"};
+      Graph transcript = labbcat.getTranscript(graphId, layers);
+      assertNotNull("A graph was returned",
+                    transcript);
+      Annotation[] words = transcript.all("word");
+      assertTrue("Graph includes annotations",
+                 words.length > 0);
+   }
+
+
    @Test public void getMedia() throws Exception {
       String[] ids = labbcat.getMatchingTranscriptIds("/AP511.+\\.eaf/.test(id)", 1, 0);
       assertTrue("Some graph IDs are returned",
