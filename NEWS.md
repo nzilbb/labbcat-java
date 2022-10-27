@@ -1,3 +1,19 @@
+# 1.0.0
+
+- Implementations
+  + LabbcatView.getSchema()
+  + LabbcatView.getTranscript()
+  + LabbcatEdit.deleteParticipant()
+  + LabbcatAdmin user CRUD functions
+  + LabbcatAdmin.setPassword()
+- Function changes
+  + layerIds parameter of StoreQuery.getParticipant
+  + overlapThreshold parameter for search() and getMatches().
+- New functions
+  + LabbcatView.getMediaFile() convenience function
+- Maven-compatible versioning/package structure
+- Documentation is CC-BY-SA
+
 # 20200909.2039
 
 - Uses javax.json.* instead of org.json.*
@@ -12,7 +28,7 @@
   + system attributes (RU operations only)
   + tracks
   + *saveLayer* (CU operations)
-- New LabbcatView function
+- New LabbcatView functions
   + *getSerializerDescriptors*
   + *getDeserializerDescriptors*
   + *getSystemAttribute*
