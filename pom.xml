@@ -6,7 +6,7 @@
 
   <groupId>nzilbb</groupId>
   <artifactId>nzilbb.labbcat</artifactId>
-  <version>1.0.0</version>
+  <version>1.1.0</version>
   <packaging>jar</packaging>
 
   <name>nzilbb.labbcat</name>
@@ -46,7 +46,7 @@
     <dependency>
       <groupId>nzilbb</groupId>
       <artifactId>nzilbb.ag</artifactId>
-      <version>[1.0.4,)</version>
+      <version>[1.1.0,)</version>
       <scope>compile</scope>
     </dependency>
     <dependency>

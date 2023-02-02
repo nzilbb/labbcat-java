@@ -1146,15 +1146,20 @@ public class LabbcatView implements GraphStoreQuery {
   } 
 
   /**
-   * Gets the number of annotations on the given layer of the given transcript.
+   * Gets the number of annotations on the given layer of the given transcript, but only
+   * those with an ordinal less than or equal to the given maximum. 
    * @param id The ID of the transcript.
    * @param layerId The ID of the layer.
+   * @param maxOrdinal The maximum ordinal for the counted annotations.
+   * e.g. a <var>maxOrdinal</var> of 1 will ensure that only the first annotation for each
+   * parent is counted. If <var>maxOrdinal</var> is null, then all annotations are
+   * counted, regardless of their ordinal.
    * @return A (possibly empty) array of annotations.
    * @throws StoreException If an error occurs.
    * @throws PermissionException If the operation is not permitted.
    * @throws GraphNotFoundException If the transcript was not found in the store.
    */
-  public long countAnnotations(String id, String layerId)
+  public long countAnnotations(String id, String layerId, Integer maxOrdinal)
     throws StoreException, PermissionException, GraphNotFoundException {
       
     try {
@@ -1164,6 +1169,7 @@ public class LabbcatView implements GraphStoreQuery {
         .setUserAgent().setLanguage(language).setHeader("Accept", "application/json")
         .setParameter("id", id)
         .setParameter("layerId", layerId);
+      if (maxOrdinal != null) request.setParameter("maxOrdinal", maxOrdinal);
       response = new Response(request.get(), verbose);
       response.checkForErrors(); // throws a StoreException on error
       return ((JsonNumber)response.getModel()).longValue();
@@ -1173,9 +1179,14 @@ public class LabbcatView implements GraphStoreQuery {
   }
 
   /**
-   * Gets the annotations on the given layer of the given transcript.
+   * Gets the annotations on the given layer of the given transcript, but only those with
+   * an ordinal less than or equal to the given maximum.
    * @param id The ID of the transcript.
    * @param layerId The ID of the layer.
+   * @param maxOrdinal The maximum ordinal for the returned annotations.
+   * e.g. a <var>maxOrdinal</var> of 1 will ensure that only the first annotation for each
+   * parent is returned. If <var>maxOrdinal</var> is null, then all annotations are
+   * returned, regardless of their ordinal.
    * @param pageLength The maximum number of IDs to return, or null to return all.
    * @param pageNumber The zero-based page number to return, or null to return the first page.
    * @return A (possibly empty) array of annotations.
@@ -1184,7 +1195,7 @@ public class LabbcatView implements GraphStoreQuery {
    * @throws GraphNotFoundException If the transcript was not found in the store.
    */
   public Annotation[] getAnnotations(
-    String id, String layerId, Integer pageLength, Integer pageNumber)
+    String id, String layerId, Integer maxOrdinal, Integer pageLength, Integer pageNumber)
     throws StoreException, PermissionException, GraphNotFoundException {
       
     try {
@@ -1193,6 +1204,7 @@ public class LabbcatView implements GraphStoreQuery {
         .setUserAgent().setLanguage(language).setHeader("Accept", "application/json")
         .setParameter("id", id)
         .setParameter("layerId", layerId);
+      if (maxOrdinal != null) request.setParameter("maxOrdinal", maxOrdinal);
       if (pageLength != null) request.setParameter("pageLength", pageLength);
       if (pageNumber != null) request.setParameter("pageNumber", pageNumber);
       if (verbose) System.out.println("getAnnotations -> " + request);

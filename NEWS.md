@@ -1,3 +1,9 @@
+# 1.1.0
+
+- Function changes
+  + maxOrdinal parameter of StoreQuery.countAnnotations
+  + maxOrdinal parameter of StoreQuery.getAnnotations
+
 # 1.0.0
 
 - Implementations
