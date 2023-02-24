@@ -37,6 +37,7 @@ import java.util.stream.Collectors;
 import javax.json.Json;
 import javax.json.JsonArray;
 import javax.json.JsonObject;
+import javax.json.JsonValue;
 import nzilbb.ag.Annotation;
 import nzilbb.ag.Graph;
 import nzilbb.ag.GraphNotFoundException;
@@ -280,7 +281,7 @@ public class LabbcatEdit extends LabbcatView implements GraphStore
   }
    
   /**
-   * <em>NOT YET IMPLEMENTED</em> - Saves a participant, and all its tags, to the database.  The participant is
+   * Saves a participant, and all its tags, to the database.  The participant is
    * represented by an Annotation that isn't assumed to be part of a transcript.
    * @param participant
    * @return true if changes were saved, false if there were no changes to save.
@@ -290,7 +291,27 @@ public class LabbcatEdit extends LabbcatView implements GraphStore
   public boolean saveParticipant(Annotation participant)
     throws StoreException, PermissionException {
       
-    throw new StoreException("Not implemented");
+    try {
+      URL url = editUrl("saveParticipant");
+      HttpRequestPost request = new HttpRequestPost(url, getRequiredHttpAuthorization())
+        .setUserAgent()
+        .setHeader("Accept", "application/json")
+        .setParameter("id", participant.getId())
+        .setParameter("label", participant.getLabel());
+      // add participant attributes to request
+      for (String layerId : participant.getAnnotations().keySet()) {
+        for (Annotation attribute : participant.getAnnotations().get(layerId)) {
+          request.setParameter(layerId, attribute.getLabel());
+        } // next child
+      } // next child layer      
+      if (verbose) System.out.println("saveParticipant -> " + request);
+      response = new Response(request.post().getInputStream(), verbose);
+      response.checkForErrors(); // throws a StoreException on error
+      JsonValue bool = (JsonValue)response.getModel();
+      return bool.equals(JsonValue.TRUE);
+    } catch(IOException x) {
+      throw new StoreException("Could not get response.", x);
+    }
   }
 
   /**

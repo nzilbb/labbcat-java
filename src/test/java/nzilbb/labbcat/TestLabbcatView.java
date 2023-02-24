@@ -357,6 +357,12 @@ public class TestLabbcatView {
                  participant.getAnnotations(attributes[0]).size() > 0);
    }
 
+   @Test public void getParticipantDoesntExist() throws Exception {
+      // find a participant ID to use
+      Annotation participant = labbcat.getParticipant("A nonexistent participant");
+      assertNull("No exception, null returned", participant);
+   }
+
    @Test public void countMatchingAnnotations() throws Exception {
       int count = labbcat.countMatchingAnnotations(
          "layer.id == 'orthography' && label == 'and'");

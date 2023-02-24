@@ -258,7 +258,7 @@ public class TestLabbcatEdit {
       }
    }
 
-   @Test public void newTranscriptUpdateTranscriptDeleteTranscriptAndDeleteParticipant()
+   @Test public void newTranscriptUpdateTranscriptDeleteTranscriptSaveParticipantAndDeleteParticipant()
       throws Exception {
       
       // first get a corpus and transcript type
@@ -272,6 +272,7 @@ public class TestLabbcatEdit {
 
       File transcript = new File(getDir(), "nzilbb.labbcat.test.txt");
       String participantId = "UnitTester";
+      String changedParticipantId = "UnitTester-changed";
       assertTrue("Test transcript exists", transcript.exists());
       try {
 
@@ -310,11 +311,22 @@ public class TestLabbcatEdit {
          // ensure the transcript exists
          assertEquals("Transcript is still in the store",
                       1, labbcat.countMatchingTranscriptIds("id = '"+transcript.getName()+"'"));
+
+         // save participant with no changes
+         Annotation participant = labbcat.getParticipant(participantId);
+         
+         // change the participant ID
+         participant.setLabel(changedParticipantId);
+         assertTrue("Changes saved", labbcat.saveParticipant(participant));
+         participant = labbcat.getParticipant(participantId);
+         assertNull("Participant not available under old ID", participant);
+         participant = labbcat.getParticipant(changedParticipantId);
+         assertNotNull("Participant available under new ID", participant);
       } finally {
          try {
             // delete transcript/participant
             labbcat.deleteTranscript(transcript.getName());
-            labbcat.deleteParticipant(participantId);
+            labbcat.deleteParticipant(changedParticipantId);
             
             // ensure the transcript/participant no longer exist
             assertEquals("Transcript has been deleted from the store",

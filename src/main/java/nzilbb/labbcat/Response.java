@@ -32,6 +32,7 @@ import javax.json.JsonArrayBuilder;
 import javax.json.JsonException;
 import javax.json.JsonObject;
 import javax.json.JsonObjectBuilder;
+import javax.json.JsonValue;
 import nzilbb.ag.StoreException;
 import nzilbb.util.IO;
 
@@ -333,7 +334,7 @@ public class Response {
     * @return true if the model returned is null, false otherwise.
     */
    public boolean isModelNull() {
-      return model == null || model.equals(null);
+      return model == null || model.equals(JsonValue.NULL);
    } // end of isModelNull()
    
 } // end of class Response
