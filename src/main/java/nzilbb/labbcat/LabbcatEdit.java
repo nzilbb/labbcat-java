@@ -283,7 +283,11 @@ public class LabbcatEdit extends LabbcatView implements GraphStore
   /**
    * Saves a participant, and all its tags, to the database.  The participant is
    * represented by an Annotation that isn't assumed to be part of a transcript.
-   * @param participant
+   * @param participant An annotation representing the participant, with
+   * {@link Annotation#addAnnotation(Annotation)} called for each participant attribute
+   * value to set. 
+   * <p> The pass phrase for participant access can also be set by specifying a
+   * an annotation on the "_password" pseudo layer, with the .
    * @return true if changes were saved, false if there were no changes to save.
    * @throws StoreException If an error prevents the participant from being saved.
    * @throws PermissionException If saving the participant is not permitted.
