@@ -1310,6 +1310,7 @@ public class LabbcatView implements GraphStoreQuery {
   public Graph getTranscript(String id, String[] layerIds) 
     throws StoreException, PermissionException, GraphNotFoundException {
     try {
+      Schema schema = getSchema();
       URL url = url("getTranscript");
       HttpRequestGet request = new HttpRequestGet(url, getRequiredHttpAuthorization()) 
         .setUserAgent().setLanguage(language).setHeader("Accept", "application/json")
@@ -1326,7 +1327,6 @@ public class LabbcatView implements GraphStoreQuery {
         } 
         return null;
       } else { // deserialize the model      
-        Schema schema = getSchema();
         // JSONSerialization can parse directly from the result stream
         JSONSerialization deserializer = new JSONSerialization();
         deserializer.configure(deserializer.configure(new ParameterSet(), schema), schema);

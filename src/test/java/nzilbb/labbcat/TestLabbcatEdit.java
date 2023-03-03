@@ -33,6 +33,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import nzilbb.ag.Anchor;
 import nzilbb.ag.Annotation;
+import nzilbb.ag.Graph;
 import nzilbb.ag.Layer;
 import nzilbb.ag.MediaFile;
 import nzilbb.ag.MediaTrackDefinition;
@@ -338,7 +339,42 @@ public class TestLabbcatEdit {
          }
       }
    }
-  
+
+  /** Test transcript attributes can be saved */
+  @Test public void saveTranscript() throws Exception {
+
+    // get the language of a transcript
+    String[] ids = labbcat.getMatchingTranscriptIds("/AP511.+\\.eaf/.test(id)", 1, 0);
+    assertTrue("Some graph IDs are returned",
+               ids.length > 0);
+    String graphId = ids[0];
+    String[] attributes = { "transcript_language" };
+    Graph graph = labbcat.getTranscript(graphId, attributes);
+    assertNotNull("Graph retrieved: " + graphId, graph);
+
+    // change the language
+    Annotation language = graph.first("transcript_language");
+    String originalLanguage = language != null?language.getLabel():null;
+    graph.createTag(graph, "transcript_language", "test-value");
+    labbcat.saveTranscript(graph);
+
+    // check the new value was saved
+    graph = labbcat.getTranscript(graphId, attributes);
+    language = graph.first("transcript_language");
+    assertNotNull("language attribute exists", language);
+    assertEquals("new label applied", "test-value", language.getLabel());
+
+    // save original value
+    if (originalLanguage != null) {
+      language.setLabel(originalLanguage);
+    } else { // delete the annotation
+      graph.trackChanges();
+      language.destroy();
+      graph.commit();
+    }
+    labbcat.saveTranscript(graph);
+  }
+
   /**
    * Directory for text files.
    * @see #getDir()

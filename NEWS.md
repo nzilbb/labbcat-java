@@ -1,3 +1,9 @@
+# 1.1.1
+
+- Implementations
+  + LabbcatEdit.saveParticipant()
+  + LabbcatEdit.saveTranscript()
+
 # 1.1.0
 
 - Function changes

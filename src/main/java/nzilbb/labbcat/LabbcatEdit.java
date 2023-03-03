@@ -33,17 +33,25 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
+import java.util.Vector;
 import java.util.stream.Collectors;
 import javax.json.Json;
 import javax.json.JsonArray;
 import javax.json.JsonObject;
 import javax.json.JsonValue;
+import nzilbb.ag.serialize.SerializationDescriptor;
+import nzilbb.ag.serialize.SerializationException;
+import nzilbb.ag.serialize.SerializerNotConfiguredException;
+import nzilbb.ag.serialize.json.JSONSerialization;
+import nzilbb.ag.serialize.util.NamedStream;
+import nzilbb.ag.serialize.util.Utility;
 import nzilbb.ag.Annotation;
 import nzilbb.ag.Graph;
 import nzilbb.ag.GraphNotFoundException;
 import nzilbb.ag.GraphStore;
 import nzilbb.ag.PermissionException;
 import nzilbb.ag.StoreException;
+import nzilbb.configure.ParameterSet;
 import nzilbb.labbcat.http.*;
 import nzilbb.util.IO;
 
@@ -158,7 +166,7 @@ public class LabbcatEdit extends LabbcatView implements GraphStore
   // GraphStore methods:
    
   /**
-   * <em>NOT YET IMPLEMENTED</em> - Saves the given transcript. The transcript can be partial e.g. include only some of the layers
+   * Saves the given transcript. The transcript can be partial e.g. include only some of the layers
    * that the stored version of the transcript contains.
    * @param transcript The transcript to save.
    * @return true if changes were saved, false if there were no changes to save.
@@ -168,7 +176,32 @@ public class LabbcatEdit extends LabbcatView implements GraphStore
    */
   public boolean saveTranscript(Graph transcript)
     throws StoreException, PermissionException, GraphNotFoundException {
-    throw new StoreException("Not implemented");
+    try {
+      URL url = editUrl("saveTranscript");
+      HttpRequestPost request = new HttpRequestPost(url, getRequiredHttpAuthorization())
+        .setUserAgent()
+        .setHeader("Accept", "application/json");
+      if (verbose) System.out.println("saveTranscript -> " + request);
+      
+      JSONSerialization s = new JSONSerialization();
+      s.configure(s.configure(new ParameterSet(), transcript.getSchema()), transcript.getSchema());
+      final Vector<SerializationException> exceptions = new Vector<SerializationException>();
+      final Vector<NamedStream> streams = new Vector<NamedStream>();
+      s.serialize(Utility.OneGraphSpliterator(transcript), null,
+                  (stream) -> streams.add(stream),
+                  (warning) -> System.out.println(warning),
+                  (exception) -> exceptions.add(exception));
+      String json = IO.InputStreamToString​(streams.elementAt(0).getStream());
+      response = new Response(request.post(json).getInputStream(), verbose);
+      response.checkForErrors(); // throws a StoreException on error
+      JsonValue bool = (JsonValue)response.getModel();
+      return bool.equals(JsonValue.TRUE);
+      
+    } catch(SerializerNotConfiguredException exception) { // shouldn't happen
+        throw new StoreException("Could not serialize graph.", exception);
+    } catch(IOException x) {
+      throw new StoreException("Could not get response.", x);
+    }
   }
 
   /**
