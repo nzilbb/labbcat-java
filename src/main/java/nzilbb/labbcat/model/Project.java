@@ -103,7 +103,9 @@ public class Project {
         projectId = json.getInt("project_id", -1);
       }
       project = json.getString("project");
-      description = json.getString("description");
+      if (json.containsKey("description") && !json.isNull("description")) {
+        description = json.getString("description");
+      }
    } // end of constructor
    
    /**

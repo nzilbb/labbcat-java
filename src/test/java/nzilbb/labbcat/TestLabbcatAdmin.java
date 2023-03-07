@@ -409,6 +409,88 @@ public class TestLabbcatAdmin {
     }
   }
 
+  @Test public void newCategoryUpdateCategoryAndDeleteCategory() throws Exception {
+    Category originalCategory = new Category()
+      .setClassId("transcript")
+      .setCategory("unit-test")
+      .setDescription("Temporary category for unit testing")
+      .setDisplayOrder(999);
+      
+    try {
+      Category newCategory = labbcat.createCategory(originalCategory);
+      assertNotNull("Category returned", newCategory);
+      assertEquals("Class correct",
+                   originalCategory.getClassId(), newCategory.getClassId());
+      assertEquals("Name correct",
+                   originalCategory.getCategory(), newCategory.getCategory());
+      assertEquals("Description correct",
+                   originalCategory.getDescription(), newCategory.getDescription());
+      assertEquals("displayOrder correct",
+                   originalCategory.getDisplayOrder(), newCategory.getDisplayOrder());
+         
+      try {
+        labbcat.createCategory(originalCategory);
+        fail("Can't create a category with existing name");
+      }
+      catch(Exception exception) {}
+         
+      Category[] categories = labbcat.readCategories("transcript");
+      // ensure the category exists
+      assertTrue("There's at least one category", categories.length >= 1);
+      boolean found = false;
+      for (Category c : categories) {
+        if (c.getCategory().equals(originalCategory.getCategory())) {
+          found = true;
+          break;
+        }
+      }
+      assertTrue("Category was added", found);
+
+      // update it
+      Category updatedCategory = new Category()
+        .setClassId("transcript")
+        .setCategory("unit-test")
+        .setDescription("Changed description")
+        .setDisplayOrder(888);
+      
+      Category changedCategory = labbcat.updateCategory(updatedCategory);
+      assertNotNull("Category returned", changedCategory);
+      assertEquals("Updated Name correct",
+                   updatedCategory.getCategory(), changedCategory.getCategory());
+      assertEquals("Updated Description correct",
+                   updatedCategory.getDescription(), changedCategory.getDescription());
+      assertEquals("Updated displayOrder correct",
+                   updatedCategory.getDisplayOrder(), changedCategory.getDisplayOrder());
+
+      // delete it
+      labbcat.deleteCategory("transcript", originalCategory.getCategory());
+      
+      Category[] categoriesAfter = labbcat.readCategories("transcript");
+      // ensure the category no longer exists
+      boolean foundAfter = false;
+      for (Category c : categoriesAfter) {
+        if (c.getCategory().equals(originalCategory.getCategory())) {
+          foundAfter = true;
+          break;
+        }
+      }
+      assertFalse("Category is gone", foundAfter);
+
+      try {
+        // can't delete it again
+        labbcat.deleteCategory(originalCategory);
+        fail("Can't delete category that doesn't exist");
+      } catch(Exception exception) {
+      }
+
+    } finally {
+      // ensure it's not there
+      try {
+        labbcat.deleteCategory(originalCategory);
+      } catch(Exception exception) {}         
+    }
+  }
+
   @Test public void newMediaTrackUpdateMediaTrackAndDeleteMediaTrack() throws Exception {
     MediaTrack originalMediaTrack = new MediaTrack()
       .setSuffix("unit-test")

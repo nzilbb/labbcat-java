@@ -40,6 +40,7 @@ import nzilbb.ag.serialize.GraphDeserializer;
 import nzilbb.ag.serialize.GraphSerializer;
 import nzilbb.ag.serialize.SerializationDescriptor;
 import nzilbb.labbcat.http.*;
+import nzilbb.labbcat.model.Category;
 import nzilbb.labbcat.model.Corpus;
 import nzilbb.labbcat.model.MediaTrack;
 import nzilbb.labbcat.model.Project;
@@ -578,6 +579,146 @@ public class LabbcatAdmin extends LabbcatEdit implements GraphStoreAdministratio
       throw new StoreException("Could not get response.", x);
     }
   } // end of updateProject()
+   
+  /**
+   * Creates a new category record.
+   * @param category The category details to save.
+   * @return The category just created.
+   * @throws StoreException, PermissionException
+   * @see #readCategories(String)
+   * @see #readCategories(String,Integer,Integer)
+   * @see #updateCategory(Category)
+   * @see #deleteCategory(Category)
+   * @see #deleteCategory(String,String)
+   */
+  public Category createCategory(Category category) throws StoreException, PermissionException {
+    try {
+      HttpRequestPost request = post("api/admin/categories")
+        .setHeader("Accept", "application/json");
+      if (verbose) System.out.println("createCategory -> " + request);
+      response = new Response(request.post(category.toJson()), verbose);
+      response.checkForErrors(); // throws a StoreException on error
+      if (response.isModelNull()) return null;
+      return new Category((JsonObject)response.getModel());
+    } catch(IOException x) {
+      throw new StoreException("Could not get response.", x);
+    }
+  } // end of createCategory()
+
+  /**
+   * Reads a list of category records.
+   * @param classId What to read the categories of - "trascript" or "participant".
+   * @return A list of categories.
+   * @throws StoreException, PermissionException
+   * @see #createCategory(Category)
+   * @see #readCategories(String,Integer,Integer)
+   * @see #updateCategory(Category)
+   * @see #deleteCategory(Category)
+   * @see #deleteCategory(String,String)
+   */
+  public Category[] readCategories(String classId) throws StoreException, PermissionException {
+    return readCategories(classId, null, null);
+  }
+   
+  /**
+   * Reads a list of category records.
+   * @param classId What to read the categories of - "trascript" or "participant".
+   * @param pageNumber The zero-based  page of records to return (if null, all records
+   * will be returned). 
+   * @param pageLength The length of pages (if null, the default page length is 20).
+   * @return A list of categories.
+   * @throws StoreException, PermissionException
+   * @see #createCategory(Category)
+   * @see #readCategories(String)
+   * @see #updateCategory(Category)
+   * @see #deleteCategory(Category)
+   * @see #deleteCategory(String,String)
+   */
+  public Category[] readCategories(String classId, Integer pageNumber, Integer pageLength)
+    throws StoreException, PermissionException {
+    if ("partipant".equals(classId)) classId = "speaker";
+    try {
+      HttpRequestGet request = get("api/admin/categories/"+classId)
+        .setHeader("Accept", "application/json");
+      if (pageLength != null) request.setParameter("pageNumber", pageLength);
+      if (pageNumber != null) request.setParameter("pageLength", pageNumber);
+      if (verbose) System.out.println("readCategories -> " + request);
+      response = new Response(request.get(), verbose);
+      response.checkForErrors(); // throws a StoreException on error
+      if (response.isModelNull()) return null;
+      JsonArray array = (JsonArray)response.getModel();
+      Vector<Category> categories = new Vector<Category>();
+      if (array != null) {
+        for (int i = 0; i < array.size(); i++) {
+          categories.add(new Category(array.getJsonObject(i)));
+        }
+      }
+      return categories.toArray(new Category[0]);
+    } catch(IOException x) {
+      throw new StoreException("Could not get response.", x);
+    }
+  } // end of readCategories()
+   
+  /**
+   * Updates an existing category record.
+   * @param category The category details to save.
+   * @return The category just updated.
+   * @throws StoreException, PermissionException
+   * @see #createCategory(Category)
+   * @see #readCategories(String)
+   * @see #readCategories(String,Integer,Integer)
+   * @see #deleteCategory(Category)
+   * @see #deleteCategory(String,String)
+   */
+  public Category updateCategory(Category category) throws StoreException, PermissionException {
+    try{
+      HttpRequestPost request = put("api/admin/categories")
+        .setHeader("Accept", "application/json");
+      if (verbose) System.out.println("updateCategory -> " + request);
+      response = new Response(request.post(category.toJson()), verbose);
+      response.checkForErrors(); // throws a StoreException on error
+      if (response.isModelNull()) return null;
+      return new Category((JsonObject)response.getModel());
+    } catch(IOException x) {
+      throw new StoreException("Could not get response.", x);
+    }
+  } // end of updateCategory()
+   
+  /**
+   * Deletes an existing category record.
+   * @param category The category to delete.
+   * @throws StoreException, PermissionException
+   * @see #createCategory(Category)
+   * @see #readCategories(String)
+   * @see #readCategories(String,Integer,Integer)
+   * @see #updateCategory(Category)
+   * @see #deleteCategory(String,String)
+   */
+  public void deleteCategory(Category category) throws StoreException, PermissionException {
+    deleteCategory(category.getClassId(), category.getCategory());
+  }
+   
+  /**
+   * Deletes an existing category record.
+   * @param classId The scope of the category - "trascript" or "participant".
+   * @param name The name/ID of the category to delete.
+   * @throws StoreException, PermissionException
+   * @see #createCategory(Category)
+   * @see #readCategories(String)
+   * @see #readCategories(String,Integer,Integer)
+   * @see #updateCategory(Category)
+   * @see #deleteCategory(Category)
+   */
+  public void deleteCategory(String classId, String name) throws StoreException, PermissionException {
+    try{
+      HttpRequestPost request = delete("api/admin/categories/" + classId + "/" + name);
+      if (verbose) System.out.println("deleteCategory -> " + request);
+      response = new Response(request.post(), verbose);
+      response.checkForErrors(); // throws a StoreException on error
+    } catch(IOException x) {
+      throw new StoreException("Could not get response.", x);
+    }
+  } // end of updateCategory()
    
   /**
    * Creates a new media track record.
