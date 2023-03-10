@@ -377,6 +377,29 @@ public class TestLabbcatView {
                  2, annotations.length);
   }
 
+  /**
+   * Ensure that aggregateMatchingAnnotations works.
+   */
+  @Test public void aggregateMatchingAnnotations() throws Exception {
+    String[] count = labbcat.aggregateMatchingAnnotations(
+      "COUNT", "layer.id == 'orthography' && label == 'and'");
+    assertEquals("A single value was returned",
+                 1, count.length);
+    assertTrue("It looks like a number",
+               count[0].matches("[0-9]+"));
+
+    String[] distinctCount = labbcat.aggregateMatchingAnnotations(
+      "DISTINCT,COUNT", "layer.id == 'orthography' && /a.*/.test(label)");
+    assertTrue("Some values returned",
+               distinctCount.length > 0);
+    assertEquals("Even number of values returned",
+                 0, distinctCount.length % 2);
+    assertTrue("First value looks like an orthography",
+               distinctCount[0].matches("[a-z0-9]+"));
+    assertTrue("Second value looks like a number",
+               distinctCount[1].matches("[0-9]+"));
+  }
+
   @Test public void getMediaTracks() throws Exception {
     MediaTrackDefinition[] tracks = labbcat.getMediaTracks();
     //for (String track : tracks) System.out.println("track " + track);
