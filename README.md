@@ -12,6 +12,8 @@ LaBB-CAT servers are usually password-protected linguistic corpora, and can be
 accessed manually via a web browser, or programmatically using a client library like
 this one.
 
+**Detailed documentation is available at https://nzilbb.github.io/labbcat-java/**
+
 ## Dependencies
 
 - [nzilbb.ag.jar](https://github.com/nzilbb/ag)
@@ -60,7 +62,3 @@ Matches[] matches = labbcat.getMatches(
        new PatternBuilder().addMatchLayer("orthography", "and").build(),
        participantIds, null, true, false, null), 1);
 ```
-
-## Documentation
-
-More documentation is available [here](https://nzilbb.github.io/labbcat-java/)
