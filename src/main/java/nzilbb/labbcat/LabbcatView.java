@@ -1957,7 +1957,7 @@ public class LabbcatView implements GraphStoreQuery {
       
     cancelling = false;
     if (pattern == null) throw new StoreException("No pattern specified.");
-    URL url = makeUrl("search");
+    URL url = makeUrl("api/search");
     HttpRequestGet request = new HttpRequestGet(url, getRequiredHttpAuthorization())
       .setUserAgent()
       .setHeader("Accept", "application/json")
@@ -1983,7 +1983,7 @@ public class LabbcatView implements GraphStoreQuery {
       request.setParameter("overlap_threshold", overlapThreshold);
     }
       
-    if (verbose) System.out.println("search -> " + request);
+    if (verbose) System.out.println("search -> " + request + "\n" + pattern.toString());
     response = new Response(request.get(), verbose);
     response.checkForErrors(); // throws a ResponseException on error
       
@@ -2048,7 +2048,7 @@ public class LabbcatView implements GraphStoreQuery {
     if (cancelling == true) return null;
       
     cancelling = false;
-    URL url = makeUrl("resultsStream");
+    URL url = makeUrl("api/results");
     HttpRequestGet request = new HttpRequestGet(url, getRequiredHttpAuthorization())
       .setUserAgent()
       .setHeader("Accept", "application/json")
