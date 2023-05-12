@@ -483,12 +483,14 @@ public class TestLabbcatView {
     }
   }
 
+  /** Ensure searching with an invalid pattern correctly fails. */
   @Test(expected = StoreException.class) public void searchInvalidPattern()
     throws Exception {
     String threadId = labbcat.search(
       Json.createObjectBuilder().build(), null, null, false, false, null, null);
   }
 
+  /** Ensure searches can be cancelled. */
   @Test public void searchAndCancelTask()
     throws Exception {
     // start a long-running search - all words
@@ -503,6 +505,7 @@ public class TestLabbcatView {
     labbcat.cancelTask(threadId);
   }
 
+  /** Ensure workflow of searching works, from specifying the search to retrieving results */
   @Test public void searchAndGetMatchesAndGetMatchAnnotations()
     throws Exception {
     // get a participant ID to use
@@ -551,6 +554,7 @@ public class TestLabbcatView {
     }
   }
 
+  /** Ensure exclusion of overlapping speech in search results works. */
   @Test public void searchExcludingOverlappingSpeech()
     throws Exception {
 
