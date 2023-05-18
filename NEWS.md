@@ -1,8 +1,12 @@
 # 1.1.1
 
+Minimum LaBB-CAT version *20230517.1844*
+
 - Implementations
   + LabbcatEdit.saveParticipant()
   + LabbcatEdit.saveTranscript()
+- Function changes
+  + aligned parameter of LabbcatView.search and LabbcatView.getMatches changed to offsetThreshold
 
 # 1.1.0
 

@@ -455,7 +455,7 @@ public class LoadTester extends CommandLineProgram {
 
                timers.start("search");
                TaskStatus searchTask = labbcat.waitForTask(
-                  labbcat.search(pattern, null, null, false, false, null, 5), 0);
+                  labbcat.search(pattern, null, null, false, null, null, 5), 0);
                timers.end("search");
                if (!verbose) System.out.print(".");
 

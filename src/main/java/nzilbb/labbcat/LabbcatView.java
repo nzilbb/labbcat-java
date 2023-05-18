@@ -1933,10 +1933,13 @@ public class LabbcatView implements GraphStoreQuery {
    * of. If null, all utterances in the corpus will be searched.
    * @param transcriptTypes An optional list of transcript types to limit the results
    * to. If null, all transcript types will be searched. 
-   * @param mainParticipant true to search only main-participant utterances, false to
+   * @param mainParticipantOnly true to search only main-participant utterances, false to
    * search all utterances. 
-   * @param aligned true to include only words that are aligned (i.e. have anchor
-   * confidence &ge; 50, false to search include un-aligned words as well. 
+   * @param offsetThreshold Optional minimum alignment confidence for matching word or
+   * segment annotations. A value of 50 means that annotations that were at least
+   * automatically aligned will be returned. Use 100 for manually-aligned annotations
+   * only, and 0 or no value to return all matching annotations regardless of alignment
+   * confidence.
    * @param matchesPerTranscript Optional maximum number of matches per transcript to
    * return. <tt>null</tt> means all matches.
    * @param overlapThreshold Optional percentage overlap with other utterances before
@@ -1951,7 +1954,7 @@ public class LabbcatView implements GraphStoreQuery {
    */
   public String search(
     JsonObject pattern, String[] participantIds, String[] transcriptTypes,
-    boolean mainParticipant, boolean aligned, Integer matchesPerTranscript,
+    boolean mainParticipantOnly, Integer offsetThreshold, Integer matchesPerTranscript,
     Integer overlapThreshold)
     throws IOException, StoreException {
       
@@ -1964,14 +1967,14 @@ public class LabbcatView implements GraphStoreQuery {
       .setParameter("command", "search")
       .setParameter("searchJson", pattern.toString())
       .setParameter("words_context", 0);
-    if (mainParticipant) {
-      request.setParameter("only_main_speaker", true);
+    if (mainParticipantOnly) {
+      request.setParameter("mainParticipantOnly", true);
     }
-    if (aligned) {
-      request.setParameter("only_aligned", true);
+    if (offsetThreshold != null) {
+      request.setParameter("offsetThreshold", offsetThreshold);
     }
     if (matchesPerTranscript != null) {
-      request.setParameter("matches_per_transcript", matchesPerTranscript);
+      request.setParameter("matchesPerTranscript", matchesPerTranscript);
     }
     if (participantIds != null) {
       request.setParameter("participant_id", participantIds);
@@ -1980,7 +1983,7 @@ public class LabbcatView implements GraphStoreQuery {
       request.setParameter("transcript_type", transcriptTypes);
     }
     if (overlapThreshold != null) {
-      request.setParameter("overlap_threshold", overlapThreshold);
+      request.setParameter("overlapThreshold", overlapThreshold);
     }
       
     if (verbose) System.out.println("search -> " + request + "\n" + pattern.toString());
@@ -2124,13 +2127,13 @@ public class LabbcatView implements GraphStoreQuery {
    */
   public Match[] getMatches(
     JsonObject pattern, String[] participantIds, String[] transcriptTypes,
-    boolean mainParticipant, boolean aligned, Integer matchesPerTranscript,
+    boolean mainParticipant, Integer offsetThreshold, Integer matchesPerTranscript,
     Integer overlapThreshold, int wordsContext)
     throws IOException, StoreException {
       
     String threadId = search(
-      pattern, participantIds, transcriptTypes, mainParticipant, aligned, matchesPerTranscript,
-      overlapThreshold);
+      pattern, participantIds, transcriptTypes, mainParticipant, offsetThreshold,
+      matchesPerTranscript, overlapThreshold);
     try {
       return  getMatches(threadId, wordsContext);
     } finally { // release the task to save server resources
@@ -2189,13 +2192,13 @@ public class LabbcatView implements GraphStoreQuery {
    */
   public Match[] getMatches(
     JsonObject pattern, String[] participantIds, String[] transcriptTypes,
-    boolean mainParticipant, boolean aligned, Integer matchesPerTranscript,
+    boolean mainParticipant, Integer offsetThreshold, Integer matchesPerTranscript,
     Integer overlapThreshold, int wordsContext, Integer maxMatches)
     throws IOException, StoreException {
       
     String threadId = search(
-      pattern, participantIds, transcriptTypes, mainParticipant, aligned, matchesPerTranscript,
-      overlapThreshold);
+      pattern, participantIds, transcriptTypes, mainParticipant, offsetThreshold,
+      matchesPerTranscript, overlapThreshold);
     try {
       return  getMatches(threadId, wordsContext, maxMatches, 0);
     } finally { // release the task to save server resources
