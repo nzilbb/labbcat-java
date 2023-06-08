@@ -1595,6 +1595,9 @@ public class LabbcatView implements GraphStoreQuery {
       }
       
       // get the URL of the media
+      String url = getMedia(id, trackSuffix, mimeType);
+      if (url == null) return null;
+      // get the media itself
       HttpRequestGet request = get(getMedia(id, trackSuffix, mimeType))
         .setHeader("Accept", mimeType);
       if (verbose) System.out.println("getMediaFile -> " + request);
