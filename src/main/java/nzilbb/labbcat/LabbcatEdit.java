@@ -85,7 +85,7 @@ import nzilbb.util.IO;
  *
  * // search for tokens of "and"
  * Matches[] matches = labbcat.{@link LabbcatView#getMatches(String,int) getMatches}(
- *     labbcat.{@link LabbcatView#search(JsonObject,String[],String[],boolean,boolean,Integer,Integer) search}(
+ *     labbcat.{@link LabbcatView#search(JsonObject,String[],String[],boolean,Integer,Integer,Integer) search}(
  *        new {@link PatternBuilder}().addMatchLayer("orthography", "and").build(),
  *        participantIds, null, true, false, null, null), 1);
  *

@@ -71,6 +71,7 @@ import nzilbb.ag.serialize.util.NamedStream;
 import nzilbb.ag.serialize.util.Utility;
 import nzilbb.configure.ParameterSet;
 import nzilbb.labbcat.http.*;
+import nzilbb.labbcat.model.AnnotatorDescriptorWrapper;
 import nzilbb.labbcat.model.Match;
 import nzilbb.labbcat.model.MatchId;
 import nzilbb.labbcat.model.TaskStatus;
@@ -93,7 +94,7 @@ import nzilbb.util.MonitorableSeries;
  * String[] documents = labbcat.{@link #getTranscriptIdsInCorpus(String) getTranscriptIdsInCorpus}(corpora[0]);
  * // search for tokens of "and"
  * Matches[] matches = labbcat.{@link #getMatches(String,int) getMatches}(
- *     labbcat.{@link #search(JsonObject,String[],String[],boolean,boolean,Integer,Integer) search}(
+ *     labbcat.{@link #search(JsonObject,String[],String[],boolean,Integer,Integer,Integer) search}(
  *        new {@link PatternBuilder}().addMatchLayer("orthography", "and").build(),
  *        participantIds, null, true, false, null, 5), 1);
  * </pre>
@@ -161,7 +162,7 @@ public class LabbcatView implements GraphStoreQuery {
    * Whether to run in batch mode or not. If false, the user may be asked to enter
    * username/password if required. Default is false.
    * @see #getBatchMode()
-   * @see #setBatchMode(Boolean)
+   * @see #setBatchMode(boolean)
    */
   protected boolean batchMode = false;
   /**
@@ -199,7 +200,6 @@ public class LabbcatView implements GraphStoreQuery {
   /**
    * Minimum server version required for this API to work properly.
    * @see #getMinLabbcatVersion()
-   * @see #setMinLabbcatVersion(String)
    */
   protected String minLabbcatVersion = "20210210.2032";
   /**
@@ -2000,7 +2000,7 @@ public class LabbcatView implements GraphStoreQuery {
    
   /**
    * Gets a list of tokens that were matched by
-   * {@link #search(JsonObject,String[],String[],boolean,boolean,Integer,Integer)}.
+   * {@link #search(JsonObject,String[],String[],boolean,Integer,Integer,Integer)}.
    * <p>If the task is still running, then this function will wait for it to finish.
    * <p>This means calls can be stacked like this:
    *  <pre>Matches[] matches = labbcat.getMatches(
@@ -2008,15 +2008,15 @@ public class LabbcatView implements GraphStoreQuery {
    *        new PatternBuilder().addMatchLayer("orthography", "and").build(),
    *        participantIds, true, true, null, null), 1);</pre>
    * @param threadId A task ID returned by
-   * {@link #search(JsonObject,String[],String[],boolean,boolean,Integer,Integer)}.
+   * {@link #search(JsonObject,String[],String[],boolean,Integer,Integer,Integer)}.
    * @param wordsContext Number of words context to include in the <q>Before Match</q>
    * and <q>After Match</q> columns in the results.
    * @return A list of IDs that can be used to identify utterances/tokens that were matched by
-   * {@link #search(JsonObject,String[],String[],boolean,boolean,Integer,Integer)}, or null if
+   * {@link #search(JsonObject,String[],String[],boolean,Integer,Integer,Integer)}, or null if
    * the task was cancelled. 
    * @throws IOException
    * @throws StoreException
-   * @see #search(JsonObject,String[],String[],boolean,boolean,Integer,Integer)}
+   * @see #search(JsonObject,String[],String[],boolean,Integer,Integer,Integer)}
    */
   public Match[] getMatches(String threadId, int wordsContext)
     throws IOException, StoreException {      
@@ -2025,7 +2025,7 @@ public class LabbcatView implements GraphStoreQuery {
 
   /**
    * Gets a list of tokens that were matched by
-   * {@link #search(JsonObject,String[],String[],boolean,boolean,Integer,Integer)}.
+   * {@link #search(JsonObject,String[],String[],boolean,Integer,Integer,Integer)}.
    * <p>If the task is still running, then this function will wait for it to finish.
    * <p>This means calls can be stacked like this:
    *  <pre>Matches[] matches = labbcat.getMatches(
@@ -2033,17 +2033,17 @@ public class LabbcatView implements GraphStoreQuery {
    *        new PatternBuilder().addMatchLayer("orthography", "and").build(),
    *        participantIds, true, false, null, 5), 1);</pre>
    * @param threadId A task ID returned by 
-   * {@link #search(JsonObject,String[],String[],boolean,boolean,Integer,Integer)}.
+   * {@link #search(JsonObject,String[],String[],boolean,Integer,Integer,Integer)}.
    * @param wordsContext Number of words context to include in the <q>Before Match</q>
    * and <q>After Match</q> columns in the results.
    * @param pageLength The maximum number of matches to return, or null to return all.
    * @param pageNumber The zero-based page number to return, or null to return the first page.
    * @return A list of IDs that can be used to identify utterances/tokens that were matched by
-   * {@link #search(JsonObject,String[],String[],boolean,boolean,Integer,Integer)}, or null if
+   * {@link #search(JsonObject,String[],String[],boolean,Integer,Integer,Integer)}, or null if
    * the task was cancelled. 
    * @throws IOException
    * @throws StoreException
-   * @see #search(JsonObject,String[],String[],boolean,boolean,Integer,Integer)}
+   * @see #search(JsonObject,String[],String[],boolean,Integer,Integer,Integer)}
    */
   public Match[] getMatches(
     String threadId, int wordsContext, Integer pageLength, Integer pageNumber)
@@ -2088,7 +2088,7 @@ public class LabbcatView implements GraphStoreQuery {
    *     labbcat.search(pattern, participantIds, mainParticipant, aligned,
    *                    matchesPerTranscript, overlapThreshold),
    *     wordsContext);</pre>
-   * <p>As with {@link #search(JsonObject,String[],String[],boolean,boolean,Integer,Integer)} the
+   * <p>As with {@link #search(JsonObject,String[],String[],boolean,Integer,Integer,Integer)} the
    * <var>pattern</var> must 
    * match the structure of the search matrix in the browser interface of LaBB-CAT.
    * <p>The PatternBuilder class is designed to make constructing valid patterns easier:
@@ -2113,8 +2113,12 @@ public class LabbcatView implements GraphStoreQuery {
    * to. If null, all transcript types will be searched. 
    * @param mainParticipant true to search only main-participant utterances, false to
    * search all utterances. 
-   * @param aligned true to include only words that are aligned (i.e. have anchor
-   * confidence &ge; 50, false to search include un-aligned words as well. 
+   * @param offsetThreshold The minimum confidence for alignments, e.g.
+   *  <ul>
+   *   <li> 0 - return all alignments, regardless of confidence;</li>
+   *   <li> 50 - return only alignments that have been at least automatically aligned;</li>
+   *   <li> 100 - return only manually-set alignments.</li>
+   *  </ul>
    * @param matchesPerTranscript Optional maximum number of matches per transcript to
    * return. <tt>null</tt> means all matches.
    * @param overlapThreshold Optional percentage overlap with other utterances before
@@ -2122,7 +2126,7 @@ public class LabbcatView implements GraphStoreQuery {
    * @param wordsContext Number of words context to include in the <q>Before Match</q>
    * and <q>After Match</q> columns in the results.
    * @return A list of IDs that can be used to identify utterances/tokens that were matched by
-   * {@link #search(JsonObject,String[],String[],boolean,boolean,Integer,Integer)}, or null if
+   * {@link #search(JsonObject,String[],String[],boolean,Integer,Integer,Integer)}, or null if
    * the task was cancelled. 
    * @throws IOException
    * @throws StoreException
@@ -2152,7 +2156,7 @@ public class LabbcatView implements GraphStoreQuery {
    *     labbcat.search(pattern, participantIds, mainParticipant, aligned,
    *                    matchesPerTranscript, overlapThreshold), 
    *     wordsContext);</pre>
-   * <p>As with {@link #search(JsonObject,String[],String[],boolean,boolean,Integer,Integer)} the
+   * <p>As with {@link #search(JsonObject,String[],String[],boolean,Integer,Integer,Integer)} the
    * <var>pattern</var> must 
    * match the structure of the search matrix in the browser interface of LaBB-CAT.
    * <p>The PatternBuilder class is designed to make constructing valid patterns easier:
@@ -2177,8 +2181,12 @@ public class LabbcatView implements GraphStoreQuery {
    * to. If null, all transcript types will be searched. 
    * @param mainParticipant true to search only main-participant utterances, false to
    * search all utterances. 
-   * @param aligned true to include only words that are aligned (i.e. have anchor
-   * confidence &ge; 50, false to search include un-aligned words as well. 
+   * @param offsetThreshold The minimum confidence for alignments, e.g.
+   *  <ul>
+   *   <li> 0 - return all alignments, regardless of confidence;</li>
+   *   <li> 50 - return only alignments that have been at least automatically aligned;</li>
+   *   <li> 100 - return only manually-set alignments.</li>
+   *  </ul>
    * @param matchesPerTranscript Optional maximum number of matches per transcript to
    * return. <tt>null</tt> means all matches.
    * @param overlapThreshold Optional percentage overlap with other utterances before
@@ -2187,7 +2195,7 @@ public class LabbcatView implements GraphStoreQuery {
    * and <q>After Match</q> columns in the results.
    * @param maxMatches The maximum number of matches to return, or null to return all.
    * @return A list of IDs that can be used to identify utterances/tokens that were matched by
-   * {@link #search(JsonObject,String[],String[],boolean,boolean,Integer,Integer)}, or null if
+   * {@link #search(JsonObject,String[],String[],boolean,Integer,Integer,Integer)}, or null if
    * the task was cancelled. 
    * @throws IOException
    * @throws StoreException
@@ -2783,7 +2791,34 @@ public class LabbcatView implements GraphStoreQuery {
      }
      }
 */
-  
+
+  /**
+   * Gets a descriptor of the annotator with the given ID.
+   * @param annotatorId The ID of the annotator.
+   * @return A descriptor of the given annotator, or null if there is no registered
+   * annotator with the given ID. 
+   */
+  public AnnotatorDescriptor getAnnotatorDescriptor(String annotatorId)
+    throws StoreException, ResponseException {
+    try {
+      URL url = url("getAnnotatorDescriptor");
+      HttpRequestGet request = new HttpRequestGet(url, getRequiredHttpAuthorization()) 
+        .setUserAgent().setLanguage(language).setHeader("Accept", "application/json")
+        .setParameter("annotatorId", annotatorId);
+      if (verbose) System.out.println("getDeserializerDescriptor -> " + request);
+      response = new Response(request.get(), verbose);
+      response.checkForErrors(); // throws a StoreException on error
+      if (response.isModelNull()) return null;
+      JsonObject o = (JsonObject)response.getModel();
+      if (o != null) {
+        return (AnnotatorDescriptor)new AnnotatorDescriptorWrapper().fromJson(o);
+      }
+      return null;
+    } catch(IOException x) {
+      throw new StoreException("Could not get response.", x);
+    }
+  }
+
   /**
    * Lists descriptors of all transcribers that are installed.
    * @return A list of descriptors of all transcribers that are installed.

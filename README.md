@@ -62,3 +62,84 @@ Matches[] matches = labbcat.getMatches(
        new PatternBuilder().addMatchLayer("orthography", "and").build(),
        participantIds, null, true, false, null), 1);
 ```
+
+## Developers
+
+### Prerequisites
+
+* The JDK for at least Java 8
+  ```
+  sudo apt install default-jdk
+  ```
+* Maven
+  ```
+  sudo apt install maven
+  ```
+
+### Build nzilbb.labbcat.jar
+
+```
+mvn package
+```
+
+### Run all unit tests
+
+```
+mvn test
+```
+
+## Build documentation site
+
+```
+mvn site
+```
+
+## Deploying to OSSRH
+
+OSSRH is the central Maven repository where nzilbb.ag modules are deployed (published).
+
+There are two type of deployment:
+
+- *snapshot*: a transient deployment that can be updated during development/testing
+- *release*: an official published version that cannot be changed once it's deployed
+
+A *snapshot* deployment is done when the module version (`version` tag in pom.xml) ends with
+`-SNAPSHOT`. Otherwise, any deployment is a *release*.
+
+### Snapshot Deployment
+
+To perform a snapshot deployment:
+
+1. Ensure the `version` in pom.xml *is* suffixed with `-SNAPSHOT`
+2. Execute the command:  
+   ```
+   mvn clean deploy
+   ```
+
+### Release Deployment
+
+To perform a release deployment:
+
+1. Ensure the `version` in pom.xml *isn't* suffixed with `-SNAPSHOT` e.g. use something
+   like the following command from within the ag directory:  
+   ```
+   mvn versions:set -DnewVersion=1.1.0
+   ```
+2. Execute the command:  
+   ```
+   mvn clean deploy -P release
+   ```
+3. Happy with everything? Complete the release with:
+   ```
+   mvn nexus-staging:release -P release
+   ```
+   Otherwise:
+   ```
+   mvn nexus-staging:drop -P release
+   ```
+   ...and start again.
+4. Regenerate the citation file:
+   ```
+   mvn cff:create
+   ```
+5. Commit/push all changes and create a release in GitHub

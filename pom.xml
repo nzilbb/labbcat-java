@@ -20,6 +20,11 @@
       <distribution>manual</distribution><!-- change to repo once it's in there -->
     </license>
   </licenses>
+  <scm>
+    <connection>scm:git:git://github.com/nzilbb/labbcat-java.git</connection>
+    <developerConnection>scm:git:ssh://github.com:nzilbb/labbcat-java.git</developerConnection>
+    <url>https://github.com/nzilbb/labbcat-java/tree/main</url>
+  </scm>
   <developers>
     <developer>
       <id>robert</id>
@@ -46,7 +51,7 @@
     <dependency>
       <groupId>nz.ilbb.ag</groupId>
       <artifactId>nzilbb.ag</artifactId>
-      <version>1.1.1-SNAPSHOT</version>
+      <version>1.1.2</version>
       <scope>compile</scope>
     </dependency>
     <dependency>
@@ -87,6 +92,17 @@
         <artifactId>maven-site-plugin</artifactId>
         <configuration>
           <outputDirectory>docs</outputDirectory>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.sonatype.plugins</groupId>
+        <artifactId>nexus-staging-maven-plugin</artifactId>
+        <version>1.6.7</version>
+        <extensions>true</extensions>
+        <configuration>
+          <serverId>ossrh</serverId>
+          <nexusUrl>https://s01.oss.sonatype.org/</nexusUrl>
+          <autoReleaseAfterClose>false</autoReleaseAfterClose>
         </configuration>
       </plugin>
     </plugins>
@@ -130,6 +146,15 @@
         <plugin>
           <artifactId>maven-project-info-reports-plugin</artifactId>
           <version>3.0.0</version>
+        </plugin>
+        <plugin>
+          <groupId>org.corpus-tools</groupId>
+          <artifactId>cff-maven-plugin</artifactId>
+          <version>0.6.0</version>
+          <configuration>
+            <input>template.cff</input>
+            <output>${basedir}/CITATION.cff</output>
+          </configuration>
         </plugin>
       </plugins>
     </pluginManagement>
@@ -177,4 +202,69 @@
       </plugin>
     </plugins>
   </reporting>
+  <profiles>
+    <profile>
+      <id>release</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-source-plugin</artifactId>
+            <version>2.2.1</version>
+            <executions>
+              <execution>
+                <id>attach-sources</id>
+                <goals>
+                  <goal>jar-no-fork</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+          <plugin>
+	    <groupId>org.apache.maven.plugins</groupId>
+	    <artifactId>maven-javadoc-plugin</artifactId>
+            <version>3.2.0</version>
+	    <configuration>
+              <javadocExecutable>${java.home}/bin/javadoc</javadocExecutable>
+              <show>protected</show>
+	      <bottom>&lt;a rel='license' href='http://creativecommons.org/licenses/by-sa/2.0/'&gt;&lt;img alt='CC-BY-SA Creative Commons Licence ' src='/labbcat-java/images/cc-by-sa.svg' title='This work is licensed under a Creative Commons Attribution-ShareAlike 2.0 Generic License' /&gt;&lt;/a&gt;&lt;a rel='author' href='https://www.canterbury.ac.nz/nzilbb/'&gt;&lt;img src='/labbcat-java/images/nzilbb.svg' alt='Te Kāhui Roro Reo | The New Zealand Institute of Language, Brain and Behaviour' title='🄯 ${maven.build.timestamp} NZILBB'&gt;&lt;/a&gt;</bottom>
+	    </configuration>
+            <executions>
+              <execution>
+                <id>attach-javadocs</id>
+                <goals>
+                  <goal>jar</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-gpg-plugin</artifactId>
+            <version>1.5</version>
+            <executions>
+              <execution>
+                <id>sign-artifacts</id>
+                <phase>verify</phase>
+                <goals>
+                  <goal>sign</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+          <plugin>
+            <groupId>org.sonatype.plugins</groupId>
+            <artifactId>nexus-staging-maven-plugin</artifactId>
+            <version>1.6.7</version>
+            <extensions>true</extensions>
+            <configuration>
+              <serverId>ossrh</serverId>
+              <nexusUrl>https://s01.oss.sonatype.org/</nexusUrl>
+              <autoReleaseAfterClose>false</autoReleaseAfterClose>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
 </project>

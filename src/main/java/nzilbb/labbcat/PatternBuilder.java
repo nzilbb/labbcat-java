@@ -31,7 +31,7 @@ import javax.json.JsonObjectBuilder;
 
 /**
  * Helper class for building layered search patterns for
- * {@link LabbcatView#search(JsonObject,String[],String[],boolean,boolean,Integer,Integer)}.
+ * {@link LabbcatView#search(JsonObject,String[],String[],boolean,Integer,Integer,Integer)}.
  * <p>e.g.
  * <pre>// words starting with 'ps...'
  *  JSONObject pattern = new PatternBuilder().addMatchLayer("orthography", "ps.*").build();
@@ -213,7 +213,7 @@ public class PatternBuilder {
    
    /**
     * Construct a valid pattern object for passing to
-    * {@link LabbcatView#search(JsonObject,String[],String[],boolean,boolean,Integer,Integer)}.
+    * {@link LabbcatView#search(JsonObject,String[],String[],boolean,Integer,Integer,Integer)}.
     * @return A valid pattern object.
     */
    public JsonObject build() {

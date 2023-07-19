@@ -46,6 +46,7 @@ import nzilbb.ag.MediaTrackDefinition;
 import nzilbb.ag.Schema;
 import nzilbb.ag.StoreException;
 import nzilbb.ag.serialize.SerializationDescriptor;
+import nzilbb.ag.automation.util.AnnotatorDescriptor;
 import nzilbb.labbcat.model.*;
 
 /**
@@ -730,6 +731,17 @@ public class TestLabbcatView {
     // user.getUser() might be null, if there's no user auth 
     assertNotNull("Roles returned", user.getRoles());
     assertTrue("There are roles", user.getRoles().length > 0);
+  }
+
+  @Test public void getAnnotatorDescriptor() throws Exception {
+    AnnotatorDescriptor descriptor = labbcat.getAnnotatorDescriptor("OrthographyStandardizer");
+    assertNotNull("Descriptor returned", descriptor);
+    assertFalse("No config webapp", descriptor.hasConfigWebapp());
+    assertFalse("No ext webapp", descriptor.hasExtWebapp());
+    assertTrue("Has tasl webapp", descriptor.hasTaskWebapp());
+    assertNotNull("Has info", descriptor.getInfo());
+    assertNotNull("Has task parameter info", descriptor.getTaskParameterInfo());
+    assertNotNull("Has version", descriptor.getVersion());
   }
   
   /**
