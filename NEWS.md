@@ -1,3 +1,11 @@
+# 1.2.0
+
+Minimum LaBB-CAT version *20240409.2000*
+
+- Implementations
+  + LabbcatEdit.saveMedia()
+  + LabbcatEdit.saveEpisodeDocument()
+
 # 1.1.1
 
 Minimum LaBB-CAT version *20230517.1844*
