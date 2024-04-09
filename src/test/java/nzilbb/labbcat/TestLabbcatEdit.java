@@ -271,6 +271,8 @@ public class TestLabbcatEdit {
    * <ul>
    *  <li> newTranscript </li>
    *  <li> updateTranscript </li>
+   *  <li> saveMedia </li>
+   *  <li> saveEpisodeDocument </li>
    *  <li> getParticipant </li>
    *  <li> saveParticipant </li>
    *  <li> deleteTranscript </li>
@@ -290,9 +292,13 @@ public class TestLabbcatEdit {
     String transcriptType = typeLayer.getValidLabels().keySet().iterator().next();
 
     File transcript = new File(getDir(), "nzilbb.labbcat.test.txt");
+    File media = new File(getDir(), "nzilbb.labbcat.test.wav");
+    File document = new File(getDir(), "nzilbb.labbcat.test.doc");
     String participantId = "UnitTester";
     String changedParticipantId = "UnitTester-changed";
-    assertTrue("Test transcript exists", transcript.exists());
+    assertTrue("Ensure transcript exists: " + transcript.getPath(), transcript.exists());
+    assertTrue("Ensure media exists: " + media.getPath(), media.exists());
+    assertTrue("Ensure document exists: " + document.getPath(), document.exists());
     try {
 
       // ensure transcript/participant don't already exist
@@ -317,8 +323,26 @@ public class TestLabbcatEdit {
                    1, labbcat.countMatchingTranscriptIds("id = '"+transcript.getName()+"'"));
       assertEquals("Participant is in the store",
                    1, labbcat.countMatchingParticipantIds("id = '"+participantId+"'"));
+      
+      // ensure there is no media
+      MediaFile[] files = labbcat.getAvailableMedia(transcript.getName());
+      assertTrue("No media is present: " + Arrays.asList(files), files.length == 0);
+      // upload media
+      labbcat.saveMedia(transcript.getName(), null, media.toURI().toString());
+      // ensure there is now media
+      files = labbcat.getAvailableMedia(transcript.getName());
+      assertTrue("Media is now present", files.length > 0);
 
-      // re-upload it
+      // ensure there are no episode documents
+      files = labbcat.getEpisodeDocuments(transcript.getName());
+      //TODO gotta implement deletion assertTrue("No docs present: " + Arrays.asList(files), files.length == 0);
+      // upload document
+      labbcat.saveEpisodeDocument(transcript.getName(), document.toURI().toString());
+      // ensure there is now a document
+      files = labbcat.getEpisodeDocuments(transcript.getName());
+      assertTrue("Document is now present", files.length > 0);
+
+      // re-upload transcript
       threadId = labbcat.updateTranscript(transcript);
          
       task = labbcat.waitForTask(threadId, 30);

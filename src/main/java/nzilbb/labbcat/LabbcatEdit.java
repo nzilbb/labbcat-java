@@ -26,6 +26,8 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.util.Arrays;
@@ -363,8 +365,43 @@ public class LabbcatEdit extends LabbcatView implements GraphStore
    */
   public void saveMedia(String id, String trackSuffix, String mediaUrl)
     throws StoreException, PermissionException, GraphNotFoundException {
-      
-    throw new StoreException("Not implemented");
+    
+    cancelling = false;
+    URL url = editUrl("saveMedia");
+    try {
+      postRequest = new HttpRequestPostMultipart(url, getRequiredHttpAuthorization())
+        .setUserAgent()
+        .setHeader("Accept", "application/json")
+        .setParameter("id", id)
+        .setParameter("trackSuffix", trackSuffix);
+      File media = null;
+      boolean deleteMediaAfterUpload = false;
+      if (mediaUrl.startsWith("file:")) {
+        try {
+          media = new File(new URI(mediaUrl));
+        } catch (URISyntaxException x) {
+          throw new StoreException(x);
+        }
+      } else { // not file URL, but we need one, so download content to a temporary file
+        URL downloadUrl = new URL(mediaUrl);
+        media = File.createTempFile("saveMedia-", "."+IO.Extension(downloadUrl.getPath()));
+        IO.SaveUrlToFile​(downloadUrl, media);
+        media.delete();
+        media.deleteOnExit();
+        deleteMediaAfterUpload = false;
+      }
+      try {
+        postRequest.setParameter("media", media);
+        
+        if (verbose) System.out.println("saveMedia -> " + postRequest);
+        response = new Response(postRequest.post(), verbose);
+        response.checkForErrors(); // throws a ResponseException on error
+      } finally {
+        if (deleteMediaAfterUpload) media.delete();
+      }
+    } catch (IOException x) {
+      throw new StoreException(x);
+    }
   }
 
   /**
@@ -392,7 +429,42 @@ public class LabbcatEdit extends LabbcatView implements GraphStore
   public void saveEpisodeDocument(String id, String url)
     throws StoreException, PermissionException, GraphNotFoundException {
       
-    throw new StoreException("Not implemented");
+    cancelling = false;
+    URL requestUrl = editUrl("saveEpisodeDocument");
+    try {
+      postRequest = new HttpRequestPostMultipart(requestUrl, getRequiredHttpAuthorization())
+        .setUserAgent()
+        .setHeader("Accept", "application/json")
+        .setParameter("id", id);
+      File media = null;
+      boolean deleteMediaAfterUpload = false;
+      if (url.startsWith("file:")) {
+        try {
+          media = new File(new URI(url));
+        } catch (URISyntaxException x) {
+          throw new StoreException(x);
+        }
+      } else { // not file URL, but we need one, so download content to a temporary file
+        URL downloadUrl = new URL(url);
+        media = File.createTempFile(
+          "saveEpisodeDocument-", "."+IO.Extension(downloadUrl.getPath()));
+        IO.SaveUrlToFile​(downloadUrl, media);
+        media.delete();
+        media.deleteOnExit();
+        deleteMediaAfterUpload = false;
+      }
+      try {
+        postRequest.setParameter("document", media);
+        
+        if (verbose) System.out.println("saveEpisodeDocument -> " + postRequest);
+        response = new Response(postRequest.post(), verbose);
+        response.checkForErrors(); // throws a ResponseException on error
+      } finally {
+        if (deleteMediaAfterUpload) media.delete();
+      }
+    } catch (IOException x) {
+      throw new StoreException(x);
+    }
   }
 
   /**
