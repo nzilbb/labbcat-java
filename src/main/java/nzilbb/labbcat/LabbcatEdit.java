@@ -354,16 +354,16 @@ public class LabbcatEdit extends LabbcatView implements GraphStore
   }
 
   /**
-   * <em>NOT YET IMPLEMENTED</em> - Saves the given media for the given transcript
-   * @param id The transcript ID
+   * Saves the given media for the given transcript.
+   * @param id The transcript ID.
+   * @param mediaUrl A URL to the media content.
    * @param trackSuffix The track suffix of the media
    *  - see <a href="https://nzilbb.github.io/ag/apidocs/nzilbb/ag/MediaTrackDefinition.html#suffix">MediaTrackDefinition.suffix</a>}.
-   * @param mediaUrl A URL to the media content.
    * @throws StoreException If an error prevents the media from being saved.
    * @throws PermissionException If saving the media is not permitted.
    * @throws GraphNotFoundException If the transcript doesn't exist.
    */
-  public void saveMedia(String id, String trackSuffix, String mediaUrl)
+  public void saveMedia(String id, String mediaUrl, String trackSuffix)
     throws StoreException, PermissionException, GraphNotFoundException {
     
     cancelling = false;
@@ -520,7 +520,7 @@ public class LabbcatEdit extends LabbcatView implements GraphStore
    * Upload a new transcript.
    * @param transcript The transcript to upload.
    * @param media The media to upload, if any.
-   * @param mediaSuffix The media suffix for the media.
+   * @param trackSuffix The track suffix for the media, which can be null.
    * @param transcriptType The transcript type.
    * @param corpus The corpus for the transcript.
    * @param episode The episode the transcript belongs to.
@@ -528,7 +528,7 @@ public class LabbcatEdit extends LabbcatView implements GraphStore
    * @throws IOException
    * @throws ResponseException
    */
-  public String newTranscript(File transcript, File[] media, String mediaSuffix, String transcriptType, String corpus, String episode)
+  public String newTranscript(File transcript, File[] media, String trackSuffix, String transcriptType, String corpus, String episode)
     throws IOException, StoreException {
       
     cancelling = false;
@@ -543,9 +543,9 @@ public class LabbcatEdit extends LabbcatView implements GraphStore
       .setParameter("episode", episode)
       .setParameter("uploadfile1_0", transcript);
     if (media != null && media.length > 0) {
-      if (mediaSuffix == null) mediaSuffix = "";
+      if (trackSuffix == null) trackSuffix = "";
       for (int f = 0; f < media.length; f++) {
-        postRequest.setParameter("uploadmedia"+mediaSuffix+"1", media[f]);
+        postRequest.setParameter("uploadmedia"+trackSuffix+"1", media[f]);
       } // next file
     }
     if (verbose) System.out.println("taskStatus -> " + postRequest);

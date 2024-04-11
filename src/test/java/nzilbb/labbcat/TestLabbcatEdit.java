@@ -328,7 +328,7 @@ public class TestLabbcatEdit {
       MediaFile[] files = labbcat.getAvailableMedia(transcript.getName());
       assertTrue("No media is present: " + Arrays.asList(files), files.length == 0);
       // upload media
-      labbcat.saveMedia(transcript.getName(), null, media.toURI().toString());
+      labbcat.saveMedia(transcript.getName(), media.toURI().toString(), null);
       // ensure there is now media
       files = labbcat.getAvailableMedia(transcript.getName());
       assertTrue("Media is now present", files.length > 0);
