@@ -5,6 +5,7 @@ Minimum LaBB-CAT version *20240409.2000*
 - Implementations
   + LabbcatEdit.saveMedia()
   + LabbcatEdit.saveEpisodeDocument()
+  + LabbcatEdit.deleteMedia()
 
 # 1.1.1
 
