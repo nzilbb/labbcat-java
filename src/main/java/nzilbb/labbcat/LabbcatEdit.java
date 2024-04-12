@@ -41,18 +41,19 @@ import javax.json.Json;
 import javax.json.JsonArray;
 import javax.json.JsonObject;
 import javax.json.JsonValue;
+import nzilbb.ag.Annotation;
+import nzilbb.ag.Graph;
+import nzilbb.ag.GraphNotFoundException;
+import nzilbb.ag.GraphStore;
+import nzilbb.ag.MediaFile;
+import nzilbb.ag.PermissionException;
+import nzilbb.ag.StoreException;
 import nzilbb.ag.serialize.SerializationDescriptor;
 import nzilbb.ag.serialize.SerializationException;
 import nzilbb.ag.serialize.SerializerNotConfiguredException;
 import nzilbb.ag.serialize.json.JSONSerialization;
 import nzilbb.ag.serialize.util.NamedStream;
 import nzilbb.ag.serialize.util.Utility;
-import nzilbb.ag.Annotation;
-import nzilbb.ag.Graph;
-import nzilbb.ag.GraphNotFoundException;
-import nzilbb.ag.GraphStore;
-import nzilbb.ag.PermissionException;
-import nzilbb.ag.StoreException;
 import nzilbb.configure.ParameterSet;
 import nzilbb.labbcat.http.*;
 import nzilbb.util.IO;
@@ -97,8 +98,7 @@ import nzilbb.util.IO;
  * @author Robert Fromont robert@fromont.net.nz
  */
 
-public class LabbcatEdit extends LabbcatView implements GraphStore
-{
+public class LabbcatEdit extends LabbcatView implements GraphStore {
   // Attributes:
   
   // Methods:
@@ -363,7 +363,7 @@ public class LabbcatEdit extends LabbcatView implements GraphStore
    * @throws PermissionException If saving the media is not permitted.
    * @throws GraphNotFoundException If the transcript doesn't exist.
    */
-  public void saveMedia(String id, String mediaUrl, String trackSuffix)
+  public MediaFile saveMedia(String id, String mediaUrl, String trackSuffix)
     throws StoreException, PermissionException, GraphNotFoundException {
     
     cancelling = false;
@@ -396,6 +396,8 @@ public class LabbcatEdit extends LabbcatView implements GraphStore
         if (verbose) System.out.println("saveMedia -> " + postRequest);
         response = new Response(postRequest.post(), verbose);
         response.checkForErrors(); // throws a ResponseException on error
+
+        return new MediaFile((JsonObject)response.getModel());
       } finally {
         if (deleteMediaAfterUpload) media.delete();
       }
@@ -419,14 +421,14 @@ public class LabbcatEdit extends LabbcatView implements GraphStore
   }
 
   /**
-   * <em>NOT YET IMPLEMENTED</em> - Saves the given document for the episode of the given transcript.
+   * Saves the given document for the episode of the given transcript.
    * @param id The transcript ID
    * @param url A URL to the document.
    * @throws StoreException If an error prevents the media from being saved.
    * @throws PermissionException If saving the media is not permitted.
    * @throws GraphNotFoundException If the transcript doesn't exist.
    */
-  public void saveEpisodeDocument(String id, String url)
+  public MediaFile saveEpisodeDocument(String id, String url)
     throws StoreException, PermissionException, GraphNotFoundException {
       
     cancelling = false;
@@ -459,6 +461,8 @@ public class LabbcatEdit extends LabbcatView implements GraphStore
         if (verbose) System.out.println("saveEpisodeDocument -> " + postRequest);
         response = new Response(postRequest.post(), verbose);
         response.checkForErrors(); // throws a ResponseException on error
+        
+        return new MediaFile((JsonObject)response.getModel());
       } finally {
         if (deleteMediaAfterUpload) media.delete();
       }
@@ -467,6 +471,30 @@ public class LabbcatEdit extends LabbcatView implements GraphStore
     }
   }
 
+  /**
+   * Delete a given media or episode document file.
+   * @param id The associated transcript ID.
+   * @param fileName The media file name, e.g. {@link MediaFile#name}.
+   * @throws StoreException, PermissionException, GraphNotFoundException
+   */
+  public void deleteMedia(String id, String fileName)
+    throws StoreException, PermissionException, GraphNotFoundException {
+    
+    try {
+      URL url = editUrl("deleteMedia");
+      HttpRequestPost request = new HttpRequestPost(url, getRequiredHttpAuthorization())
+        .setUserAgent()
+        .setHeader("Accept", "application/json")
+        .setParameter("id", id)
+        .setParameter("fileName", fileName);
+      if (verbose) System.out.println("deleteTranscript -> " + request);
+      response = new Response(request.post(), verbose);
+      response.checkForErrors(); // throws a StoreException on error
+    } catch(IOException x) {
+      throw new StoreException("Could not get response.", x);
+    }
+  }
+  
   /**
    * Deletes the given transcript, and all associated files.
    * @param id The ID transcript to save.
