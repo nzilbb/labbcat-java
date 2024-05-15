@@ -37,21 +37,22 @@ public class Category {
   // Attributes:
 
   /**
-   * What kind of attributes are categorised - "transcript" or "speaker".
+   * What kind of attributes are categorised - "transcript", "speaker", or "layer".
    * @see #getClassId()
    * @see #setClassId(String)
    */
   protected String classId;
   /**
-   * Getter for {@link #classId}: What kind of attributes are categorised - "transcript"
-   * or "speaker". 
-   * @return What kind of attributes are categorised - "transcript" or "speaker".
+   * Getter for {@link #classId}: What kind of attributes are categorised - "transcript",
+   * "speaker", or "layer". 
+   * @return What kind of attributes are categorised - "transcript", "speaker", or "layer".
    */
   public String getClassId() { return classId; }
   /**
-   * Setter for {@link #classId}: What kind of attributes are categorised - "transcript"
-   * or "speaker". 
-   * @param newClassId What kind of attributes are categorised - "transcript" or "speaker".
+   * Setter for {@link #classId}: What kind of attributes are categorised - "transcript",
+   * "speaker", or "layer". 
+   * @param newClassId What kind of attributes are categorised - "transcript", "speaker", 
+   * or "layer".
    */
   public Category setClassId(String newClassId) { classId = newClassId; return this; }
   

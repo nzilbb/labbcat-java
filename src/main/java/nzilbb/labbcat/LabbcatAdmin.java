@@ -27,7 +27,9 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.util.Arrays;
 import java.util.Vector;
+import java.util.stream.Collectors;
 import javax.json.Json;
 import javax.json.JsonArray;
 import javax.json.JsonObject;
@@ -449,36 +451,27 @@ public class LabbcatAdmin extends LabbcatEdit implements GraphStoreAdministratio
    * @param project The project details to save.
    * @return The project just created.
    * @throws StoreException, PermissionException
-   * @see #readProjects()
-   * @see #readProjects(Integer,Integer)
-   * @see #updateProject(Project)
-   * @see #deleteProject(Project)
-   * @see #deleteProject(String)
+   * @see #createCategory(Category)
+   * @deprecated 
+   * Projects are now layer categories - a type of {@link Category} with classId = "layer".
+   * Use {@link #createCategory(Category)} instead.
    */
+  @Deprecated(since="1.2.0", forRemoval=true)
   public Project createProject(Project project) throws StoreException, PermissionException {
-    try {
-      HttpRequestPost request = post("api/admin/projects")
-        .setHeader("Accept", "application/json");
-      if (verbose) System.out.println("createProject -> " + request);
-      response = new Response(request.post(project.toJson()), verbose);
-      response.checkForErrors(); // throws a StoreException on error
-      if (response.isModelNull()) return null;
-      return new Project((JsonObject)response.getModel());
-    } catch(IOException x) {
-      throw new StoreException("Could not get response.", x);
-    }
+    Category category = createCategory(project);
+    return new Project(category);
   } // end of createProject()
 
   /**
    * Reads a list of project records.
    * @return A list of projects.
    * @throws StoreException, PermissionException
-   * @see #createProject(Project)
-   * @see #readProjects(Integer,Integer)
-   * @see #updateProject(Project)
-   * @see #deleteProject(Project)
-   * @see #deleteProject(String)
+   * @see #readCategories(String)
+   * @deprecated 
+   * Projects are now layer categories - a type of {@link Category} with classId = "layer".
+   * Use {@link #readCategories(String)} instead.
    */
+  @Deprecated(since="1.2.0", forRemoval=true)
   public Project[] readProjects() throws StoreException, PermissionException {
     return readProjects(null, null);
   }
@@ -490,34 +483,20 @@ public class LabbcatAdmin extends LabbcatEdit implements GraphStoreAdministratio
    * @param pageLength The length of pages (if null, the default page length is 20).
    * @return A list of projects.
    * @throws StoreException, PermissionException
-   * @see #createProject(Project)
-   * @see #readProjects()
-   * @see #updateProject(Project)
-   * @see #deleteProject(Project)
-   * @see #deleteProject(String)
+   * @see #readCategories(String,Integer,Integer)
+   * @deprecated 
+   * Projects are now layer categories - a type of {@link Category} with classId = "layer".
+   * Use {@link #readCategories(String,Integer,Integer)} instead.
    */
+  @Deprecated(since="1.2.0", forRemoval=true)
   public Project[] readProjects(Integer pageNumber, Integer pageLength)
     throws StoreException, PermissionException {
-    try {
-      HttpRequestGet request = get("api/admin/projects")
-        .setHeader("Accept", "application/json");
-      if (pageLength != null) request.setParameter("pageNumber", pageLength);
-      if (pageNumber != null) request.setParameter("pageLength", pageNumber);
-      if (verbose) System.out.println("readProjects -> " + request);
-      response = new Response(request.get(), verbose);
-      response.checkForErrors(); // throws a StoreException on error
-      if (response.isModelNull()) return null;
-      JsonArray array = (JsonArray)response.getModel();
-      Vector<Project> projects = new Vector<Project>();
-      if (array != null) {
-        for (int i = 0; i < array.size(); i++) {
-          projects.add(new Project(array.getJsonObject(i)));
-        }
-      }
-      return projects.toArray(new Project[0]);
-    } catch(IOException x) {
-      throw new StoreException("Could not get response.", x);
-    }
+    Category[] categories = readCategories("layer", pageNumber, pageLength);
+    if (categories == null) return null;
+    return Arrays.stream(categories)
+      .map(c -> new Project(c))
+      .collect(Collectors.toList())
+      .toArray(new Project[0]);
   } // end of readProjects()
    
   /**
@@ -525,59 +504,43 @@ public class LabbcatAdmin extends LabbcatEdit implements GraphStoreAdministratio
    * @param project The project details to save.
    * @return The project just updated.
    * @throws StoreException, PermissionException
-   * @see #createProject(Project)
-   * @see #readProjects()
-   * @see #readProjects(Integer,Integer)
-   * @see #deleteProject(Project)
-   * @see #deleteProject(String)
+   * @see #updateCategory(Category)
+   * @deprecated 
+   * Projects are now layer categories - a type of {@link Category} with classId = "layer".
+   * Use {@link #updateCategory(Category)} isntead.
    */
+  @Deprecated(since="1.2.0", forRemoval=true)
   public Project updateProject(Project project) throws StoreException, PermissionException {
-    try{
-      HttpRequestPost request = put("api/admin/projects")
-        .setHeader("Accept", "application/json");
-      if (verbose) System.out.println("updateProject -> " + request);
-      response = new Response(request.post(project.toJson()), verbose);
-      response.checkForErrors(); // throws a StoreException on error
-      if (response.isModelNull()) return null;
-      return new Project((JsonObject)response.getModel());
-    } catch(IOException x) {
-      throw new StoreException("Could not get response.", x);
-    }
+    Category category = updateCategory(project);
+    return new Project(category);
   } // end of updateProject()
    
   /**
    * Deletes an existing project record.
    * @param project The project to delete.
    * @throws StoreException, PermissionException
-   * @see #createProject(Project)
-   * @see #readProjects()
-   * @see #readProjects(Integer,Integer)
-   * @see #updateProject(Project)
-   * @see #deleteProject(String)
+   * @see #deleteCategory(Category)
+   * @deprecated 
+   * Projects are now layer categories - a type of {@link Category} with classId = "layer".
+   * Use {@link #deleteCategory(Category)} instead
    */
+  @Deprecated(since="1.2.0", forRemoval=true)
   public void deleteProject(Project project) throws StoreException, PermissionException {
-    deleteProject(project.getProject());
+    deleteCategory(project);
   }
    
   /**
    * Deletes an existing project record.
    * @param name The name/ID of the project to delete.
    * @throws StoreException, PermissionException
-   * @see #createProject(Project)
-   * @see #readProjects()
-   * @see #readProjects(Integer,Integer)
-   * @see #updateProject(Project)
-   * @see #deleteProject(Project)
+   * @see #deleteCategory(String,String)
+   * @deprecated 
+   * Projects are now layer categories - a type of {@link Category} with classId = "layer".
+   * Use {@link #deleteCategory(String,String)} instead.
    */
+  @Deprecated(since="1.2.0", forRemoval=true)
   public void deleteProject(String name) throws StoreException, PermissionException {
-    try{
-      HttpRequestPost request = delete("api/admin/projects/" + name);
-      if (verbose) System.out.println("deleteProject -> " + request);
-      response = new Response(request.post(), verbose);
-      response.checkForErrors(); // throws a StoreException on error
-    } catch(IOException x) {
-      throw new StoreException("Could not get response.", x);
-    }
+    deleteCategory("layer", name);
   } // end of updateProject()
    
   /**

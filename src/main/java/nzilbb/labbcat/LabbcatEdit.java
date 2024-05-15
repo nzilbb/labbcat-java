@@ -474,7 +474,7 @@ public class LabbcatEdit extends LabbcatView implements GraphStore {
   /**
    * Delete a given media or episode document file.
    * @param id The associated transcript ID.
-   * @param fileName The media file name, e.g. {@link MediaFile#name}.
+   * @param fileName The media/document file name, e.g. {@link MediaFile#name}.
    * @throws StoreException, PermissionException, GraphNotFoundException
    */
   public void deleteMedia(String id, String fileName)

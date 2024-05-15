@@ -337,8 +337,9 @@ public class TestLabbcatAdmin {
     }
   }
 
+  /** Test deprecated project CRUD operations. */
   @Test public void newProjectUpdateProjectAndDeleteProject() throws Exception {
-    Project originalProject = new Project()
+    Project originalProject = (Project)new Project()
       .setProject("unit-test")
       .setDescription("Temporary project for unit testing");
       
@@ -369,7 +370,7 @@ public class TestLabbcatAdmin {
       assertTrue("Project was added", found);
 
       // update it
-      Project updatedProject = new Project()
+      Project updatedProject = (Project)new Project()
         .setProject("unit-test")
         .setDescription("Changed description");
          

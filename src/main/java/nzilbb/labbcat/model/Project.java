@@ -31,93 +31,63 @@ import javax.json.JsonString;
 /**
  * Project record.
  * @author Robert Fromont robert@fromont.net.nz
+ * @deprecated 
+ * Projects are now layer categories - a type of {@link Category} with classId = "layer" 
  */
-public class Project {
+@Deprecated(since="1.2.0", forRemoval=true)
+public class Project extends Category {
    
-   // Attributes:
-   
-   /**
-    * Database key value.
-    * @see #getProjectId()
-    * @see #setProjectId(int)
-    */
-   protected int projectId;
-   /**
-    * Getter for {@link #projectId}: Database key value.
-    * @return Database key value.
-    */
-   public int getProjectId() { return projectId; }
-   /**
-    * Setter for {@link #projectId}: Database key value.
-    * @param newProjectId Database key value.
-    */
-   public Project setProjectId(int newProjectId) { projectId = newProjectId; return this; }
+  // Attributes:
+  
+  /**
+   * Deprecated getter for the database key value.
+   * @return Database key value.
+   */
+  @Deprecated(since="1.2.0", forRemoval=true)
+  public int getProjectId() { if (category != null) return category.hashCode(); else return -1; }
+  /**
+   * Deprecated setter for the database key value, which now has no effect.
+   * @param newProjectId Database key value.
+   */
+  @Deprecated(since="1.2.0", forRemoval=true)
+  public Project setProjectId(int newProjectId) { /* Now does nothing */ return this; }
 
-   /**
-    * The name of the project.
-    * @see #getProject()
-    * @see #setProject(String)
-    */
-   protected String project;
-   /**
-    * Getter for {@link #project}: The name of the project.
-    * @return The name of the project.
-    */
-   public String getProject() { return project; }
-   /**
-    * Setter for {@link #project}: The name of the project.
-    * @param newProject The name of the project.
-    */
-   public Project setProject(String newProject) { project = newProject; return this; }
-
-   /**
-    * Description of the project.
-    * @see #getDescription()
-    * @see #setDescription(String)
-    */
-   protected String description;
-   /**
-    * Getter for {@link #description}: Description of the project.
-    * @return Description of the project.
-    */
-   public String getDescription() { return description; }
-   /**
-    * Setter for {@link #description}: Description of the project.
-    * @param newDescription Description of the project.
-    */
-   public Project setDescription(String newDescription) { description = newDescription; return this; }
-   
-   // Methods:
-   
-   /**
-    * Default constructor.
-    */
-   public Project() {
-   } // end of constructor
-   
-   /**
-    * Constructor from JSON.
-    */
-   public Project(JsonObject json) {      
-      if (json.containsKey("project_id")) {
-        projectId = json.getInt("project_id", -1);
-      }
-      project = json.getString("project");
-      if (json.containsKey("description") && !json.isNull("description")) {
-        description = json.getString("description");
-      }
-   } // end of constructor
-   
-   /**
-    * Serializes the object to JSON.
-    * @return A JSON serialization of the object.
-    */
-   public JsonObject toJson() {
-      JsonObjectBuilder json = Json.createObjectBuilder()
-         .add("project_id", projectId);
-      if (project != null) json = json.add("project", project);
-      if (description != null) json = json.add("description", description);
-      return json.build();
-   } // end of toJSON()
-   
+  /**
+   * Getter for the name of the project.
+   * @return The name of the project.
+   */
+  public String getProject() { return getCategory(); }
+  /**
+   * Setter for the name of the project.
+   * @param newProject The name of the project.
+   */
+  public Project setProject(String newProject) { setCategory(newProject); return this; }
+  
+  // Methods:
+  
+  /**
+   * Default constructor.
+   */
+  public Project() {
+    classId = "layer";
+  } // end of constructor
+  
+  /**
+   * Constructor from JSON.
+   */
+  public Project(JsonObject json) {
+    super(json);
+    classId = "layer";
+  } // end of constructor
+  
+  /**
+   * Constructor from Category object.
+   */
+  public Project(Category category) {
+    this.classId = "layer";
+    this.category = category.getCategory();
+    this.description = category.getDescription();
+    this.displayOrder = category.getDisplayOrder();
+  } // end of constructor
+  
 } // end of class Project
