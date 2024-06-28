@@ -15,9 +15,9 @@ abstract: Client library for communicating with LaBB-CAT corpus servers.
 keywords:
 - LaBB-CAT
 - Linguistic Annotation
-license: AGPL-3.0-or-later
-version: 1.1.1
-date-released: 2023-07-19
+license: GPL-3.0-or-later
+version: 1.2.0
+date-released: 2024-06-28
 references:
 - type: software
   title: ANTLR 4 Runtime
@@ -38,7 +38,7 @@ references:
   repository-code: https://github.com/antlr/antlr4/tree/master/antlr4-runtime
 - type: software
   title: Annotation Graphs
-  version: 1.1.2
+  version: 1.2.0
   abbreviation: nz.ilbb.ag:nzilbb.ag
   license-url: https://www.gnu.org/licenses/agpl.txt
   notes: More license information can be found in the THIRD-PARTY/Annotation_Graphs
@@ -114,29 +114,29 @@ references:
   repository-code: https://gitbox.apache.org/repos/asf?p=commons-io.git
 - type: software
   title: Apache Derby Database Engine and Embedded JDBC Driver
-  version: 10.15.2.0
+  version: 10.17.1.0
   abbreviation: org.apache.derby:derby
   license: Apache-2.0
   notes: More license information can be found in the THIRD-PARTY/Apache_Derby_Database_Engine_and_Embedded_JDBC_Driver
     directory.
   authors:
-  - name: The Apache Derby Database Engine and Embedded JDBC Driver 10.15.2.0 Team
+  - name: The Apache Derby Database Engine and Embedded JDBC Driver 10.17.1.0 Team
   repository-code: http://svn.apache.org/viewcvs.cgi/db/derby/code/trunk/?root=Apache-SVN/derby
 - type: software
   title: Apache Derby Shared Code
-  version: 10.15.2.0
+  version: 10.17.1.0
   abbreviation: org.apache.derby:derbyshared
   license: Apache-2.0
   notes: More license information can be found in the THIRD-PARTY/Apache_Derby_Shared_Code
     directory.
   authors:
-  - name: The Apache Derby Shared Code 10.15.2.0 Team
+  - name: The Apache Derby Shared Code 10.17.1.0 Team
   repository-code: http://svn.apache.org/viewcvs.cgi/db/derby/code/trunk/?root=Apache-SVN/derbyshared
 - type: software
   title: JSR 374 (JSON Processing) Default Provider
   version: 1.1.4
   abbreviation: org.glassfish:javax.json
-  license: CDDL-1.1 OR GPL-2.0-only WITH Classpath-exception-2.0
+  license: NOASSERTION OR CDDL-1.1
   notes: More license information can be found in the THIRD-PARTY/JSR_374_JSON_Processing_Default_Provider
     directory.
   authors:
