@@ -1,5 +1,5 @@
 //
-// Copyright 2020 New Zealand Institute of Language, Brain and Behaviour, 
+// Copyright 2020-2024 New Zealand Institute of Language, Brain and Behaviour, 
 // University of Canterbury
 // Written by Robert Fromont - robert.fromont@canterbury.ac.nz
 //
@@ -48,6 +48,8 @@ import nzilbb.ag.StoreException;
 import nzilbb.ag.serialize.SerializationDescriptor;
 import nzilbb.ag.automation.util.AnnotatorDescriptor;
 import nzilbb.labbcat.model.*;
+import nzilbb.labbcat.http.HttpRequestGet;
+import nzilbb.util.IO;
 
 /**
  * Unit tests for LabbcatView.
@@ -589,8 +591,7 @@ public class TestLabbcatView {
          
       Match[] matches = labbcat.getMatches(threadId, 2);
       if (matches.length == 0) {
-        System.out.println(
-          "getMatches: No matches were returned, cannot test getSoundFragments");
+        fail("getMatches: No matches were returned, cannot test getSoundFragments");
       } else {
         int upTo = Math.min(5, matches.length);
         Match[] subset = Arrays.copyOfRange(matches, 0, upTo);
@@ -636,8 +637,7 @@ public class TestLabbcatView {
          
       Match[] matches = labbcat.getMatches(threadId, 2);
       if (matches.length == 0) {
-        System.out.println(
-          "getMatches: No matches were returned, cannot test getFragments");
+        fail("getMatches: No matches were returned, cannot test getFragments");
       } else {
         int upTo = Math.min(5, matches.length);
         Match[] subset = Arrays.copyOfRange(matches, 0, upTo);
@@ -663,6 +663,72 @@ public class TestLabbcatView {
       }
     } finally {
       labbcat.releaseTask(threadId);
+    }
+  }
+
+  @Test public void processWithPraat()
+    throws Exception {
+    // get a participant ID to use
+    String[] ids = labbcat.getParticipantIds();
+    assertTrue("getParticipantIds: Some IDs are returned",
+               ids.length > 0);
+    String[] participantId = { ids[0] };      
+
+    // all instances of any segment
+    JsonObject pattern = new PatternBuilder().addMatchLayer("segment", ".*").build();
+    String searchThreadId = labbcat.search(pattern, participantId, null, false, null, null, null);
+    try {
+      TaskStatus task = labbcat.waitForTask(searchThreadId, 30);
+      // if the task is still running, it's taking too long, so cancel it
+      if (task.getRunning()) {
+        try { labbcat.cancelTask(searchThreadId); } catch(Exception exception) {}
+      }
+      assertFalse("Search task finished in a timely manner",
+                  task.getRunning());
+      
+      Match[] matches = labbcat.getMatches(searchThreadId, 2);
+      if (matches.length == 0) {
+        fail("getMatches: No matches were returned, cannot test processWithPraat");
+      } else {
+        int upTo = Math.min(5, matches.length);
+        Match[] subset = Arrays.copyOfRange(matches, 0, upTo);
+        String[] matchIds = Arrays.stream(subset)
+          .map(match -> match.getMatchId())
+          .collect(Collectors.toList()).toArray(new String[0]);
+        Double[] startOffsets = Arrays.stream(subset)
+          .map(match -> match.getLine())
+          .collect(Collectors.toList()).toArray(new Double[0]);
+        Double[] endOffsets = Arrays.stream(subset)
+          .map(match -> match.getLineEnd())
+          .collect(Collectors.toList()).toArray(new Double[0]);
+        String script = "test$ = \"test\"\nprint 'test$' 'newline$'";
+        String praatThreadId = labbcat.processWithPraat(
+          matchIds, startOffsets, endOffsets, script, 0.0, null);
+        try {
+          task = labbcat.waitForTask(praatThreadId, 30);
+          // if the task is still running, it's taking too long, so cancel it
+          if (task.getRunning()) {
+            try { labbcat.cancelTask(praatThreadId); } catch(Exception exception) {}
+          }
+          assertFalse("Search task finished in a timely manner",
+                      task.getRunning());
+          
+          assertTrue("Output is a CSV URL: " + task.getResultUrl(),
+                     task.getResultUrl().endsWith(".csv"));
+
+          // download URL
+          HttpRequestGet request = new HttpRequestGet(
+            task.getResultUrl(), labbcat.getRequiredHttpAuthorization());
+          String csv = IO.InputStreamToString(request.get().getInputStream());
+          assertEquals("CSV result is correct: " + csv,
+                       "test,Error\n\"test \",\n\"test \",\n\"test \",\n\"test \",\n\"test \",",
+                       csv);          
+        } finally {
+          labbcat.releaseTask(praatThreadId);
+        }
+      }
+    } finally {
+      labbcat.releaseTask(searchThreadId);
     }
   }
 

@@ -1,3 +1,8 @@
+# 1.2.1
+
+- New functions
+  + LabbcatView.processWithPraat()
+
 # 1.2.0
 
 Minimum LaBB-CAT version *20240409.2000*

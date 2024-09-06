@@ -31,16 +31,19 @@ import java.net.URL;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.util.Arrays;
 import java.util.Base64;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.TreeMap;
 import java.util.Vector;
 import java.util.Vector;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 import javax.json.Json;
 import javax.json.JsonArray;
 import javax.json.JsonNumber;
@@ -2021,7 +2024,7 @@ public class LabbcatView implements GraphStoreQuery {
   public Match[] getMatches(String threadId, int wordsContext)
     throws IOException, StoreException {      
     return getMatches(threadId, wordsContext, null, null);
-  } // end of getMatchIds()
+  } // end of getMatches()
 
   /**
    * Gets a list of tokens that were matched by
@@ -2079,7 +2082,7 @@ public class LabbcatView implements GraphStoreQuery {
     }
       
     return matches.toArray(new Match[0]);
-  } // end of getMatchIds()
+  } // end of getMatches()
 
   /**
    * Searches for tokens that match the givem pattern and returns a list of matches.
@@ -2567,7 +2570,156 @@ public class LabbcatView implements GraphStoreQuery {
 
     return fragments;
   } // end of getFragments()
-   
+
+  /**
+   * Executes Praat on the server in order to perform acoustic analysis on a given
+   * collection of sound fragments. 
+   * @param matchIds An array of annotation IDs, e.g. the MatchId column, or the URL column,
+   * of a results set. 
+   * @param startOffsets An array of start times in seconds, which must have the same
+   * number of elements as <var>matchIds</var>.
+   * @param endOffsets An array of end times in seconds, which must have the same
+   * number of elements as <var>matchIds</var>.
+   * @param praatScript Script to run on each match.
+   * @param windowOffset In many circumstances, you will want some context before and after
+   * the sample start/end time.  For this reason, you can specify a "window offset" -
+   * this is a number of seconds to subtract from the sample start and add to the sample
+   * end time, before extracting that part of the audio for processing. For example, if
+   * the sample starts at 2.0s and ends at 3.0s, and you set the window offset to 0.5s,
+   * then Praat will extract a sample of audio from  1.5s to 3.5s, and do the selected
+   * processing on that sample. The best value for this depends on what the praat.script
+   * is doing; if you are getting formants from  vowels, including some context ensures
+   * that the formants at the edges are more accurate (in LaBB-CAT's web interface, the
+   * default value for this 0.025), but if you're getting max pitch or COG during a
+   * segment, most likely you want a window.offset of 0 to ensure neighbouring segments
+   * doesn't influence the measurement. 
+   * @param attributes Array of participant attributes to make available to the script. For
+   * example, if you want to use different acoustic parameters depending on what the
+   * gender of the speaker is, including the "participant_gender" attribute will make a
+   * variable called <var>participant_gender$</var> available to the praat script, whose 
+   * value will be the gender of the speaker for that segment.
+   * @return The threadId of the resulting task, the result of which will be a CSV file
+   * containing acoustic measurs. The threadId can be passed in to {@link #taskStatus(String)},
+   * {@link #waitForTask(String,int)}, etc.
+   * @throws IOException, StoreException
+   */
+  public String processWithPraat(
+    String[] matchIds, Double[] startOffsets, Double[] endOffsets,
+    String praatScript, Double windowOffset, String[] attributes)
+    throws IOException, StoreException {
+    // split MatchIds into transcript and participant...
+    return processWithPraat(
+      // split transcript ID out of matchIds
+      Arrays.stream(matchIds)
+      .map(matchId -> matchId.replaceAll(".*(g_[0-9]+);.*", "$1"))
+      .collect(Collectors.toList()).toArray(new String[0]),
+      // split participant ID out of matchIds
+      Arrays.stream(matchIds)
+      .map(matchId -> matchId.replaceAll(".*(p_[0-9]+);.*", "$1"))
+      .collect(Collectors.toList()).toArray(new String[0]),
+      startOffsets, endOffsets,
+      praatScript, windowOffset, attributes);
+  }
+  
+  /**
+   * Executes Praat on the server in order to perform acoustic analysis on a given
+   * collection of sound fragments. 
+   * @param transcriptIds An array of Transcript IDs identifying the recording that the
+   * sample comes from. 
+   * @param participantIds An array of Participant IDs, which must have the same
+   * number of elements as <var>transcriptIds</var>, identifying the speaker of the
+   * speech sample (e.g. so that their gender can be identified, for calibrating script
+   * parameters). 
+   * @param startOffsets An array of start times in seconds, which must have the same
+   * number of elements as <var>transcriptIds</var>.
+   * @param endOffsets An array of end times in seconds, which must have the same
+   * number of elements as <var>transcriptIds</var>.
+   * @param script Praat script to run on each match.
+   * @param windowOffset In many circumstances, you will want some context before and after
+   * the sample start/end time.  For this reason, you can specify a "window offset" -
+   * this is a number of seconds to subtract from the sample start and add to the sample
+   * end time, before extracting that part of the audio for processing. For example, if
+   * the sample starts at 2.0s and ends at 3.0s, and you set the window offset to 0.5s,
+   * then Praat will extract a sample of audio from  1.5s to 3.5s, and do the selected
+   * processing on that sample. The best value for this depends on what the praat.script
+   * is doing; if you are getting formants from  vowels, including some context ensures
+   * that the formants at the edges are more accurate (in LaBB-CAT's web interface, the
+   * default value for this 0.025), but if you're getting max pitch or COG during a
+   * segment, most likely you want a window.offset of 0 to ensure neighbouring segments
+   * doesn't influence the measurement. 
+   * @param attributes Array of participant attributes to make available to the script. For
+   * example, if you want to use different acoustic parameters depending on what the
+   * gender of the speaker is, including the "participant_gender" attribute will make a
+   * variable called <var>participant_gender$</var> available to the praat script, whose 
+   * value will be the gender of the speaker for that segment.
+   * @return The threadId of the resulting task, the result of which will be a CSV file
+   * containing acoustic measurs. The threadId can be passed in to {@link #taskStatus(String)},
+   * {@link #waitForTask(String,int)}, etc.
+   * @throws IOException, StoreException
+   */
+  public String processWithPraat(
+    String[] transcriptIds, String[] participantIds, Double[] startOffsets, Double[] endOffsets,
+    String script, Double windowOffset, String[] attributes)
+    throws IOException, StoreException {
+
+    cancelling = false;
+
+    if (transcriptIds.length != participantIds.length
+        || transcriptIds.length != startOffsets.length
+        || transcriptIds.length != endOffsets.length) {
+      throw new StoreException(
+        "transcriptIds ("+transcriptIds.length +"), participantIds ("+participantIds.length
+        +"), startOffsets ("+startOffsets.length
+        +"), and endOffsets ("+endOffsets.length+") must be arrays of equal size.");
+    }
+
+    // write the IDs to a temporary file for upload
+    File csvUpload = File.createTempFile("processWithPraat_",".csv");
+    try {
+      csvUpload.deleteOnExit();
+      PrintWriter csvOut = new PrintWriter(csvUpload, "UTF-8");
+      csvOut.print("Transcript,Participant,StartOffset,EndOffset");
+      for (int i = 0; i < transcriptIds.length; i++) {
+        csvOut.println();      
+        csvOut.print(transcriptIds[i]);
+        csvOut.print(",");
+        csvOut.print(participantIds[i]);
+        csvOut.print(",");
+        csvOut.print(startOffsets[i]);
+        csvOut.print(",");
+        csvOut.print(endOffsets[i]);
+      }
+      csvOut.close();
+      if (verbose) System.out.println("matchIds written to: " + csvUpload.getPath());
+      
+      URL url = makeUrl("api/praat");
+      postRequest = new HttpRequestPostMultipart(url, getRequiredHttpAuthorization())
+        .setUserAgent()
+        .setHeader("Accept", "application/json");
+      if (attributes != null && attributes.length > 0) {
+        postRequest.setParameter("attributes", attributes);
+      }
+      postRequest.setParameter("transcriptColumn", "0")
+        .setParameter("participantColumn", "1")
+        .setParameter("startTimeColumn", "2")
+        .setParameter("endTimeColumn", "3")
+        .setParameter(
+          "windowOffset", Optional.ofNullable(windowOffset).orElse(Double.valueOf(0)).toString())
+        .setParameter("script", script)
+        .setParameter("passThroughData", "false")
+        .setParameter("csv", csvUpload);
+      if (verbose) System.out.println("processWithPraat -> " + postRequest);
+      response = new Response(postRequest.post(), verbose);
+      response.checkForErrors(); // throws a ResponseException on error
+      
+      // extract the threadId from model.threadId
+      JsonObject model = (JsonObject)response.getModel();
+      return ""+model.getInt("threadId");
+    } finally {
+      csvUpload.delete();
+    }
+  } // end of processWithPraat()
+
   /**
    * Gets transcript attribute values for given transcript IDs.
    * @param transcriptIds A list of transcript IDs (transcript names).
