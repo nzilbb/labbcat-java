@@ -154,7 +154,7 @@ public class HttpRequestPost {
    /**
     * Sets the user-agent header to indicate the name/version of the library.
     */
-   public HttpRequestPost setUserAgent() {
+  public HttpRequestPost setUserAgent() { // TODO use pom.xml Implementation-Title/Version
       if (HttpRequestGet.UserAgent == null) {
          // get our version info from the comment of the jar file we're built into
          try {

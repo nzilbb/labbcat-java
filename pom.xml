@@ -6,7 +6,7 @@
 
   <groupId>nz.ilbb.labbcat</groupId>
   <artifactId>nzilbb.labbcat</artifactId>
-  <version>1.2.1-SNAPSHOT</version>
+  <version>1.2.1</version>
   <packaging>jar</packaging>
 
   <name>nzilbb.labbcat</name>

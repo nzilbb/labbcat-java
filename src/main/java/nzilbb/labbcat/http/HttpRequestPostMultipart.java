@@ -179,7 +179,7 @@ public class HttpRequestPostMultipart {
    /**
     * Sets the user-agent header to indicate the name/version of the library.
     */
-   public HttpRequestPostMultipart setUserAgent() {
+   public HttpRequestPostMultipart setUserAgent() { // TODO use pom.xml Implementation-Title/Version
       if (HttpRequestGet.UserAgent == null) {
          // get our version info from the comment of the jar file we're built into
          try {
