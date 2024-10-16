@@ -1,6 +1,6 @@
 # 1.2.1
 
-- New functions
+- New function
   + LabbcatView.processWithPraat()
 
 # 1.2.0
