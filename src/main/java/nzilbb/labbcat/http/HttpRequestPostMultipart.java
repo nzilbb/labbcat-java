@@ -34,6 +34,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Random;
 import java.util.jar.JarFile;
 
@@ -179,18 +180,14 @@ public class HttpRequestPostMultipart {
    /**
     * Sets the user-agent header to indicate the name/version of the library.
     */
-   public HttpRequestPostMultipart setUserAgent() { // TODO use pom.xml Implementation-Title/Version
+   public HttpRequestPostMultipart setUserAgent() {
       if (HttpRequestGet.UserAgent == null) {
-         // get our version info from the comment of the jar file we're built into
-         try {
-            URL thisClassUrl = getClass().getResource(getClass().getSimpleName() + ".class");
-            if (thisClassUrl.toString().startsWith("jar:")) {
-               URI thisJarUri = new URI(thisClassUrl.toString().replaceAll("jar:(.*)!.*","$1"));
-               JarFile thisJarFile = new JarFile(new File(thisJarUri));
-               HttpRequestGet.UserAgent = thisJarFile.getComment();
-            }
-         } catch (Throwable t) {
-         }
+        HttpRequestGet.UserAgent = "Java "
+          +Optional.ofNullable(getClass().getPackage().getImplementationTitle())
+          .orElse("nzilbb.labbcat")
+          + " "
+          + Optional.ofNullable(getClass().getPackage().getImplementationVersion())
+          .orElse("?");
       }
       setHeader("user-agent", HttpRequestGet.UserAgent);
       return this;

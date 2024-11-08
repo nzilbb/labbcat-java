@@ -158,16 +158,12 @@ public class HttpRequestGet {
     */
    public HttpRequestGet setUserAgent() { // TODO use pom.xml Implementation-Title/Version
       if (UserAgent == null) {
-         // get our version info from the comment of the jar file we're built into
-         try {
-            URL thisClassUrl = getClass().getResource(getClass().getSimpleName() + ".class");
-            if (thisClassUrl.toString().startsWith("jar:")) {
-               URI thisJarUri = new URI(thisClassUrl.toString().replaceAll("jar:(.*)!.*","$1"));
-               JarFile thisJarFile = new JarFile(new File(thisJarUri));
-               UserAgent = thisJarFile.getComment();
-            }
-         } catch (Throwable t) {
-         }
+        UserAgent = "Java "
+          +Optional.ofNullable(getClass().getPackage().getImplementationTitle())
+          .orElse("nzilbb.labbcat")
+          + " "
+          + Optional.ofNullable(getClass().getPackage().getImplementationVersion())
+          .orElse("?");
       }
       setHeader("user-agent", UserAgent);
       return this;

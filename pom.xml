@@ -74,7 +74,7 @@
             </manifest>
             <manifestEntries>
               <Name>nzilbb/labbcat/</Name>
-              <Implementation-Title>${project.description}</Implementation-Title>
+              <Implementation-Title>${project.name}</Implementation-Title>
               <Implementation-Version>${project.version}</Implementation-Version>
               <Implementation-Vendor>New Zealand Institute of Language, Brain and Behaviour</Implementation-Vendor>
             </manifestEntries>
