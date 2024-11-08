@@ -904,11 +904,8 @@ public class TestLabbcatAdmin {
       .setType(Constants.TYPE_STRING);
     // TODO validLabels
 
-    try {
-      labbcat.getLayer(testLayer.getId());
-      fail("Test layer doesn't already exist: " + testLayer.getId());
-    } catch (StoreException x) {
-    }
+    assertNull("Test layer doesn't already exist: " + testLayer.getId(),
+               labbcat.getLayer(testLayer.getId()));
     try {
 
       // create the layer
@@ -1016,11 +1013,8 @@ public class TestLabbcatAdmin {
       labbcat.deleteLayer(testLayer.getId());
 
       // ensure it's been deleted
-      try {
-        labbcat.getLayer(testLayer.getId());
-        fail("Should not be able to get layer that has been deleted: " + testLayer.getId());
-      } catch (StoreException x) {
-      }
+      assertNull("Should not be able to get layer that has been deleted: " + testLayer.getId(),
+                 labbcat.getLayer(testLayer.getId()));
          
     } finally {
       // ensure layer is deleted
