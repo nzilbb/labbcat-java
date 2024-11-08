@@ -31,6 +31,7 @@ import java.net.URL;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.text.MessageFormat;
 import java.util.Arrays;
 import java.util.Base64;
 import java.util.Date;
@@ -1615,17 +1616,11 @@ public class LabbcatView implements GraphStoreQuery {
         return null;
       } else {
         File file = null;
-        // use the name given by the server, if any
-        String contentDisposition = connection.getHeaderField("content-disposition");
-        if (contentDisposition != null) {
-          // something like attachment; filename=blah.wav
-          int equals = contentDisposition.indexOf("=");
-          if (equals > 0) {
-            String fileName = contentDisposition.substring(equals + 1);
-            if (fileName.length() > 0) file = new File(dir, fileName);
-          }
-        }
-        if (file == null) { // no name was suggested
+        String fileName = FileNameFromContentDisposition(
+          connection.getHeaderField("content-disposition"));        
+        if (fileName != null) {
+          file = new File(dir, fileName);
+        } else { // no name was suggested
           // invent a name
           file = new File(
             dir, IO.WithoutExtension(id)
@@ -2425,16 +2420,11 @@ public class LabbcatView implements GraphStoreQuery {
         continue;
       } else {
         // use the name given by the server, if any
-        String contentDisposition = connection.getHeaderField("content-disposition");
-        if (contentDisposition != null) {
-          // something like attachment; filename=blah.wav
-          int equals = contentDisposition.indexOf("=");
-          if (equals > 0) {
-            String fileName = contentDisposition.substring(equals + 1);
-            if (fileName.length() > 0) fragments[i] = new File(dir, fileName);
-          }
-        }
-        if (fragments[i] == null) { // no name was suggested
+        String fileName = FileNameFromContentDisposition(
+          connection.getHeaderField("content-disposition"));        
+        if (fileName != null) {
+          fragments[i] = new File(dir, fileName);
+        } else { // no name was suggested
           // invent a name
           fragments[i] = new File(
             dir, Graph.FragmentId(transcriptIds[i], startOffsets[i], endOffsets[i]) + ".wav");
@@ -2549,19 +2539,14 @@ public class LabbcatView implements GraphStoreQuery {
         continue;
       } else {
         // use the name given by the server, if any
-        String contentDisposition = connection.getHeaderField("content-disposition");
-        if (contentDisposition != null) {
-          // something like attachment; filename=blah.wav
-          int equals = contentDisposition.indexOf("=");
-          if (equals > 0) {
-            String fileName = contentDisposition.substring(equals + 1);
-            if (fileName.length() > 0) fragments[i] = new File(dir, fileName);
-          }
-        }
-        if (fragments[i] == null) { // no suggested name
+        String fileName = FileNameFromContentDisposition(
+          connection.getHeaderField("content-disposition"));        
+        if (fileName != null) {
+          fragments[i] = new File(dir, fileName);
+        } else { // no name was suggested
           // invent a name
           fragments[i] = new File(
-            dir, Graph.FragmentId(transcriptIds[i], startOffsets[i], endOffsets[i]));
+            dir, Graph.FragmentId(transcriptIds[i], startOffsets[i], endOffsets[i]) + ".wav");
         }
         if (tempFiles) fragments[i].deleteOnExit();
         IO.SaveUrlConnectionToFile(connection, fragments[i]);           
@@ -3102,5 +3087,44 @@ public class LabbcatView implements GraphStoreQuery {
       throw new StoreException("Could not get response.", x);
     }
   } // end of getDictionaryEntries()
+  
+  /**
+   * Infers the filename from a given Content-Disposition header.
+   * @param contentDisposition The Content-Disposition header, or null.
+   * @return Suggested file name, or null if none could be determined.
+   */
+  public static String FileNameFromContentDisposition(String contentDisposition) {
+    if (contentDisposition != null) {
+      // try for filename*= parameter
+      MessageFormat msgContentDisposition
+        = new MessageFormat("attachment; filename*={0}; filename={1}");
+      try { 
+        Object[] aFileName = msgContentDisposition.parse(contentDisposition);
+        return aFileName[0].toString()
+          // replace any enclosing quotes
+          .replaceAll("^\"","").replaceAll("\"$","");
+      } catch(Throwable t) { // try other way around
+        msgContentDisposition 
+          = new MessageFormat("attachment; filename={1}; filename*={0}");
+        try { 
+          Object[] aFileName = msgContentDisposition.parse(contentDisposition);
+          return aFileName[0].toString()
+            // replace any enclosing quotes
+            .replaceAll("^\"","").replaceAll("\"$","");
+        } catch(Throwable t2) { // no filename*= parameter
+          // try for just filename= parameter
+          msgContentDisposition = new MessageFormat("attachment; filename={0}");
+          try {
+            Object[] aFileName = msgContentDisposition.parse(contentDisposition);
+            return aFileName[0].toString()
+              // replace any eclosing quotes
+              .replaceAll("^\"","").replaceAll("\"$","");
+          } catch(Throwable t3) {
+          }
+        }
+      }
+    }
+    return null;
+  } // end of FileNameFromContentDisposition()
 
 } // end of class LabbcatView
