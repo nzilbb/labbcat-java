@@ -1,5 +1,5 @@
 //
-// Copyright 2020-2022 New Zealand Institute of Language, Brain and Behaviour, 
+// Copyright 2020-2025 New Zealand Institute of Language, Brain and Behaviour, 
 // University of Canterbury
 // Written by Robert Fromont - robert.fromont@canterbury.ac.nz
 //
@@ -54,8 +54,10 @@ import nzilbb.ag.serialize.SerializerNotConfiguredException;
 import nzilbb.ag.serialize.json.JSONSerialization;
 import nzilbb.ag.serialize.util.NamedStream;
 import nzilbb.ag.serialize.util.Utility;
+import nzilbb.configure.Parameter;
 import nzilbb.configure.ParameterSet;
 import nzilbb.labbcat.http.*;
+import nzilbb.labbcat.model.Upload;
 import nzilbb.util.IO;
 
 /**
@@ -543,7 +545,97 @@ public class LabbcatEdit extends LabbcatView implements GraphStore {
   }
 
   // Other methods:
-   
+
+  /**
+   * Upload a transcript file and associated media files, as the first stage in adding or
+   * modifying a transcript to LaBB-CAT. The second stage is {@link #transcriptSave(Upload)}
+   * @param transcript The transcript to upload.
+   * @param media The media to upload, if any. These will be uploaded with the default
+   * track suffix: "".
+   * @param merge Whether the upload corresponds to updates to an existing transcript
+   * (true) or a new transcript (false).
+   * @return The ID and parameters required to complete the upload by calling
+   * {@link #transcriptSave(Upload)}
+   * @throws IOException
+   * @throws ResponseException
+   */
+  public Upload transcriptUpload(File transcript, File[] media, boolean merge)
+    throws IOException, StoreException {
+    return transcriptUpload(transcript, new TreeMap<String,File[]>(){{ put("", media); }}, merge);
+  }
+  
+  /**
+   * Upload a transcript file and associated media files, as the first stage in adding or
+   * modifying a transcript to LaBB-CAT. The second stage is {@link #transcriptSave(Upload)}
+   * @param transcript The transcript to upload.
+   * @param media The media to upload, if any; a map of 
+   * {@link track suffixes MediaTrack#suffix} to media files to upload for that track.
+   * @param merge Whether the upload corresponds to updates to an existing transcript
+   * (true) or a new transcript (false).
+   * @return The ID and {@link parameters Upload#parameters} required to complete the
+   * upload by calling {@link #transcriptSave(Upload)}
+   * @throws IOException
+   * @throws ResponseException
+   */
+  public Upload transcriptUpload(File transcript, Map<String,File[]> media, boolean merge)
+    throws IOException, StoreException {
+      
+    cancelling = false;
+    URL url = makeUrl("api/edit/transcript/upload");
+    postRequest = new HttpRequestPostMultipart(url, getRequiredHttpAuthorization())
+      .setUserAgent()
+      .setHeader("Accept", "application/json")
+      .setParameter("transcript", transcript);
+    if (merge) postRequest.setParameter("merge", true);
+    if (media != null) {
+      for (String trackSuffix : media.keySet()) {
+        for (File file : media.get(trackSuffix)) {
+          postRequest.setParameter("media"+trackSuffix, file);
+        } // next media file
+      } // next track suffix
+    } // media is set
+    if (verbose) System.out.println("transcriptUpload -> " + postRequest);
+    response = new Response(postRequest.post(), verbose);
+    response.checkForErrors(); // throws a ResponseException on error
+    
+    return new Upload((JsonObject)response.getModel());
+  } // end of transcriptUpload()
+  
+  /**
+   * The second part of a transcript upload process started by a call to
+   * {@link #transcriptUpload(File,Map,boolean)}, which specifies values for the parameters
+   * required to save the uploaded transcript to LaBB-CAT's database. 
+   * <p> If the response includes more parameters, then this method should be called again
+   * to supply their values.
+   * @param upload Response from {@link #transcriptUpload(File,Map,boolean)} with
+   * parameter values filled in as required.
+   * @return The ID and a {@link transcript-ID to thread-ID map Upload#transcripts} for
+   * transcripts that are being finalized (and any further parameters required to complete
+   * the upload). 
+   * @throws IOException, StoreException
+   */
+  public Upload transcriptSave(Upload upload) throws IOException, StoreException {
+    try {
+      URL url = makeUrl("api/edit/transcript/save");
+      HttpRequestPost request = new HttpRequestPost(url, getRequiredHttpAuthorization())
+        .setUserAgent()
+        .setHeader("Accept", "application/json")
+        .setParameter("id", upload.getId());
+      for (Parameter parameter : upload.getParameters().values()) {
+        if (parameter.getValue() != null) {
+          request.setParameter(parameter.getName(), parameter.getValue());
+        }
+      } // next parameter
+      if (verbose) System.out.println("transcriptSave -> " + request);
+      response = new Response(request.post(), verbose);
+      response.checkForErrors(); // throws a ResponseException on error
+      
+      return new Upload((JsonObject)response.getModel());
+    } catch(IOException x) {
+      throw new StoreException("Could not get response.", x);
+    }
+  } // end of transcriptSave()
+
   /**
    * Upload a new transcript.
    * @param transcript The transcript to upload.
@@ -576,7 +668,7 @@ public class LabbcatEdit extends LabbcatView implements GraphStore {
         postRequest.setParameter("uploadmedia"+trackSuffix+"1", media[f]);
       } // next file
     }
-    if (verbose) System.out.println("taskStatus -> " + postRequest);
+    if (verbose) System.out.println("newTranscript -> " + postRequest);
     response = new Response(postRequest.post(), verbose);
     response.checkForErrors(); // throws a ResponseException on error
 
@@ -604,7 +696,7 @@ public class LabbcatEdit extends LabbcatView implements GraphStore {
       .setParameter("todo", "update")
       .setParameter("auto", true)
       .setParameter("uploadfile1_0", transcript);
-    if (verbose) System.out.println("taskStatus -> " + postRequest);
+    if (verbose) System.out.println("updateTranscript -> " + postRequest);
     response = new Response(postRequest.post(), verbose);
     response.checkForErrors(); // throws a ResponseException on error
       

@@ -267,6 +267,67 @@ public class TestLabbcatEdit {
   }
 
   /**
+   * Test /api/edit/transcript/* API, specifically:
+   * <ul>
+   *  <li> transcriptUpload </li>
+   *  <li> transcriptSave </li>
+   * </ul>
+   */
+  @Test public void transcriptUpdateSave()
+    throws Exception {
+    
+    File transcript = new File(getDir(), "nzilbb.labbcat.test.txt");
+    File[] media = {
+      new File(getDir(), "nzilbb.labbcat.test.wav")
+    };
+    File document = new File(getDir(), "nzilbb.labbcat.test.doc");
+    String participantId = "UnitTester";
+    assertTrue("Ensure transcript exists: " + transcript.getPath(), transcript.exists());
+    assertTrue("Ensure media exists: " + media[0].getPath(), media[0].exists());
+    assertTrue("Ensure document exists: " + document.getPath(), document.exists());
+    try {
+      
+      // ensure transcript/participant don't already exist
+      try {
+        labbcat.deleteTranscript(transcript.getName());
+      } catch(ResponseException exception) {}
+      try {
+        labbcat.deleteParticipant(participantId);
+      } catch(ResponseException exception) {}
+
+      // upload transcript
+      labbcat.setVerbose(true);
+      Upload upload = labbcat.transcriptUpload(transcript, media, false);
+      System.out.println("ID " + upload.getId());
+      System.out.println("parameters " + upload.getParameters());
+
+      // finalize parameters
+      upload = labbcat.transcriptSave(upload);
+      System.out.println("ID " + upload.getId());
+      System.out.println("transcripts " + upload.getTranscripts());
+
+      // TODO wait for transcript threads before deleting
+      
+      
+    } finally {
+      labbcat.setVerbose(false);
+      try {
+        // delete transcript/participant
+        labbcat.deleteTranscript(transcript.getName());
+        labbcat.deleteParticipant(participantId);
+            
+        // ensure the transcript/participant no longer exist
+        assertEquals("Transcript has been deleted from the store",
+                     0, labbcat.countMatchingTranscriptIds("id = '"+transcript.getName()+"'"));
+        assertEquals("Participant has been deleted from the store",
+                     0, labbcat.countMatchingParticipantIds("id = '"+participantId+"'"));
+      } catch (Exception x) {
+        System.err.println("Unexpectedly can't delete test transcript: " + x);
+      }
+    }
+  }
+
+  /**
    * Test transcript upload, media upload, and transcript/participant deletion, specifically:
    * <ul>
    *  <li> newTranscript </li>
