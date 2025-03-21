@@ -118,9 +118,26 @@ public class HttpRequestGet {
     * @param sNewAuthorization The HTTP authorization string, or null if not required.
     */
    public HttpRequestGet setAuthorization(String sNewAuthorization) { sAuthorization = sNewAuthorization; return this; }
-   
-   // Methods:
-   
+  
+  /**
+   * HTTP method.
+   * @see #getMethod()
+   * @see #setMethod(String)
+   */
+  protected String method = "GET";
+  /**
+   * Getter for {@link #method}: HTTP method.
+   * @return HTTP method.
+   */
+  public String getMethod() { return method; }
+  /**
+   * Setter for {@link #method}: HTTP method.
+   * @param newMethod HTTP method.
+   */
+  public HttpRequestGet setMethod(String newMethod) { method = newMethod; return this; }
+  
+  // Methods:
+  
    /**
     * Constructor
     */
@@ -178,7 +195,7 @@ public class HttpRequestGet {
       if (language != null) setHeader("Accept-Language", language);
       return this;
    } // end of setLanguage()
-   
+     
    /**
     * Sets a request parameter value
     * @param sParameter
@@ -213,6 +230,7 @@ public class HttpRequestGet {
       String sQueryString = getQueryString();
       
       URLConnection connection = new URL(sBase + sQueryString).openConnection();
+      ((HttpURLConnection)connection).setRequestMethod(method);
       connection.setUseCaches(false);
       for (String sKey: mHeaders.keySet()) {
          connection.setRequestProperty(sKey, mHeaders.get(sKey));

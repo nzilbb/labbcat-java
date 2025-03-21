@@ -636,7 +636,7 @@ public class LabbcatEdit extends LabbcatView implements GraphStore {
   public Upload transcriptUploadParameters(Upload upload) throws IOException, StoreException {
     try {
       URL url = makeUrl("api/edit/transcript/upload/"+URLEncoder.encode(upload.getId(), "UTF-8"));
-      HttpRequestPost request = new HttpRequestPost(url, getRequiredHttpAuthorization())
+      HttpRequestGet request = new HttpRequestGet(url, getRequiredHttpAuthorization())
         .setUserAgent()
         .setHeader("Accept", "application/json")
         .setMethod("PUT");
@@ -646,7 +646,7 @@ public class LabbcatEdit extends LabbcatView implements GraphStore {
         }
       } // next parameter
       if (verbose) System.out.println("transcriptUploadParameters -> " + request);
-      response = new Response(request.post(), verbose);
+      response = new Response(request.get(), verbose);
       response.checkForErrors(); // throws a ResponseException on error
       
       return new Upload((JsonObject)response.getModel());

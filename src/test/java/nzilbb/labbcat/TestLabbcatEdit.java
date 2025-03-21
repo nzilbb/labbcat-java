@@ -325,16 +325,37 @@ public class TestLabbcatEdit {
       // upload transcript
       labbcat.setVerbose(true);
       Upload upload = labbcat.transcriptUpload(transcript, media, false);
-      System.out.println("ID " + upload.getId());
-      System.out.println("parameters " + upload.getParameters());
+      assertNotNull("ID", upload.getId());
 
       // finalize parameters
       upload = labbcat.transcriptUploadParameters(upload);
-      System.out.println("ID " + upload.getId());
-      System.out.println("transcripts " + upload.getTranscripts());
+      assertNotNull("ID ", upload.getId());
+      assertNotNull("transcript threads returned", upload.getTranscripts());
 
-      // TODO wait for transcript threads before deleting
-      
+      String threadId = upload.getTranscripts().get(transcript.getName());
+      assertNotNull("transcript thread is specified " +upload.getTranscripts(),
+                    threadId);
+      // cancel layer generation, we don't care about it         
+      labbcat.cancelTask(threadId);
+      labbcat.releaseTask(threadId);
+
+      assertEquals("Transcript has been added to the store",
+                   1, labbcat.countMatchingTranscriptIds("id = '"+transcript.getName()+"'"));
+
+      // now the transcript exists, try updating it...
+      upload = labbcat.transcriptUpload(transcript, true);
+      assertTrue("generate parameter" + upload.getParameters(),
+                 upload.getParameters().containsKey("labbcat_generate"));
+      assertTrue("generation enabled by default",
+                 (Boolean)upload.getParameters().get("labbcat_generate").getValue());
+
+      upload = labbcat.transcriptUploadParameters(upload);
+      assertNotNull("transcript thread is specified " +upload.getTranscripts(),
+                    threadId);
+      // cancel layer generation, we don't care about it         
+      labbcat.cancelTask(threadId);
+      labbcat.releaseTask(threadId);
+
       
     } finally {
       labbcat.setVerbose(false);
