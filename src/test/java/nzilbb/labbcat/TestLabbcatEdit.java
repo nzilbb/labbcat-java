@@ -270,10 +270,37 @@ public class TestLabbcatEdit {
    * Test /api/edit/transcript/* API, specifically:
    * <ul>
    *  <li> transcriptUpload </li>
-   *  <li> transcriptSave </li>
+   *  <li> transcriptUploadDelete </li>
    * </ul>
    */
-  @Test public void transcriptUpdateSave()
+  @Test public void transcriptUploadDelete()
+    throws Exception {
+    
+    File transcript = new File(getDir(), "nzilbb.labbcat.test.txt");
+    assertTrue("Ensure transcript exists: " + transcript.getPath(), transcript.exists());
+    try {
+      
+      // upload transcript
+      labbcat.setVerbose(true);
+      Upload upload = labbcat.transcriptUpload(transcript, false);
+      System.out.println("ID " + upload.getId());
+
+      // delete upload
+      labbcat.transcriptUploadDelete(upload);
+      
+    } finally {
+      labbcat.setVerbose(false);
+    }
+  }
+
+  /**
+   * Test /api/edit/transcript/* API, specifically:
+   * <ul>
+   *  <li> transcriptUpload </li>
+   *  <li> transcriptUploadParameters </li>
+   * </ul>
+   */
+  @Test public void transcriptUpload()
     throws Exception {
     
     File transcript = new File(getDir(), "nzilbb.labbcat.test.txt");
@@ -302,7 +329,7 @@ public class TestLabbcatEdit {
       System.out.println("parameters " + upload.getParameters());
 
       // finalize parameters
-      upload = labbcat.transcriptSave(upload);
+      upload = labbcat.transcriptUploadParameters(upload);
       System.out.println("ID " + upload.getId());
       System.out.println("transcripts " + upload.getTranscripts());
 

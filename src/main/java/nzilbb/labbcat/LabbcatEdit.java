@@ -547,15 +547,33 @@ public class LabbcatEdit extends LabbcatView implements GraphStore {
   // Other methods:
 
   /**
+   * Upload a transcript file as the first stage in adding or
+   * modifying a transcript to LaBB-CAT. The second stage is
+   * {@link #transcriptUploadParameters(Upload)}
+   * @param transcript The transcript to upload.
+   * @param merge Whether the upload corresponds to updates to an existing transcript
+   * (true) or a new transcript (false).
+   * @return The ID and parameters required to complete the upload by calling
+   * {@link #transcriptUploadParameters(Upload)}
+   * @throws IOException
+   * @throws ResponseException
+   */
+  public Upload transcriptUpload(File transcript, boolean merge)
+    throws IOException, StoreException {
+    return transcriptUpload(transcript, (TreeMap<String,File[]>)null, merge);
+  }
+  
+  /**
    * Upload a transcript file and associated media files, as the first stage in adding or
-   * modifying a transcript to LaBB-CAT. The second stage is {@link #transcriptSave(Upload)}
+   * modifying a transcript to LaBB-CAT. The second stage is
+   * {@link #transcriptUploadParameters(Upload)}
    * @param transcript The transcript to upload.
    * @param media The media to upload, if any. These will be uploaded with the default
    * track suffix: "".
    * @param merge Whether the upload corresponds to updates to an existing transcript
    * (true) or a new transcript (false).
    * @return The ID and parameters required to complete the upload by calling
-   * {@link #transcriptSave(Upload)}
+   * {@link #transcriptUploadParameters(Upload)}
    * @throws IOException
    * @throws ResponseException
    */
@@ -566,14 +584,15 @@ public class LabbcatEdit extends LabbcatView implements GraphStore {
   
   /**
    * Upload a transcript file and associated media files, as the first stage in adding or
-   * modifying a transcript to LaBB-CAT. The second stage is {@link #transcriptSave(Upload)}
+   * modifying a transcript to LaBB-CAT. The second stage is
+   * {@link #transcriptUploadParameters(Upload)}
    * @param transcript The transcript to upload.
    * @param media The media to upload, if any; a map of 
    * {@link track suffixes MediaTrack#suffix} to media files to upload for that track.
    * @param merge Whether the upload corresponds to updates to an existing transcript
    * (true) or a new transcript (false).
    * @return The ID and {@link parameters Upload#parameters} required to complete the
-   * upload by calling {@link #transcriptSave(Upload)}
+   * {@link #transcriptUploadParameters(Upload)}
    * @throws IOException
    * @throws ResponseException
    */
@@ -614,19 +633,19 @@ public class LabbcatEdit extends LabbcatView implements GraphStore {
    * the upload). 
    * @throws IOException, StoreException
    */
-  public Upload transcriptSave(Upload upload) throws IOException, StoreException {
+  public Upload transcriptUploadParameters(Upload upload) throws IOException, StoreException {
     try {
-      URL url = makeUrl("api/edit/transcript/save");
+      URL url = makeUrl("api/edit/transcript/upload/"+URLEncoder.encode(upload.getId(), "UTF-8"));
       HttpRequestPost request = new HttpRequestPost(url, getRequiredHttpAuthorization())
         .setUserAgent()
         .setHeader("Accept", "application/json")
-        .setParameter("id", upload.getId());
+        .setMethod("PUT");
       for (Parameter parameter : upload.getParameters().values()) {
         if (parameter.getValue() != null) {
           request.setParameter(parameter.getName(), parameter.getValue());
         }
       } // next parameter
-      if (verbose) System.out.println("transcriptSave -> " + request);
+      if (verbose) System.out.println("transcriptUploadParameters -> " + request);
       response = new Response(request.post(), verbose);
       response.checkForErrors(); // throws a ResponseException on error
       
@@ -634,7 +653,36 @@ public class LabbcatEdit extends LabbcatView implements GraphStore {
     } catch(IOException x) {
       throw new StoreException("Could not get response.", x);
     }
-  } // end of transcriptSave()
+  } // end of transcriptUploadParameters()
+
+  /**
+   * Delete an upload made by {@link #transcriptUpload(File,Map,boolean)}.
+   * @param upload Response from {@link #transcriptUpload(File,Map,boolean)}.
+   * @throws IOException, StoreException
+   */
+  public void transcriptUploadDelete(Upload upload) throws IOException, StoreException {
+    transcriptUploadDelete(upload.getId());
+  } // end of transcriptUploadDelete()
+  
+  /**
+   * Delete an upload made by {@link #transcriptUpload(File,Map,boolean)}.
+   * @param id The ID of the upload as returned by {@link #transcriptUpload(File,Map,boolean)}.
+   * @throws IOException, StoreException
+   */
+  public void transcriptUploadDelete(String id) throws IOException, StoreException {
+    try {
+      URL url = makeUrl("api/edit/transcript/upload/"+URLEncoder.encode(id, "UTF-8"));
+      HttpRequestPost request = new HttpRequestPost(url, getRequiredHttpAuthorization())
+        .setUserAgent()
+        .setHeader("Accept", "application/json")
+        .setMethod("DELETE");
+      if (verbose) System.out.println("transcriptUploadDelete -> " + request);
+      response = new Response(request.post(), verbose);
+      response.checkForErrors(); // throws a ResponseException on error
+    } catch(IOException x) {
+      throw new StoreException("Could not get response.", x);
+    }
+  } // end of transcriptUploadDelete()
 
   /**
    * Upload a new transcript.

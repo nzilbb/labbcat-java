@@ -611,6 +611,6 @@ public class HttpRequestPost {
     * @return A String representation of the request, for logging.
     */
    public String toString() {
-      return "POST " + url + " : " + body;
+     return connection.getRequestMethod() + " " + url + " : " + body;
    } // end of toString()
 }
