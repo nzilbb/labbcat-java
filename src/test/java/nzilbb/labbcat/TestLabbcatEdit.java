@@ -281,7 +281,7 @@ public class TestLabbcatEdit {
     try {
       
       // upload transcript
-      labbcat.setVerbose(true);
+      // labbcat.setVerbose(true);
       Upload upload = labbcat.transcriptUpload(transcript, false);
       System.out.println("ID " + upload.getId());
 
@@ -323,7 +323,7 @@ public class TestLabbcatEdit {
       } catch(ResponseException exception) {}
 
       // upload transcript
-      labbcat.setVerbose(true);
+      // labbcat.setVerbose(true);
       Upload upload = labbcat.transcriptUpload(transcript, media, false);
       assertNotNull("ID", upload.getId());
 
