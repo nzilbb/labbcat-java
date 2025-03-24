@@ -32,6 +32,7 @@ import java.net.URL;
 import java.net.URLEncoder;
 import java.util.Arrays;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
@@ -555,6 +556,19 @@ public class LabbcatEdit extends LabbcatView implements GraphStore {
    * (true) or a new transcript (false).
    * @return The ID and parameters required to complete the upload by calling
    * {@link #transcriptUploadParameters(Upload)}
+   * <p> These may include both information
+   * required by the format deserializer (e.g. mappings from tiers to LaBB-CAT layers) 
+   * and also general information required by LaBB-CAT, such as:
+   *  <dl>
+   *   <dt> labbcat_corpus </dt>
+   *       <dd> The corpus the new transcript(s) belong(s) to. </dd> 
+   *   <dt> labbcat_episode </dt>
+   *       <dd> The episode the new transcript(s) belong(s) to. </dd> 
+   *   <dt> labbcat_transcript_type </dt>
+   *       <dd> The transcript type for the new transcript(s). </dd> 
+   *   <dt> labbcat_generate </dt>
+   *       <dd> Whether to re-regenerate layers of automated annotations or not. </dd> 
+   *  </dl> 
    * @throws IOException
    * @throws ResponseException
    */
@@ -574,6 +588,19 @@ public class LabbcatEdit extends LabbcatView implements GraphStore {
    * (true) or a new transcript (false).
    * @return The ID and parameters required to complete the upload by calling
    * {@link #transcriptUploadParameters(Upload)}
+   * <p> These may include both information
+   * required by the format deserializer (e.g. mappings from tiers to LaBB-CAT layers) 
+   * and also general information required by LaBB-CAT, such as:
+   *  <dl>
+   *   <dt> labbcat_corpus </dt>
+   *       <dd> The corpus the new transcript(s) belong(s) to. </dd> 
+   *   <dt> labbcat_episode </dt>
+   *       <dd> The episode the new transcript(s) belong(s) to. </dd> 
+   *   <dt> labbcat_transcript_type </dt>
+   *       <dd> The transcript type for the new transcript(s). </dd> 
+   *   <dt> labbcat_generate </dt>
+   *       <dd> Whether to re-regenerate layers of automated annotations or not. </dd> 
+   *  </dl> 
    * @throws IOException
    * @throws ResponseException
    */
@@ -592,7 +619,20 @@ public class LabbcatEdit extends LabbcatView implements GraphStore {
    * @param merge Whether the upload corresponds to updates to an existing transcript
    * (true) or a new transcript (false).
    * @return The ID and {@link parameters Upload#parameters} required to complete the
-   * {@link #transcriptUploadParameters(Upload)}
+   * {@link #transcriptUploadParameters(Upload)}.
+   * <p> These may include both information
+   * required by the format deserializer (e.g. mappings from tiers to LaBB-CAT layers) 
+   * and also general information required by LaBB-CAT, such as:
+   *  <dl>
+   *   <dt> labbcat_corpus </dt>
+   *       <dd> The corpus the new transcript(s) belong(s) to. </dd> 
+   *   <dt> labbcat_episode </dt>
+   *       <dd> The episode the new transcript(s) belong(s) to. </dd> 
+   *   <dt> labbcat_transcript_type </dt>
+   *       <dd> The transcript type for the new transcript(s). </dd> 
+   *   <dt> labbcat_generate </dt>
+   *       <dd> Whether to re-regenerate layers of automated annotations or not. </dd> 
+   *  </dl> 
    * @throws IOException
    * @throws ResponseException
    */
@@ -698,32 +738,72 @@ public class LabbcatEdit extends LabbcatView implements GraphStore {
    */
   public String newTranscript(File transcript, File[] media, String trackSuffix, String transcriptType, String corpus, String episode)
     throws IOException, StoreException {
-      
-    cancelling = false;
-    URL url = makeUrl("edit/transcript/new");
-    postRequest = new HttpRequestPostMultipart(url, getRequiredHttpAuthorization())
-      .setUserAgent()
-      .setHeader("Accept", "application/json")
-      .setParameter("todo", "new")
-      .setParameter("auto", true)
-      .setParameter("transcriptType", transcriptType)
-      .setParameter("corpus", corpus)
-      .setParameter("episode", episode)
-      .setParameter("uploadfile1_0", transcript);
-    if (media != null && media.length > 0) {
-      if (trackSuffix == null) trackSuffix = "";
-      for (int f = 0; f < media.length; f++) {
-        postRequest.setParameter("uploadmedia"+trackSuffix+"1", media[f]);
-      } // next file
-    }
-    if (verbose) System.out.println("newTranscript -> " + postRequest);
-    response = new Response(postRequest.post(), verbose);
-    response.checkForErrors(); // throws a ResponseException on error
 
-    // extract the threadId from model.result.id
-    JsonObject model = (JsonObject)response.getModel();
-    JsonObject result = model.getJsonObject("result");
-    return result.getString(transcript.getName());
+    try { // from 20250324 onwards, use api/edit/transcript/upload/* endpoints
+      // first upload file(s)
+      File[] finalMedia = Optional.ofNullable(media).orElse(new File[0]);
+      String finalTrackSuffix = Optional.ofNullable(trackSuffix).orElse("");
+      Upload upload = transcriptUpload(
+        transcript,
+        new TreeMap<String,File[]>() {{ put(finalTrackSuffix, finalMedia); }},
+        false); // merge=false when transcript doesn't already exist
+      
+      // set the upload parameters
+      if (upload.getParameters().containsKey("labbcat_transcript_type")) {
+        upload.getParameters().get("labbcat_transcript_type").setValue(transcriptType);
+      }
+      if (upload.getParameters().containsKey("labbcat_corpus")) {
+        upload.getParameters().get("labbcat_corpus").setValue(corpus);
+      }
+      if (upload.getParameters().containsKey("labbcat_episode")) {
+        upload.getParameters().get("labbcat_episode").setValue(episode);
+      }
+
+      // send the upload parameters (with whatever their default values were)
+      upload = transcriptUploadParameters(upload);
+      if (upload.getTranscripts() == null || upload.getTranscripts().size() == 0) {
+        return null; // no thread ID to return
+      } else if (upload.getTranscripts().containsKey(transcript.getName())) {
+        // there is a thread named after the file
+        return upload.getTranscripts().get(transcript.getName());
+      } else { // no thread is named after the file, but there's at least one thread
+        // return the first thread
+        return upload.getTranscripts().values().iterator().next();
+      }
+      
+    } catch (ResponseException x) { // prior versions return 404 for api/edit/transcript/upload/*
+      if (x.getResponse().getHttpStatus() == 404) {
+        // use older api/edit/transcript/new endpoint
+        
+        cancelling = false;
+        URL url = makeUrl("edit/transcript/new");
+        postRequest = new HttpRequestPostMultipart(url, getRequiredHttpAuthorization())
+          .setUserAgent()
+          .setHeader("Accept", "application/json")
+          .setParameter("todo", "new")
+          .setParameter("auto", true)
+          .setParameter("transcriptType", transcriptType)
+          .setParameter("corpus", corpus)
+          .setParameter("episode", episode)
+          .setParameter("uploadfile1_0", transcript);
+        if (media != null && media.length > 0) {
+          if (trackSuffix == null) trackSuffix = "";
+          for (int f = 0; f < media.length; f++) {
+            postRequest.setParameter("uploadmedia"+trackSuffix+"1", media[f]);
+          } // next file
+        }
+        if (verbose) System.out.println("newTranscript -> " + postRequest);
+        response = new Response(postRequest.post(), verbose);
+        response.checkForErrors(); // throws a ResponseException on error
+        
+        // extract the threadId from model.result.id
+        JsonObject model = (JsonObject)response.getModel();
+        JsonObject result = model.getJsonObject("result");
+        return result.getString(transcript.getName());
+      } else { // not 404, some other problem, so just throw the exception
+        throw x;
+      }
+    }
   } // end of newTranscript()
 
   /**
@@ -735,23 +815,66 @@ public class LabbcatEdit extends LabbcatView implements GraphStore {
    */
   public String updateTranscript(File transcript)
     throws IOException, StoreException {
+    return updateTranscript(transcript, true);
+  }
+  
+  /**
+   * Uploads a new version of an existing transcript.
+   * @param transcript
+   * @param generate Whether to regenerate automatic annotation layers or not.
+   * @return The taskId of the server task processing the upload. 
+   * @throws IOException
+   * @throws ResponseException
+   */
+  public String updateTranscript(File transcript, boolean generate)
+    throws IOException, StoreException {
       
-    cancelling = false;
-    URL url = makeUrl("edit/transcript/new");
-    postRequest = new HttpRequestPostMultipart(url, getRequiredHttpAuthorization())
-      .setUserAgent()
-      .setHeader("Accept", "application/json")
-      .setParameter("todo", "update")
-      .setParameter("auto", true)
-      .setParameter("uploadfile1_0", transcript);
-    if (verbose) System.out.println("updateTranscript -> " + postRequest);
-    response = new Response(postRequest.post(), verbose);
-    response.checkForErrors(); // throws a ResponseException on error
+    try { // from 20250324 onwards, use api/edit/transcript/upload/* endpoints
+      // first upload file(s)
+      Upload upload = transcriptUpload(
+        transcript, true); // merge=true when transcript already exists
       
-    // extract the threadId from model.result.id
-    JsonObject model = (JsonObject)response.getModel();
-    JsonObject result = model.getJsonObject("result");
-    return result.getString(transcript.getName());
+      // set the upload parameters
+      if (upload.getParameters().containsKey("labbcat_generate")) {
+        upload.getParameters().get("labbcat_generate").setValue(generate);
+      }
+
+      // send the upload parameters (with whatever their default values were)
+      upload = transcriptUploadParameters(upload);
+      if (upload.getTranscripts() == null || upload.getTranscripts().size() == 0) {
+        return null; // no thread ID to return
+      } else if (upload.getTranscripts().containsKey(transcript.getName())) {
+        // there is a thread named after the file
+        return upload.getTranscripts().get(transcript.getName());
+      } else { // no thread is named after the file, but there's at least one thread
+        // return the first thread
+        return upload.getTranscripts().values().iterator().next();
+      }
+      
+    } catch (ResponseException x) { // prior versions return 404 for api/edit/transcript/upload/*
+      if (x.getResponse().getHttpStatus() == 404) {
+        // use older api/edit/transcript/new endpoint
+
+        cancelling = false;
+        URL url = makeUrl("edit/transcript/new");
+        postRequest = new HttpRequestPostMultipart(url, getRequiredHttpAuthorization())
+          .setUserAgent()
+          .setHeader("Accept", "application/json")
+          .setParameter("todo", "update")
+          .setParameter("auto", true)
+          .setParameter("uploadfile1_0", transcript);
+        if (verbose) System.out.println("updateTranscript -> " + postRequest);
+        response = new Response(postRequest.post(), verbose);
+        response.checkForErrors(); // throws a ResponseException on error
+        
+        // extract the threadId from model.result.id
+        JsonObject model = (JsonObject)response.getModel();
+        JsonObject result = model.getJsonObject("result");
+        return result.getString(transcript.getName());
+      } else { // not 404, some other problem, so just throw the exception
+        throw x;
+      }
+    }
   } // end of updateTranscript()
   
   /**
