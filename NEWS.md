@@ -8,7 +8,7 @@
   + LabbcatEdit.newTranscript() and LabbcatEdit.updateTranscript() use new API (above) by default.
 - Improvements to handling of request/response headers.
 
-Minimum LaBB-CAT version *20250420.1200*
+Minimum LaBB-CAT version *20250430.1200*
 
 # 1.2.1
 
