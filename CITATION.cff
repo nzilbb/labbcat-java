@@ -16,8 +16,8 @@ keywords:
 - LaBB-CAT
 - Linguistic Annotation
 license: GPL-3.0-or-later
-version: 1.2.1
-date-released: 2024-10-16
+version: 1.3.0
+date-released: 2025-04-30
 references:
 - type: software
   title: ANTLR 4 Runtime
@@ -38,7 +38,7 @@ references:
   repository-code: https://github.com/antlr/antlr4/tree/master/antlr4-runtime
 - type: software
   title: Annotation Graphs
-  version: 1.2.1-SNAPSHOT
+  version: 1.2.3-SNAPSHOT
   abbreviation: nz.ilbb.ag:nzilbb.ag
   license-url: https://www.gnu.org/licenses/agpl.txt
   notes: More license information can be found in the THIRD-PARTY/Annotation_Graphs

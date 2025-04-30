@@ -615,11 +615,12 @@ public class LabbcatEdit extends LabbcatView implements GraphStore {
    * {@link #transcriptUploadParameters(Upload)}
    * @param transcript The transcript to upload.
    * @param media The media to upload, if any; a map of 
-   * {@link track suffixes MediaTrack#suffix} to media files to upload for that track.
+   * track suffixes ({@link nzilbb.labbcat.model.MediaTrack#suffix}) to media files to upload 
+   * for that track.
    * @param merge Whether the upload corresponds to updates to an existing transcript
    * (true) or a new transcript (false).
-   * @return The ID and {@link parameters Upload#parameters} required to complete the
-   * {@link #transcriptUploadParameters(Upload)}.
+   * @return The ID and {@link nzilbb.labbcat.model.Upload#parameters} required to 
+   * complete the {@link #transcriptUploadParameters(Upload)}.
    * <p> These may include both information
    * required by the format deserializer (e.g. mappings from tiers to LaBB-CAT layers) 
    * and also general information required by LaBB-CAT, such as:
@@ -668,7 +669,7 @@ public class LabbcatEdit extends LabbcatView implements GraphStore {
    * to supply their values.
    * @param upload Response from {@link #transcriptUpload(File,Map,boolean)} with
    * parameter values filled in as required.
-   * @return The ID and a {@link transcript-ID to thread-ID map Upload#transcripts} for
+   * @return The ID and a transcript-ID to thread-ID map ({@link Upload#transcripts}) for
    * transcripts that are being finalized (and any further parameters required to complete
    * the upload). 
    * @throws IOException, StoreException

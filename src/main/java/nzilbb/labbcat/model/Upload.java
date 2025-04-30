@@ -73,7 +73,7 @@ public class Upload {
   /**
    * A map of transcript IDs to thread IDs, if any transcripts are already being processed.
    * @see #getTranscripts()
-   * @see #setTranscripts(Map<String,String>)
+   * @see #setTranscripts(Map)
    */
   protected Map<String,String> transcripts;
   /**

@@ -1,3 +1,15 @@
+# 1.3.0
+
+- New functions
+  + LabbcatEdit.transcriptUpload()
+  + LabbcatEdit.transcriptUploadParameters()
+  + LabbcatEdit.transcriptUploadDelete()
+- Function implementation changes
+  + LabbcatEdit.newTranscript() and LabbcatEdit.updateTranscript() use new API (above) by default.
+- Improvements to handling of request/response headers.
+
+Minimum LaBB-CAT version *20250420.1200*
+
 # 1.2.1
 
 - New function
