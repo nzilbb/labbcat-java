@@ -3,7 +3,7 @@
  * <p>In particular, the {@link CommandLine} utility is the <q>main class</q> for
  * <i>nzilbb.labbcat.jar</i>, so is easy to invoke from the command line for performing
  * ad-hoc API requests: e.g.
- * <p><tt>java -jar nzilbb.labbcat.jar --indent --labbcaturl=&hellip; <b>getLayer orthography</b></tt>
+ * <p><code>java -jar nzilbb.labbcat.jar --indent --labbcaturl=&hellip; <b>getLayer orthography</b></code>
  * <p> &hellip; might print:
  * <pre>{
  *     "title": "LaBB-CAT",

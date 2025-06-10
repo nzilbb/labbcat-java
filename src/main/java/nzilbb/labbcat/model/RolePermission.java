@@ -51,6 +51,7 @@ public class RolePermission {
    /**
     * Setter for {@link #roleId}: The ID of the role this permission applies to.
     * @param newRoleId The ID of the role this permission applies to.
+    * @return A reference to this object, so that setters can be chained.
     */
    public RolePermission setRoleId(String newRoleId) { roleId = newRoleId; return this; }
    
@@ -73,6 +74,7 @@ public class RolePermission {
     * made up of "t" (transcript), "a" (audio), "v" (video), or "i" (image). 
     * @param newEntity The media entity this permission applies to - a string made up of
     * "t" (transcript), "a" (audio), "v" (video), or "i" (image). 
+    * @return A reference to this object, so that setters can be chained.
     */
    public RolePermission setEntity(String newEntity) { entity = newEntity; return this; }
 
@@ -95,6 +97,7 @@ public class RolePermission {
     * access. This is either a valid transcript attribute layer ID, or "corpus". 
     * @param newLayerId ID of the layer for which the label determines access. This is
     * either a valid transcript attribute layer ID, or "corpus". 
+    * @return A reference to this object, so that setters can be chained.
     */
    public RolePermission setLayerId(String newLayerId) { layerId = newLayerId; return this; }
 
@@ -119,6 +122,7 @@ public class RolePermission {
     * allowed. 
     * @param newValuePattern Regular expression for matching against the <var> layerId </var>
     * label. If the regular expression matches the label, access is allowed. 
+    * @return A reference to this object, so that setters can be chained.
     */
    public RolePermission setValuePattern(String newValuePattern) { valuePattern = newValuePattern; return this; }
 
@@ -132,6 +136,7 @@ public class RolePermission {
    
    /**
     * Constructor from JSON.
+    * @param json A JSON representation of the object to construct.
     */
    public RolePermission(JsonObject json) {      
       roleId = json.getString("role_id");

@@ -46,6 +46,7 @@ public class RequestCancelledException
    /**
     * Setter for {@link #rRequest}: The request that was cancelled
     * @param rNewRequest The request that was cancelled
+    * @return A reference to this object, so that setters can be chained.
     */
    public RequestCancelledException setRequest(HttpRequestPostMultipart rNewRequest) { rRequest = rNewRequest;  return this;}
    
@@ -57,6 +58,7 @@ public class RequestCancelledException
    
    /**
     * Constructor
+    * @param s Message.
     */
    public RequestCancelledException(String s) {
       super(s);
@@ -64,6 +66,7 @@ public class RequestCancelledException
    
    /**
     * Default constructor
+    * @param request The cancelled request.
     */
    public RequestCancelledException(HttpRequestPostMultipart request) {	 
       setRequest(request);

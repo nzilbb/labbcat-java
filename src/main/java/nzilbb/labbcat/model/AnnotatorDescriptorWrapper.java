@@ -51,6 +51,7 @@ public class AnnotatorDescriptorWrapper extends AnnotatorDescriptor {
   /**
    * Setter for {@link #annotatorId}: Annotator ID.
    * @param newAnnotatorId Annotator ID.
+   * @return A reference to this object, so that setters can be chained.
    */
   public AnnotatorDescriptorWrapper setAnnotatorId(String newAnnotatorId) { annotatorId = newAnnotatorId; return this; }
   
@@ -74,6 +75,7 @@ public class AnnotatorDescriptorWrapper extends AnnotatorDescriptor {
    * be numeric, but this is not a requirement. 
    * @param newVersion Version of this implementation; versions will typically be numeric,
    * but this is not a requirement. 
+   * @return A reference to this object, so that setters can be chained.
    */
   public AnnotatorDescriptorWrapper setVersion(String newVersion) { version = newVersion; return this; }
   
@@ -95,6 +97,7 @@ public class AnnotatorDescriptorWrapper extends AnnotatorDescriptor {
    * supported by the serializer.  
    * @param newMinimumApiVersion Get the minimum version of the nzilbb.ag API supported by
    * the serializer.  
+   * @return A reference to this object, so that setters can be chained.
    */
   public AnnotatorDescriptorWrapper setMinimumApiVersion(String newMinimumApiVersion) { minimumApiVersion = newMinimumApiVersion; return this; }
   
@@ -116,6 +119,7 @@ public class AnnotatorDescriptorWrapper extends AnnotatorDescriptor {
    * for displaying to the user. 
    * @param newInfo HTML-encoded description of the function of the annotator, for
    * displaying to the user.
+   * @return A reference to this object, so that setters can be chained.
    */
   public AnnotatorDescriptorWrapper setInfo(String newInfo) { info = newInfo; return this; }
   
@@ -146,6 +150,7 @@ public class AnnotatorDescriptorWrapper extends AnnotatorDescriptor {
    * @param newTaskParameterInfo HTML-encoded definition of the task parameters, including
    * a list of all parameters, and the encoding of the parameter string, for displaying to
    * users who wish to configure annotator tasks programmatically. 
+   * @return A reference to this object, so that setters can be chained.
    */
   public AnnotatorDescriptorWrapper setTaskParameterInfo(String newTaskParameterInfo) { taskParameterInfo = newTaskParameterInfo; return this; }
   
@@ -176,6 +181,7 @@ public class AnnotatorDescriptorWrapper extends AnnotatorDescriptor {
    * @param newConfigParameterInfo HTML-encoded definition of the installation config
    * parameters, including a list of all parameters, and the encoding of the parameter
    * string, for displaying to users who wish to configure the annotator programmatically.  
+   * @return A reference to this object, so that setters can be chained.
    */
   public AnnotatorDescriptorWrapper setConfigParameterInfo(String newConfigParameterInfo) { configParameterInfo = newConfigParameterInfo; return this; }
   
@@ -203,6 +209,7 @@ public class AnnotatorDescriptorWrapper extends AnnotatorDescriptor {
    * @param newExtApiInfo HTML-encoded document containing information about what
    * endpoints are published by the ext web-app, for displaying to users who wish to use
    * it programmatically. 
+   * @return A reference to this object, so that setters can be chained.
    */
   public AnnotatorDescriptorWrapper setExtApiInfo(String newExtApiInfo) { extApiInfo = newExtApiInfo; return this; }
   
@@ -232,6 +239,7 @@ public class AnnotatorDescriptorWrapper extends AnnotatorDescriptor {
    * installation or general configuration. 
    * @param newHasConfigWebapp Whether the annotator includes a web-app for installation
    * or general configuration. 
+   * @return A reference to this object, so that setters can be chained.
    */
   public AnnotatorDescriptorWrapper setHasConfigWebapp(Boolean newHasConfigWebapp) { hasConfigWebapp = newHasConfigWebapp; return this; }
   
@@ -260,6 +268,7 @@ public class AnnotatorDescriptorWrapper extends AnnotatorDescriptor {
    * parameter configuration. 
    * @param newHasTaskWebapp Whether the annotator includes a web-app for task parameter
    * configuration. 
+   * @return A reference to this object, so that setters can be chained.
    */
   public AnnotatorDescriptorWrapper setHasTaskWebapp(Boolean newHasTaskWebapp) { hasTaskWebapp = newHasTaskWebapp; return this; }
 
@@ -285,6 +294,7 @@ public class AnnotatorDescriptorWrapper extends AnnotatorDescriptor {
   /**
    * Setter for {@link #hasExtWebapp}: Whether the annotator includes an extras web-app.
    * @param newHasExtWebapp Whether the annotator includes an extras web-app.
+   * @return A reference to this object, so that setters can be chained.
    */
   public AnnotatorDescriptorWrapper setHasExtWebapp(Boolean newHasExtWebapp) { hasExtWebapp = newHasExtWebapp; return this; }
 

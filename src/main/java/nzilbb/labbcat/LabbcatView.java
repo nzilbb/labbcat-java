@@ -125,6 +125,7 @@ public class LabbcatView implements GraphStoreQuery {
    * e.g. https://labbcat.canterbury.ac.nz/demo/ 
    * @param newLabbcatUrl The base URL of the LaBB-CAT server -
    * e.g. https://labbcat.canterbury.ac.nz/demo/ 
+   * @return A reference to this object, so that setters can be chained.
    */
   public LabbcatView setLabbcatUrl(URL newLabbcatUrl) { labbcatUrl = newLabbcatUrl; return this; }
    
@@ -142,6 +143,7 @@ public class LabbcatView implements GraphStoreQuery {
   /**
    * Setter for {@link #username}: LaBB-CAT username.
    * @param newUsername LaBB-CAT username.
+   * @return A reference to this object, so that setters can be chained.
    */
   public LabbcatView setUsername(String newUsername) { username = newUsername; return this; }
 
@@ -159,6 +161,7 @@ public class LabbcatView implements GraphStoreQuery {
   /**
    * Setter for {@link #password}: LaBB-CAT password.
    * @param newPassword LaBB-CAT password.
+   * @return A reference to this object, so that setters can be chained.
    */
   public LabbcatView setPassword(String newPassword) { password = newPassword; return this; }
 
@@ -181,6 +184,7 @@ public class LabbcatView implements GraphStoreQuery {
    * user may be asked to enter username/password if required. 
    * @param newBatchMode Whether to run in batch mode or not. If false, the user may be
    * asked to enter username/password if required. 
+   * @return A reference to this object, so that setters can be chained.
    */
   public LabbcatView setBatchMode(boolean newBatchMode) { batchMode = newBatchMode; return this; }
 
@@ -198,6 +202,7 @@ public class LabbcatView implements GraphStoreQuery {
   /**
    * Setter for {@link #verbose}: Whether to print verbose output or not.
    * @param newVerbose Whether to print verbose output or not.
+   * @return A reference to this object, so that setters can be chained.
    */
   public LabbcatView setVerbose(boolean newVerbose) { verbose = newVerbose; return this; }
 
@@ -227,6 +232,7 @@ public class LabbcatView implements GraphStoreQuery {
   /**
    * Setter for {@link #response}: The last response received from the server.
    * @param newResponse The last response received from the server.
+   * @return A reference to this object, so that setters can be chained.
    */
   public LabbcatView setResponse(Response newResponse) { response = newResponse; return this; }
 
@@ -249,7 +255,8 @@ public class LabbcatView implements GraphStoreQuery {
    * Setter for {@link #language}: The language code for server message localization,
    * e.g. "es-AR" for Argentine Spanish. 
    * @param newLanguage The language code for server message localization, e.g. "es-AR"
-   * for Argentine Spanish. 
+   * for Argentine Spanish.
+   * @return A reference to this object, so that setters can be chained.
    */
   public LabbcatView setLanguage(String newLanguage) { language = newLanguage; return this; }
   // Methods:
@@ -264,6 +271,7 @@ public class LabbcatView implements GraphStoreQuery {
    * Constructor from string URL.
    * @param labbcatUrl The base URL of the LaBB-CAT server -
    * e.g. https://labbcat.canterbury.ac.nz/demo/
+   * @throws MalformedURLException If the URl is invalid.
    */
   public LabbcatView(String labbcatUrl) throws MalformedURLException {
     if (!labbcatUrl.endsWith("/")) labbcatUrl += "/";
@@ -276,6 +284,7 @@ public class LabbcatView implements GraphStoreQuery {
    * e.g. https://labbcat.canterbury.ac.nz/demo/
    * @param username LaBB-CAT username.
    * @param password LaBB-CAT password.
+   * @throws MalformedURLException If the URl is invalid.
    */
   public LabbcatView(String labbcatUrl, String username, String password)
     throws MalformedURLException {
@@ -312,7 +321,8 @@ public class LabbcatView implements GraphStoreQuery {
    * Determines whether an authorization string is required for HTTP requests
    * (i.e. whether a username/password is required)
    * @return The authorization string that's required, if any
-   * @throws Exception if the user cancels while begin prompted for credentials
+   * @throws IOException If an IO error occurs.
+   * @throws StoreException If the server returns an error.
    */
   public String getRequiredHttpAuthorization()
     throws IOException, StoreException {
@@ -506,7 +516,7 @@ public class LabbcatView implements GraphStoreQuery {
    
   /**
    * Constructs a URL for the given resource.
-   * @param resource
+   * @param resource The relative name of the resource.
    * @return A URL for the given resource.
    * @throws StoreException If the URL is malformed.
    */
@@ -541,8 +551,8 @@ public class LabbcatView implements GraphStoreQuery {
    * authorized if required, but otherwise has no headers or parameters set. 
    * @param resource The path to the resource.
    * @return The request.
-   * @throws IOException
-   * @throws ResponseException
+   * @throws IOException If a communications error occurs.
+   * @throws StoreException If the server returns an error.
    */
   public HttpRequestGet get(String resource) throws IOException, StoreException {
     return new HttpRequestGet(makeUrl(resource), getRequiredHttpAuthorization())
@@ -554,8 +564,8 @@ public class LabbcatView implements GraphStoreQuery {
    * authorized if required, but otherwise has no headers or parameters set. 
    * @param resource The path to the resource.
    * @return The request.
-   * @throws IOException
-   * @throws ResponseException
+   * @throws IOException If a communications error occurs.
+   * @throws StoreException If the server returns an error.
    */
   public HttpRequestPost post(String resource) throws IOException, StoreException {
     return new HttpRequestPost(makeUrl(resource), getRequiredHttpAuthorization())
@@ -567,8 +577,8 @@ public class LabbcatView implements GraphStoreQuery {
    * authorized if required, but otherwise has no headers or parameters set. 
    * @param resource The path to the resource.
    * @return The request.
-   * @throws IOException
-   * @throws ResponseException
+   * @throws IOException If a communications error occurs.
+   * @throws StoreException If the server returns an error.
    */
   public HttpRequestPost put(String resource) throws IOException, StoreException {
     return new HttpRequestPost(makeUrl(resource), getRequiredHttpAuthorization())
@@ -581,8 +591,8 @@ public class LabbcatView implements GraphStoreQuery {
    * authorized if required, but otherwise has no headers or parameters set. 
    * @param resource The path to the resource.
    * @return The request.
-   * @throws IOException
-   * @throws ResponseException
+   * @throws IOException If a communications error occurs.
+   * @throws StoreException If the server returns an error.
    */
   public HttpRequestPost delete(String resource) throws IOException, StoreException {
     return new HttpRequestPost(makeUrl(resource), getRequiredHttpAuthorization())
@@ -597,8 +607,8 @@ public class LabbcatView implements GraphStoreQuery {
    * cancel the request if it's in-course.
    * @param resource The path to the resource.
    * @return The request.
-   * @throws IOException
-   * @throws ResponseException
+   * @throws IOException If a communications error occurs.
+   * @throws StoreException If the server returns an error.
    */
   public HttpRequestPostMultipart postMultipart(String resource)
     throws IOException, StoreException {
@@ -839,8 +849,8 @@ public class LabbcatView implements GraphStoreQuery {
    * participant data is required. 
    * @return An annotation representing the participant, or null if the participant was
    * not found.
-   * @throws StoreException
-   * @throws PermissionException
+   * @throws StoreException If an error prevents the operation.
+   * @throws PermissionException If the operation is not permitted.
    */
   public Annotation getParticipant(String id, String[] layerIds)
     throws StoreException, PermissionException {
@@ -1050,7 +1060,8 @@ public class LabbcatView implements GraphStoreQuery {
    * Counts the number of transcripts that match a particular pattern.
    * @param expression An expression that determines which transcripts match.
    * <p> The expression language is loosely based on JavaScript; expressions such as
-   * the following can be used: 
+   * the following can be used:
+   * <ul>
    *  <li><code>/Ada.+/.test(id)</code></li>
    *  <li><code>labels('participant').includes('Robert')</code></li>
    *  <li><code>('CC', 'IA', 'MU').includes(first('corpus').label)</code></li>
@@ -1098,6 +1109,7 @@ public class LabbcatView implements GraphStoreQuery {
    * @param expression An expression that determines which transcripts match.
    * <p> The expression language is loosely based on JavaScript; expressions such as
    * the following can be used:
+   * <ul>
    *  <li><code>/Ada.+/.test(id)</code></li>
    *  <li><code>labels('participant').includes('Robert')</code></li>
    *  <li><code>('CC', 'IA', 'MU').includes(first('corpus').label)</code></li>
@@ -1802,8 +1814,8 @@ public class LabbcatView implements GraphStoreQuery {
    * Gets the current state of the given task.
    * @param threadId The ID of the task.
    * @return The status of the task
-   * @throws IOException
-   * @throws ResponseException
+   * @throws IOException If a communications error occurs.
+   * @throws StoreException If the server returns an error.
    */
   public TaskStatus taskStatus(String threadId)
     throws IOException, StoreException {
@@ -1823,11 +1835,11 @@ public class LabbcatView implements GraphStoreQuery {
    
   /**
    * Wait for the given task to finish.
-   * @param threadId
+   * @param threadId The ID of the task.
    * @param maxSeconds The maximum time to wait for the task, or 0 for forever.
    * @return The final task status.
-   * @throws IOException
-   * @throws StoreException
+   * @throws IOException If a communications error occurs.
+   * @throws StoreException If the server returns an error.
    */
   public TaskStatus waitForTask(String threadId, int maxSeconds)
     throws IOException, StoreException {
@@ -1857,8 +1869,8 @@ public class LabbcatView implements GraphStoreQuery {
   /**
    * Cancels a running task.
    * @param threadId The ID of the task.
-   * @throws IOException
-   * @throws StoreException
+   * @throws IOException If a communications error occurs.
+   * @throws StoreException If the server returns an error.
    */
   public void cancelTask(String threadId) throws IOException, StoreException {
       
@@ -1877,8 +1889,8 @@ public class LabbcatView implements GraphStoreQuery {
   /**
    * Release a finished task, to free up server resources.
    * @param threadId The ID of the task.
-   * @throws IOException
-   * @throws StoreException
+   * @throws IOException If a communications error occurs.
+   * @throws StoreException If the server returns an error.
    */
   public void releaseTask(String threadId) throws IOException, StoreException {
       
@@ -1897,8 +1909,8 @@ public class LabbcatView implements GraphStoreQuery {
   /**
    * Gets a list of all tasks on the server.
    * @return A list of all task statuses.
-   * @throws IOException
-   * @throws StoreException
+   * @throws IOException If a communications error occurs.
+   * @throws StoreException If the server returns an error.
    */
   public Map<String,TaskStatus> getTasks() throws IOException, StoreException {
       
@@ -2030,16 +2042,16 @@ public class LabbcatView implements GraphStoreQuery {
    * only, and 0 or no value to return all matching annotations regardless of alignment
    * confidence.
    * @param matchesPerTranscript Optional maximum number of matches per transcript to
-   * return. <tt>null</tt> means all matches.
+   * return. <code>null</code> means all matches.
    * @param overlapThreshold Optional percentage overlap with other utterances before
-   * simultaneous speech is excluded. <tt>null</tt> means include all overlapping utterances.
+   * simultaneous speech is excluded. <code>null</code> means include all overlapping utterances.
    * @return The threadId of the resulting task, which can be passed in to
    * {@link #getMatches(String,int)}, {@link #taskStatus(String)},
    * {@link #waitForTask(String,int)}, etc.
    * @see #getMatches(String,int)
    * @see PatternBuilder
-   * @throws IOException
-   * @throws StoreException
+   * @throws IOException If a communications error occurs.
+   * @throws StoreException If the server returns an error.
    */
   public String search(
     JsonObject pattern, String[] participantIds, String[] transcriptTypes,
@@ -2100,8 +2112,8 @@ public class LabbcatView implements GraphStoreQuery {
    * @return A list of IDs that can be used to identify utterances/tokens that were matched by
    * {@link #search(JsonObject,String[],String[],boolean,Integer,Integer,Integer)}, or null if
    * the task was cancelled. 
-   * @throws IOException
-   * @throws StoreException
+   * @throws IOException If a communications error occurs.
+   * @throws StoreException If the server returns an error.
    * @see #search(JsonObject,String[],String[],boolean,Integer,Integer,Integer)}
    */
   public Match[] getMatches(String threadId, int wordsContext)
@@ -2127,8 +2139,8 @@ public class LabbcatView implements GraphStoreQuery {
    * @return A list of IDs that can be used to identify utterances/tokens that were matched by
    * {@link #search(JsonObject,String[],String[],boolean,Integer,Integer,Integer)}, or null if
    * the task was cancelled. 
-   * @throws IOException
-   * @throws StoreException
+   * @throws IOException If a communications error occurs.
+   * @throws StoreException If the server returns an error.
    * @see #search(JsonObject,String[],String[],boolean,Integer,Integer,Integer)}
    */
   public Match[] getMatches(
@@ -2206,16 +2218,16 @@ public class LabbcatView implements GraphStoreQuery {
    *   <li> 100 - return only manually-set alignments.</li>
    *  </ul>
    * @param matchesPerTranscript Optional maximum number of matches per transcript to
-   * return. <tt>null</tt> means all matches.
+   * return. <code>null</code> means all matches.
    * @param overlapThreshold Optional percentage overlap with other utterances before
-   * simultaneous speech is excluded. <tt>null</tt> means include all overlapping utterances.
+   * simultaneous speech is excluded. <code>null</code> means include all overlapping utterances.
    * @param wordsContext Number of words context to include in the <q>Before Match</q>
    * and <q>After Match</q> columns in the results.
    * @return A list of IDs that can be used to identify utterances/tokens that were matched by
    * {@link #search(JsonObject,String[],String[],boolean,Integer,Integer,Integer)}, or null if
    * the task was cancelled. 
-   * @throws IOException
-   * @throws StoreException
+   * @throws IOException If a communications error occurs.
+   * @throws StoreException If the server returns an error.
    * @see #getMatches(String,int)}
    */
   public Match[] getMatches(
@@ -2274,17 +2286,17 @@ public class LabbcatView implements GraphStoreQuery {
    *   <li> 100 - return only manually-set alignments.</li>
    *  </ul>
    * @param matchesPerTranscript Optional maximum number of matches per transcript to
-   * return. <tt>null</tt> means all matches.
+   * return. <code>null</code> means all matches.
    * @param overlapThreshold Optional percentage overlap with other utterances before
-   * simultaneous speech is excluded. <tt>null</tt> means include all overlapping utterances.
+   * simultaneous speech is excluded. <code>null</code> means include all overlapping utterances.
    * @param wordsContext Number of words context to include in the <q>Before Match</q>
    * and <q>After Match</q> columns in the results.
    * @param maxMatches The maximum number of matches to return, or null to return all.
    * @return A list of IDs that can be used to identify utterances/tokens that were matched by
    * {@link #search(JsonObject,String[],String[],boolean,Integer,Integer,Integer)}, or null if
    * the task was cancelled. 
-   * @throws IOException
-   * @throws StoreException
+   * @throws IOException If a communications error occurs.
+   * @throws StoreException If the server returns an error.
    * @see #getMatches(String,int)}
    */
   public Match[] getMatches(
@@ -2322,8 +2334,8 @@ public class LabbcatView implements GraphStoreQuery {
    * @return An array of arrays of Annotations, of dimensions <var>matchIds</var>.length
    * &times; (<var>layerIds</var>.length * <var>annotationsPerLayer</var>). The first
    * index matches the corresponding index in <var>matchIds</var>. 
-   * @throws IOException
-   * @throws StoreException
+   * @throws IOException If a communications error occurs.
+   * @throws StoreException If the server returns an error.
    * @see #getMatches(String,int)}
    */
   public Annotation[][] getMatchAnnotations(
@@ -2354,8 +2366,8 @@ public class LabbcatView implements GraphStoreQuery {
    * @return An array of arrays of Annotations, of dimensions <var>matchIds</var>.length
    * &times; (<var>layerIds</var>.length * <var>annotationsPerLayer</var>). The first
    * index matches the corresponding index in <var>matchIds</var>. 
-   * @throws IOException
-   * @throws StoreException
+   * @throws IOException If a communications error occurs.
+   * @throws StoreException If the server returns an error.
    * @see #getMatches(String,int)}
    */
   public Annotation[][] getMatchAnnotations(
@@ -2425,8 +2437,8 @@ public class LabbcatView implements GraphStoreQuery {
    * @return A list of WAV files. If <var>dir</var> is null, these files will be stored
    * under the system's temporary directory, so once processing is finished, they should
    * be deleted by the caller, or moved to a more permanent location. 
-   * @throws IOException
-   * @throws StoreException
+   * @throws IOException If a communications error occurs.
+   * @throws StoreException If the server returns an error.
    */
   public File[] getSoundFragments(Match[] matches, Integer sampleRate, File dir)
     throws IOException, StoreException {
@@ -2458,8 +2470,8 @@ public class LabbcatView implements GraphStoreQuery {
    * @return A list of WAV files. If <var>dir</var> is null, these files will be stored
    * under the system's temporary directory, so once processing is finished, they should
    * be deleted by the caller, or moved to a more permanent location. 
-   * @throws IOException
-   * @throws StoreException
+   * @throws IOException If a communications error occurs.
+   * @throws StoreException If the server returns an error.
    */
   public File[] getSoundFragments(
     String[] transcriptIds, Double[] startOffsets, Double[] endOffsets, Integer sampleRate,
@@ -2541,8 +2553,8 @@ public class LabbcatView implements GraphStoreQuery {
    * @return A list of files. If <var>dir</var> is null, these files will be stored under the
    * system's temporary directory, so once processing is finished, they should be deleted
    * by the caller, or moved to a more permanent location. 
-   * @throws IOException
-   * @throws StoreException
+   * @throws IOException If a communications error occurs.
+   * @throws StoreException If the server returns an error.
    */
   public File[] getFragments(Match[] matches, String[] layerIds, String mimeType, File dir)
     throws IOException, StoreException {
@@ -2576,8 +2588,8 @@ public class LabbcatView implements GraphStoreQuery {
    * @return A list of files. If <var>dir</var> is null, these files will be stored under the
    * system's temporary directory, so once processing is finished, they should be deleted
    * by the caller, or moved to a more permanent location. 
-   * @throws IOException
-   * @throws StoreException
+   * @throws IOException If a communications error occurs.
+   * @throws StoreException If the server returns an error.
    */
   public File[] getFragments(
     String[] transcriptIds, Double[] startOffsets, Double[] endOffsets, String[] layerIds,
@@ -2674,7 +2686,8 @@ public class LabbcatView implements GraphStoreQuery {
    * @return The threadId of the resulting task, the result of which will be a CSV file
    * containing acoustic measurs. The threadId can be passed in to {@link #taskStatus(String)},
    * {@link #waitForTask(String,int)}, etc.
-   * @throws IOException, StoreException
+   * @throws IOException If a communications error occurs.
+   * @throws StoreException If the server returns an error.
    */
   public String processWithPraat(
     String[] matchIds, Double[] startOffsets, Double[] endOffsets,
@@ -2728,7 +2741,8 @@ public class LabbcatView implements GraphStoreQuery {
    * @return The threadId of the resulting task, the result of which will be a CSV file
    * containing acoustic measurs. The threadId can be passed in to {@link #taskStatus(String)},
    * {@link #waitForTask(String,int)}, etc.
-   * @throws IOException, StoreException
+   * @throws IOException If a communications error occurs.
+   * @throws StoreException If the server returns an error.
    */
   public String processWithPraat(
     String[] transcriptIds, String[] participantIds, Double[] startOffsets, Double[] endOffsets,
@@ -2803,8 +2817,8 @@ public class LabbcatView implements GraphStoreQuery {
    * which includes "corpus" as well as transcript attribute layers. 
    * @return A CSV file with the attribute values, which it is the caller's
    * responsibility to delete once processing is finished.
-   * @throws IOException
-   * @throws StoreException
+   * @throws IOException If a communications error occurs.
+   * @throws StoreException If the server returns an error.
    */
   public File getTranscriptAttributes(String[] transcriptIds, String[] layerIds) 
     throws IOException, StoreException {
@@ -2839,8 +2853,8 @@ public class LabbcatView implements GraphStoreQuery {
    *  layer.getParentId().equals("parent") &amp;&amp; layer.getAlignment() == 0. 
    * @return A CSV file with the attribute values, which it is the caller's
    * responsibility to delete once processing is finished.
-   * @throws IOException
-   * @throws StoreException
+   * @throws IOException If a communications error occurs.
+   * @throws StoreException If the server returns an error.
    */
   public File getParticipantAttributes(String[] participantIds, String[] layerIds) 
     throws IOException, StoreException {
@@ -3022,6 +3036,8 @@ public class LabbcatView implements GraphStoreQuery {
    * @param annotatorId The ID of the annotator.
    * @return A descriptor of the given annotator, or null if there is no registered
    * annotator with the given ID. 
+   * @throws StoreException If the server returns an error.
+   * @throws ResponseException If some other error occurs.
    */
   public AnnotatorDescriptor getAnnotatorDescriptor(String annotatorId)
     throws StoreException, ResponseException {
@@ -3102,7 +3118,7 @@ public class LabbcatView implements GraphStoreQuery {
   /**
    * List dictionaries available.
    * @return A map of layer manager IDs to lists of dictionary IDs.
-   * @throws StoreException
+   * @throws StoreException If an error prevents the operation.
    */
   public Map<String,List<String>> getDictionaries() throws StoreException {
     try {
@@ -3130,12 +3146,12 @@ public class LabbcatView implements GraphStoreQuery {
   
   /**
    * Lookup entries in a dictionary.
-   * @param managerId
-   * @param dictionaryId
-   * @param keys
+   * @param managerId The ID of the layer manager.
+   * @param dictionaryId The ID of the dictionary.
+   * @param keys The keys to fetch entries for.
    * @return A CSV file with the entries, which it is the caller's
    * responsibility to delete once processing is finished.
-   * @throws StoreException
+   * @throws StoreException If an error prevents the operation.
    */
   public File getDictionaryEntries(
     String managerId, String dictionaryId, String[] keys) throws StoreException {

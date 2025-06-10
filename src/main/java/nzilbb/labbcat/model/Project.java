@@ -48,6 +48,7 @@ public class Project extends Category {
   /**
    * Deprecated setter for the database key value, which now has no effect.
    * @param newProjectId Database key value.
+   * @return A reference to this object, so that setters can be chained.
    */
   @Deprecated(since="1.2.0", forRemoval=true)
   public Project setProjectId(int newProjectId) { /* Now does nothing */ return this; }
@@ -60,6 +61,7 @@ public class Project extends Category {
   /**
    * Setter for the name of the project.
    * @param newProject The name of the project.
+   * @return A reference to this object, so that setters can be chained.
    */
   public Project setProject(String newProject) { setCategory(newProject); return this; }
   
@@ -74,6 +76,7 @@ public class Project extends Category {
   
   /**
    * Constructor from JSON.
+    * @param json A JSON representation of the object to construct.
    */
   public Project(JsonObject json) {
     super(json);
@@ -82,6 +85,7 @@ public class Project extends Category {
   
   /**
    * Constructor from Category object.
+    * @param category The cateory to convert into a Project.
    */
   public Project(Category category) {
     this.classId = "layer";

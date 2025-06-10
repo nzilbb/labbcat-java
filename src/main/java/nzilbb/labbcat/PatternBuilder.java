@@ -45,6 +45,7 @@ import javax.json.JsonObjectBuilder;
  *    .addNotMatchLayer("phonemes", "[cCEFHiIPqQuUV0123456789~#\\$@].*")
  *    .addMaxLayer("frequency", 2)
  *    .build();
+ * </pre>
  * @author Robert Fromont robert@fromont.net.nz
  */
 

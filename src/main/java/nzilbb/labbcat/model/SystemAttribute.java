@@ -45,7 +45,9 @@ public class SystemAttribute {
     * @return ID of the attribute. */
    public String getAttribute() { return attribute; }
    /** Setter for {@link #attribute}: ID of the attribute.
-    * @param newAttribute ID of the attribute. */
+    * @param newAttribute ID of the attribute.
+    * @return A reference to this object, so that setters can be chained.
+    */
    public SystemAttribute setAttribute(String newAttribute) { attribute = newAttribute; return this; }
    
    /** The type of the attribute - "string", "integer", "boolean", "select", etc.
@@ -58,7 +60,9 @@ public class SystemAttribute {
    public String getType() { return type; }
    /** Setter for {@link #type}: The type of the attribute - "string", "integer",
     * "boolean", "select", etc. 
-    * @param newType The type of the attribute - "string", "integer", "boolean", "select", etc. */
+    * @param newType The type of the attribute - "string", "integer", "boolean", "select", etc.
+    * @return A reference to this object, so that setters can be chained.
+    */
    public SystemAttribute setType(String newType) { type = newType; return this; }
 
    /** Style definition which depends on {@link #type} - e.g. whether the "boolean" is shown as a
@@ -74,7 +78,9 @@ public class SystemAttribute {
    /** Setter for {@link #style}: Style definition which depends on {@link #type} - e.g. whether
     * the "boolean" is shown as a checkbox or radio buttons, etc. 
     * @param newStyle Style definition which depends on {@link #type} - e.g. whether the
-    * "boolean" is shown as a checkbox or radio buttons, etc. */
+    * "boolean" is shown as a checkbox or radio buttons, etc.
+    * @return A reference to this object, so that setters can be chained.
+    */
    public SystemAttribute setStyle(String newStyle) { style = newStyle; return this; }
 
    /** User-facing label for the attribute.
@@ -85,7 +91,9 @@ public class SystemAttribute {
     * @return User-facing label for the attribute. */
    public String getLabel() { return label; }
    /** Setter for {@link #label}: User-facing label for the attribute.
-    * @param newLabel User-facing label for the attribute. */
+    * @param newLabel User-facing label for the attribute.
+    * @return A reference to this object, so that setters can be chained.
+    */
    public SystemAttribute setLabel(String newLabel) { label = newLabel; return this; }
 
    /** User-facing (long) description of the attribute.
@@ -96,7 +104,9 @@ public class SystemAttribute {
     * @return User-facing (long) description of the attribute. */
    public String getDescription() { return description; }
    /** Setter for {@link #description}: User-facing (long) description of the attribute.
-    * @param newDescription User-facing (long) description of the attribute. */
+    * @param newDescription User-facing (long) description of the attribute.
+    * @return A reference to this object, so that setters can be chained.
+    */
    public SystemAttribute setDescription(String newDescription) { description = newDescription; return this; }
 
    /** If {@link #type} is "select", these are the valid options for the attribute, where the map
@@ -117,7 +127,9 @@ public class SystemAttribute {
     * value is the user-facing label for the option. 
     * @param newOptions If {@link #type} is "select", these are the valid options for the
     * attribute, where the map key is the attribute value and the map value is the
-    * user-facing label for the option. */
+    * user-facing label for the option.
+    * @return A reference to this object, so that setters can be chained.
+    */
    public SystemAttribute setOptions(Map<String,String> newOptions) { options = newOptions; return this; }
 
    /** The value of the attribute.
@@ -128,7 +140,9 @@ public class SystemAttribute {
     * @return The value of the attribute. */
    public String getValue() { return value; }
    /** Setter for {@link #value}: The value of the attribute.
-    * @param newValue The value of the attribute. */
+    * @param newValue The value of the attribute.
+    * @return A reference to this object, so that setters can be chained.
+    */
    public SystemAttribute setValue(String newValue) { value = newValue; return this; }
    
    // Methods:
@@ -137,7 +151,9 @@ public class SystemAttribute {
    public SystemAttribute() {      
    } // end of constructor
    
-   /** Constructor from JSON. */
+   /** Constructor from JSON.
+    * @param json A JSON representation of the object to construct.
+    */
    public SystemAttribute(JsonObject json) {      
       attribute = json.getString("attribute");
       if (json.containsKey("type")) type = json.getString("type");

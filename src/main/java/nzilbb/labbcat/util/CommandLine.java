@@ -47,12 +47,12 @@ import nzilbb.util.Timers;
  * Command-line utility for making ad-hoc LaBB-CAT API calls.
  * <p> The utility generally prints the JSON response from the server.
  * e.g. 
- * <p><tt>java -jar nzilbb.labbcat.jar --labbcaturl=&hellip; --username=&hellip; --password=&hellip; getLayerIds</tt>
+ * <p><code>java -jar nzilbb.labbcat.jar --labbcaturl=&hellip; --username=&hellip; --password=&hellip; getLayerIds</code>
  * <p> &hellip; might print:
- * <p><tt>{"title":"LaBB-CAT","version":"20200212.1030","code":0,"errors":[],"messages":[],"model":"http://localhost:8080/labbcat/"}</tt>
- * <p>Human-readable JSON can be obtained using the <tt>--indent</tt> switch, 
+ * <p><code>{"title":"LaBB-CAT","version":"20200212.1030","code":0,"errors":[],"messages":[],"model":"http://localhost:8080/labbcat/"}</code>
+ * <p>Human-readable JSON can be obtained using the <code>--indent</code> switch, 
  * e.g.
- * <p><tt>java -jar nzilbb.labbcat.jar <b>--indent</b> --labbcaturl=&hellip; getLayer orthography</tt>
+ * <p><code>java -jar nzilbb.labbcat.jar <b>--indent</b> --labbcaturl=&hellip; getLayer orthography</code>
  * <p> &hellip; might print:
  * <pre>{
  *     "title": "LaBB-CAT",
@@ -80,7 +80,10 @@ import nzilbb.util.Timers;
 
 @ProgramDescription(value="Command-line utility for making ad-hoc LaBB-CAT API calls.",arguments="function [arg ...]")
 public class CommandLine extends CommandLineProgram {
-   
+
+  /** Main entrypoint.
+   * @param argv Array or command-line parameters.
+   */
    public static void main(String argv[]) {
       CommandLine application = new CommandLine();
       if (application.processArguments(argv)) {
@@ -104,6 +107,7 @@ public class CommandLine extends CommandLineProgram {
    /**
     * Setter for {@link #labbcatUrl}: Base URL for the LaBB-CAT server.
     * @param newLabbcatUrl Base URL for the LaBB-CAT server.
+    * @return A reference to this object, so that setters can be chained.
     */
    @Switch(value="Base URL for the LaBB-CAT server.",compulsory=true)
    public CommandLine setLabbcatUrl(String newLabbcatUrl) { labbcatUrl = newLabbcatUrl; return this; }
@@ -122,6 +126,7 @@ public class CommandLine extends CommandLineProgram {
    /**
     * Setter for {@link #username}: Username for LaBB-CAT.
     * @param newUsername Username for LaBB-CAT.
+    * @return A reference to this object, so that setters can be chained.
     */
    @Switch("Username for LaBB-CAT.")
    public CommandLine setUsername(String newUsername) { username = newUsername; return this; }
@@ -140,6 +145,7 @@ public class CommandLine extends CommandLineProgram {
    /**
     * Setter for {@link #password}: Password for LaBB-CAT.
     * @param newPassword Password for LaBB-CAT.
+    * @return A reference to this object, so that setters can be chained.
     */
    @Switch("Password for LaBB-CAT.")
    public CommandLine setPassword(String newPassword) { password = newPassword; return this; }
@@ -158,6 +164,7 @@ public class CommandLine extends CommandLineProgram {
    /**
     * Setter for {@link #verbose}: Whether to produce verbose logging.
     * @param newVerbose Whether to produce verbose logging.
+    * @return A reference to this object, so that setters can be chained.
     */
    @Switch("Whether to produce verbose logging.")
    public CommandLine setVerbose(Boolean newVerbose) { verbose = newVerbose; return this; }
@@ -176,6 +183,7 @@ public class CommandLine extends CommandLineProgram {
    /**
     * Setter for {@link #indent}: Whether to indent JSON for readability.
     * @param newIndent Whether to indent JSON for readability.
+    * @return A reference to this object, so that setters can be chained.
     */
    @Switch("Whether to indent JSON for readability.")
    public CommandLine setIndent(Boolean newIndent) { indent = newIndent; return this; }

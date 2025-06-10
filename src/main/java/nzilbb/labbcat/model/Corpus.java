@@ -51,6 +51,7 @@ public class Corpus {
    /**
     * Setter for {@link #corpusId}: Database key value.
     * @param newCorpusId Database key value.
+    * @return A reference to this object, so that setters can be chained.
     */
    public Corpus setCorpusId(int newCorpusId) { corpusId = newCorpusId; return this; }
 
@@ -68,6 +69,7 @@ public class Corpus {
    /**
     * Setter for {@link #name}: Corpus name.
     * @param newName Corpus name.
+    * @return A reference to this object, so that setters can be chained.
     */
    public Corpus setName(String newName) { name = newName; return this; }
 
@@ -85,6 +87,7 @@ public class Corpus {
    /**
     * Setter for {@link #language}: The ISO 639-1 code for the default language.
     * @param newLanguage The ISO 639-1 code for the default language.
+    * @return A reference to this object, so that setters can be chained.
     */
    public Corpus setLanguage(String newLanguage) { language = newLanguage; return this; }
 
@@ -102,6 +105,7 @@ public class Corpus {
    /**
     * Setter for {@link #description}: Description of corpus.
     * @param newDescription Description of corpus.
+    * @return A reference to this object, so that setters can be chained.
     */
    public Corpus setDescription(String newDescription) { description = newDescription; return this; }
    
@@ -115,6 +119,7 @@ public class Corpus {
    
    /**
     * Constructor from JSON.
+    * @param json A JSON-encoded version of the corpus.
     */
    public Corpus(JsonObject json) {
       if (json.containsKey("corpus_id")) {

@@ -49,6 +49,7 @@ public class User
    /**
     * Setter for {@link #user}: User ID.
     * @param newUser User ID.
+    * @return A reference to this object, so that setters can be chained.
     */
    public User setUser(String newUser) { user = newUser; return this; }
 
@@ -66,6 +67,7 @@ public class User
    /**
     * Setter for {@link #email}: Email address.
     * @param newEmail Email address.
+    * @return A reference to this object, so that setters can be chained.
     */
    public User setEmail(String newEmail) { email = newEmail; return this; }
 
@@ -85,6 +87,7 @@ public class User
     * Setter for {@link #resetPassword}: Whether the user must reset their password when they 
     * next log in.
     * @param newResetPassword Whether the user must reset their password when they next log in.
+    * @return A reference to this object, so that setters can be chained.
     */
    public User setResetPassword(Boolean newResetPassword) { resetPassword = newResetPassword; return this; }
    
@@ -102,6 +105,7 @@ public class User
    /**
     * Setter for {@link #roles}: Roles or groups the user belongs to.
     * @param newRoles Roles or groups the user belongs to.
+    * @return A reference to this object, so that setters can be chained.
     */
    public User setRoles(String[] newRoles) { roles = newRoles; return this; }
    
@@ -115,6 +119,7 @@ public class User
 
    /**
     * Constructor from JSON.
+    * @param json A JSON representation of the object to construct.
     */
    public User(JsonObject json) {      
       user = json.getString("user");

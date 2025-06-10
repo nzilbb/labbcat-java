@@ -53,6 +53,7 @@ public class Category {
    * "speaker", or "layer". 
    * @param newClassId What kind of attributes are categorised - "transcript", "speaker", 
    * or "layer".
+   * @return A reference to this object, so that setters can be chained.
    */
   public Category setClassId(String newClassId) { classId = newClassId; return this; }
   
@@ -70,6 +71,7 @@ public class Category {
   /**
    * Setter for {@link #category}: The name/id of the category.
    * @param newCategory The name/id of the category.
+   * @return A reference to this object, so that setters can be chained.
    */
   public Category setCategory(String newCategory) { category = newCategory; return this; }
   
@@ -87,6 +89,7 @@ public class Category {
   /**
    * Setter for {@link #description}: The description of the category.
    * @param newDescription The description of the category.
+   * @return A reference to this object, so that setters can be chained.
    */
   public Category setDescription(String newDescription) { description = newDescription; return this; }
   
@@ -104,6 +107,7 @@ public class Category {
   /**
    * Setter for {@link #displayOrder}: Where the category appears among other categories.
    * @param newDisplayOrder Where the category appears among other categories.
+   * @return A reference to this object, so that setters can be chained.
    */
   public Category setDisplayOrder(int newDisplayOrder) { displayOrder = newDisplayOrder; return this; }
   
@@ -117,6 +121,7 @@ public class Category {
   
   /**
    * Constructor from JSON.
+   * @param json JSON-encoded version of category.
    */
   public Category(JsonObject json) {
     classId = json.getString("class_id");

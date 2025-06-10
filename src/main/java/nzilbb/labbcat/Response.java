@@ -81,6 +81,7 @@ public class Response {
    /**
     * Setter for {@link #version}: Server version.
     * @param newVersion Server version.
+    * @return A reference to this object, so that setters can be chained.
     */
    public Response setVersion(String newVersion) { version = newVersion; return this; }
 
@@ -130,6 +131,7 @@ public class Response {
    /**
     * Setter for {@link #model}: The model or result returned.
     * @param newModel The model or result returned.
+    * @return A reference to this object, so that setters can be chained.
     */
    public Response setModel(Object newModel) { model = newModel; return this; }
 
@@ -166,6 +168,7 @@ public class Response {
    /**
     * Constructor from InputStream.
     * @param input The stream to read from.
+    * @throws StoreException If an error prevents the operation.
     */
    public Response(InputStream input)
       throws StoreException {
@@ -181,6 +184,7 @@ public class Response {
     * Constructor from InputStream.
     * @param input The stream to read from.
     * @param verbose The verbosity setting to use.
+    * @throws StoreException If an error prevents the operation.
     */
    public Response(InputStream input, boolean verbose)
       throws StoreException {
@@ -197,6 +201,7 @@ public class Response {
     * Constructor from HttpURLConnection.
     * @param connection The connection to read from.
     * @param verbose The verbosity setting to use.
+    * @throws StoreException If an error prevents the operation.
     */
    public Response(HttpURLConnection connection, boolean verbose)
       throws StoreException {
@@ -238,7 +243,7 @@ public class Response {
     * Loads the response from the given stream.
     * @param input The stream to read from.
     * @return A reference to this object,
-    * @throws IOException, JSONException
+    * @throws IOException If an IO error occurs.
     */
    public Response load(InputStream input)
     throws IOException {
@@ -316,7 +321,7 @@ public class Response {
     * Convenience method for checking whether the response any errors. If so, a
     * corresponding StoreException will be thrown.
     * @return A reference to this object,
-    * @throws StoreException
+    * @throws ResponseException If an error prevents the operation.
     */
    public Response checkForErrors() throws ResponseException {
       

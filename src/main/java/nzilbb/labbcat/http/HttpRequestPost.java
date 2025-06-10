@@ -53,8 +53,11 @@ public class HttpRequestPost {
    
    static String UserAgent = null;
 
+  /** Connection of currently-posting request.  */
    protected HttpURLConnection connection;
+  /** Output stream of currently-posting request.  */
    protected OutputStream os = null;
+  /** Cookies.  */
    protected Map<String,String> cookies = new HashMap<String,String>();
    
    /** Parameters so far flag */
@@ -65,8 +68,9 @@ public class HttpRequestPost {
    
    /**
     * Sets a request parameter value
-    * @param sKey
-    * @param sValue
+    * @param sKey The header name.
+    * @param sValue The header value.
+    * @return A reference to this object, so that setters can be chained.
     */
    public HttpRequestPost setHeader(String sKey, String sValue) {
       
@@ -74,6 +78,9 @@ public class HttpRequestPost {
       return this;
    } // end of setHeader()
    
+  /** Open the connection.
+   * @throws IOException If an IO error occurs.
+   */
    protected void connect() throws IOException {
       
       if (os == null) {
@@ -81,12 +88,20 @@ public class HttpRequestPost {
       }
    }
    
+  /** Write a character.
+   * @param c The character to write.
+   * @throws IOException If an IO error occurs.
+   */
    protected void write(char c) throws IOException {
       
       connect();
       os.write(c);
    }
    
+  /** Write a character.
+   * @param s The string to write.
+   * @throws IOException If an IO error occurs.
+   */
    protected void write(String s) throws IOException {
       
       body.append(s);
@@ -94,6 +109,9 @@ public class HttpRequestPost {
       os.write(s.getBytes());
    }
    
+  /** Send a newline.
+   * @throws IOException If an IO error occurs.
+   */
    protected void newline() throws IOException {
       
       body.append("\n");
@@ -101,6 +119,10 @@ public class HttpRequestPost {
       write("\r\n");
    }
    
+  /** Write a string followed by a newline.
+   * @param s The string to write.
+   * @throws IOException If an IO error occurs.
+   */
    protected void writeln(String s) throws IOException {
       
       connect();
@@ -113,7 +135,7 @@ public class HttpRequestPost {
     *
     * @param connection an already open URL connection
     * @param sAuthorization Authorisation string or null if none is required
-    * @throws IOException
+    * @throws IOException If an IO error occurs.
     */
    public HttpRequestPost(HttpURLConnection connection, String sAuthorization) throws IOException {
       
@@ -136,7 +158,7 @@ public class HttpRequestPost {
     *
     * @param url the URL to send request to
     * @param sAuthorization Authorisation string or null if none is required
-    * @throws IOException
+    * @throws IOException If an IO error occurs.
     */
    public HttpRequestPost(URL url, String sAuthorization) throws IOException {
       
@@ -148,7 +170,8 @@ public class HttpRequestPost {
     * Creates a new POST HTTP request for a specified URL string
     *
     * @param urlString the string representation of the URL to send request to
-    * @throws IOException
+    * @param sAuthorization Authoriztion header to use.
+    * @throws IOException If an IO error occurs.
     */
    public HttpRequestPost(String urlString, String sAuthorization) throws IOException {
       
@@ -158,6 +181,7 @@ public class HttpRequestPost {
       
    /**
     * Sets the user-agent header to indicate the name/version of the library.
+    * @return A reference to this object, so that setters can be chained.
     */
   public HttpRequestPost setUserAgent() {
       if (UserAgent == null) {
@@ -187,7 +211,7 @@ public class HttpRequestPost {
     * Sets the HTTP method to use.
     * @param method "POST", "PUT", "DELETE", etc.
     * @return A reference to this object.
-    * @throws IOException
+    * @throws IOException If an IO error occurs.
     */
    public HttpRequestPost setMethod(String method) throws IOException {
       connection.setRequestMethod(method);
@@ -216,7 +240,8 @@ public class HttpRequestPost {
     * adds a cookie to the requst
     * @param name cookie name
     * @param value cookie value
-    * @throws IOException
+    * @return A reference to this object, so that setters can be chained.
+    * @throws IOException If an IO error occurs.
     */
    public HttpRequestPost setCookie(String name, String value) throws IOException {
       
@@ -227,7 +252,8 @@ public class HttpRequestPost {
    /**
     * adds cookies to the request
     * @param cookies the cookie "name-to-value" map
-    * @throws IOException
+    * @return A reference to this object, so that setters can be chained.
+    * @throws IOException If an IO error occurs.
     */
    public HttpRequestPost setCookies(Map<String,String> cookies) throws IOException {
       
@@ -240,7 +266,8 @@ public class HttpRequestPost {
     * adds cookies to the request
     * @param cookies array of cookie names and values (cookies[2*i] is a name, cookies[2*i
     * + 1] is a value) 
-    * @throws IOException
+    * @return A reference to this object, so that setters can be chained.
+    * @throws IOException If an IO error occurs.
     */
    public HttpRequestPost setCookies(String[] cookies) throws IOException {
       
@@ -255,7 +282,8 @@ public class HttpRequestPost {
     * adds a string parameter to the request
     * @param name parameter name
     * @param value parameter value
-    * @throws IOException
+    * @return A reference to this object, so that setters can be chained.
+    * @throws IOException If an IO error occurs.
     */
    public HttpRequestPost setParameter(String name, String value) throws IOException {
       
@@ -272,7 +300,8 @@ public class HttpRequestPost {
     * otherwise the string value of the parameter is passed in the request 
     * @param name parameter name
     * @param object parameter value, or a collection of values
-    * @throws IOException
+    * @return A reference to this object, so that setters can be chained.
+    * @throws IOException If an IO error occurs.
     */
    public HttpRequestPost setParameter(String name, Object object) throws IOException {
       
@@ -298,7 +327,8 @@ public class HttpRequestPost {
     * adds parameters to the request
     * @param parameters "name-to-value" map of parameters; if a value is a file, the file
     * is uploaded, otherwise it is stringified and sent in the request 
-    * @throws IOException
+    * @return A reference to this object, so that setters can be chained.
+    * @throws IOException If an IO error occurs.
     */
    @SuppressWarnings("rawtypes")
    public HttpRequestPost setParameters(Map<String,String> parameters) throws IOException {
@@ -316,7 +346,8 @@ public class HttpRequestPost {
     * @param parameters array of parameter names and values (parameters[2*i] is a name,
     * parameters[2*i + 1] is a value); if a value is a file, the file is uploaded,
     * otherwise it is stringified and sent in the request 
-    * @throws IOException
+    * @return A reference to this object, so that setters can be chained.
+    * @throws IOException If an IO error occurs.
     */
    public HttpRequestPost setParameters(Object[] parameters) throws IOException {
       
@@ -330,7 +361,7 @@ public class HttpRequestPost {
    /**
     * posts the requests to the server, with all the cookies and parameters that were added
     * @return input stream with the server response
-    * @throws IOException
+    * @throws IOException If an IO error occurs.
     */
    public HttpURLConnection post() throws IOException {
       if (os == null) connect();
@@ -340,8 +371,9 @@ public class HttpRequestPost {
    
    /**
     * posts the requests to the server, with all the cookies and parameters that were added
+    * @param json JSON body t post.
     * @return input stream with the server response
-    * @throws IOException
+    * @throws IOException If an IO error occurs.
     */
    public HttpURLConnection post(JsonObject json) throws IOException {
       
@@ -352,8 +384,9 @@ public class HttpRequestPost {
    
    /**
     * posts the requests to the server, with all the cookies and parameters that were added
+    * @param body Body text to post.
     * @return input stream with the server response
-    * @throws IOException
+    * @throws IOException If an IO error occurs.
     */
    public HttpURLConnection post(String body) throws IOException {
       
@@ -367,7 +400,7 @@ public class HttpRequestPost {
     * added before (if any), and with parameters that are passed in the argument 
     * @param parameters request parameters
     * @return input stream with the server response
-    * @throws IOException
+    * @throws IOException If an IO error occurs.
     * @see #setParameters
     */
    public HttpURLConnection post(Map<String,String> parameters) throws IOException {
@@ -381,7 +414,7 @@ public class HttpRequestPost {
     * added before (if any), and with parameters that are passed in the argument 
     * @param parameters request parameters
     * @return input stream with the server response
-    * @throws IOException
+    * @throws IOException If an IO error occurs.
     * @see #setParameters
     */
    public HttpURLConnection post(Object[] parameters) throws IOException {
@@ -397,7 +430,7 @@ public class HttpRequestPost {
     * @param cookies request cookies
     * @param parameters request parameters
     * @return input stream with the server response
-    * @throws IOException
+    * @throws IOException If an IO error occurs.
     * @see #setParameters
     * @see #setCookies
     */
@@ -415,7 +448,7 @@ public class HttpRequestPost {
     * @param cookies request cookies
     * @param parameters request parameters
     * @return input stream with the server response
-    * @throws IOException
+    * @throws IOException If an IO error occurs.
     * @see #setParameters
     * @see #setCookies
     */
@@ -431,7 +464,7 @@ public class HttpRequestPost {
     * @param name parameter name
     * @param value parameter value
     * @return input stream with the server response
-    * @throws IOException
+    * @throws IOException If an IO error occurs.
     * @see #setParameter
     */
    public HttpURLConnection post(String name, Object value) throws IOException {
@@ -447,7 +480,7 @@ public class HttpRequestPost {
     * @param name2 second parameter name
     * @param value2 second parameter value
     * @return input stream with the server response
-    * @throws IOException
+    * @throws IOException If an IO error occurs.
     * @see #setParameter
     */
    public HttpURLConnection post(String name1, Object value1, String name2, Object value2) throws IOException {
@@ -465,7 +498,7 @@ public class HttpRequestPost {
     * @param name3 third parameter name
     * @param value3 third parameter value
     * @return input stream with the server response
-    * @throws IOException
+    * @throws IOException If an IO error occurs.
     * @see #setParameter
     */
    public HttpURLConnection post(String name1, Object value1, String name2, Object value2, String name3, Object value3) throws IOException {
@@ -485,7 +518,7 @@ public class HttpRequestPost {
     * @param name4 fourth parameter name
     * @param value4 fourth parameter value
     * @return input stream with the server response
-    * @throws IOException
+    * @throws IOException If an IO error occurs.
     * @see #setParameter
     */
    public HttpURLConnection post(String name1, Object value1, String name2, Object value2, String name3, Object value3, String name4, Object value4) throws IOException {
@@ -496,9 +529,11 @@ public class HttpRequestPost {
    
    /**
     * posts a new request to specified URL, with parameters that are passed in the argument
-    * @param parameters request parameters
+    * @param url URL to post to.
+    * @param sAuthorization Authorition header to use.
+    * @param parameters request parameters.
     * @return input stream with the server response
-    * @throws IOException
+    * @throws IOException If an IO error occurs.
     * @see #setParameters
     */
    public static HttpURLConnection post(URL url, String sAuthorization, Map<String,String> parameters) throws IOException {
@@ -508,9 +543,11 @@ public class HttpRequestPost {
    
    /**
     * posts a new request to specified URL, with parameters that are passed in the argument
+    * @param url URL to post to.
+    * @param sAuthorization Authoriztion header to use.
     * @param parameters request parameters
     * @return input stream with the server response
-    * @throws IOException
+    * @throws IOException If an IO error occurs.
     * @see #setParameters
     */
    public static HttpURLConnection post(URL url, String sAuthorization, Object[] parameters) throws IOException {
@@ -520,10 +557,12 @@ public class HttpRequestPost {
    
    /**
     * posts a new request to specified URL, with cookies and parameters that are passed in the argument
+    * @param url URL to post to.
+    * @param sAuthorization Authoriztion header to use.
     * @param cookies request cookies
     * @param parameters request parameters
     * @return input stream with the server response
-    * @throws IOException
+    * @throws IOException If an IO error occurs.
     * @see #setCookies
     * @see #setParameters
     */
@@ -534,10 +573,12 @@ public class HttpRequestPost {
    
    /**
     * posts a new request to specified URL, with cookies and parameters that are passed in the argument
+    * @param url URL to post to.
+    * @param sAuthorization Authoriztion header to use.
     * @param cookies request cookies
     * @param parameters request parameters
     * @return input stream with the server response
-    * @throws IOException
+    * @throws IOException If an IO error occurs.
     * @see #setCookies
     * @see #setParameters
     */
@@ -548,10 +589,12 @@ public class HttpRequestPost {
    
    /**
     * post the POST request specified URL, with the specified parameter
+    * @param url URL to post to.
+    * @param sAuthorization Authoriztion header to use.
     * @param name1 parameter name
     * @param value1 parameter value
     * @return input stream with the server response
-    * @throws IOException
+    * @throws IOException If an IO error occurs.
     * @see #setParameter
     */
    public static HttpURLConnection post(URL url, String sAuthorization, String name1, Object value1) throws IOException {
@@ -561,12 +604,14 @@ public class HttpRequestPost {
    
    /**
     * post the POST request to specified URL, with the specified parameters
+    * @param url URL to post to.
+    * @param sAuthorization Authoriztion header to use.
     * @param name1 first parameter name
     * @param value1 first parameter value
     * @param name2 second parameter name
     * @param value2 second parameter value
     * @return input stream with the server response
-    * @throws IOException
+    * @throws IOException If an IO error occurs.
     * @see #setParameter
     */
    public static HttpURLConnection post(URL url, String sAuthorization, String name1, Object value1, String name2, Object value2) throws IOException {
@@ -576,6 +621,8 @@ public class HttpRequestPost {
    
    /**
     * post the POST request to specified URL, with the specified parameters
+    * @param url URL to post to.
+    * @param sAuthorization Authoriztion header to use.
     * @param name1 first parameter name
     * @param value1 first parameter value
     * @param name2 second parameter name
@@ -583,7 +630,7 @@ public class HttpRequestPost {
     * @param name3 third parameter name
     * @param value3 third parameter value
     * @return input stream with the server response
-    * @throws IOException
+    * @throws IOException If an IO error occurs.
     * @see #setParameter
     */
    public static HttpURLConnection post(URL url, String sAuthorization, String name1, Object value1, String name2, Object value2, String name3, Object value3) throws IOException {
@@ -593,6 +640,8 @@ public class HttpRequestPost {
    
    /**
     * post the POST request to specified URL, with the specified parameters
+    * @param url URL to post to.
+    * @param sAuthorization Authoriztion header to use.
     * @param name1 first parameter name
     * @param value1 first parameter value
     * @param name2 second parameter name
@@ -602,7 +651,7 @@ public class HttpRequestPost {
     * @param name4 fourth parameter name
     * @param value4 fourth parameter value
     * @return input stream with the server response
-    * @throws IOException
+    * @throws IOException If an IO error occurs.
     * @see #setParameter
     */
    public static HttpURLConnection post(URL url, String sAuthorization, String name1, Object value1, String name2, Object value2, String name3, Object value3, String name4, Object value4) throws IOException {

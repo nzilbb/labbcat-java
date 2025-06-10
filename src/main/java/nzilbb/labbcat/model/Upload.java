@@ -50,6 +50,7 @@ public class Upload {
   /**
    * Setter for {@link #id}: Unique upload identifier.
    * @param newId Unique upload identifier.
+   * @return A reference to this object, so that setters can be chained.
    */
   public Upload setId(String newId) { id = newId; return this; }
   
@@ -67,6 +68,7 @@ public class Upload {
   /**
    * Setter for {@link #parameters}: Parameters that are required to complete the upload.
    * @param newParameters Parameters that are required to complete the upload.
+   * @return A reference to this object, so that setters can be chained.
    */
   public Upload setParameters(ParameterSet newParameters) { parameters = newParameters; return this; }
   
@@ -87,6 +89,7 @@ public class Upload {
    * transcripts are already being processed. 
    * @param newTranscripts A map of transcript IDs to thread IDs, if any transcripts are
    * already being processed. 
+   * @return A reference to this object, so that setters can be chained.
    */
   public Upload setTranscripts(Map<String,String> newTranscripts) { transcripts = newTranscripts; return this; }
 
@@ -99,6 +102,7 @@ public class Upload {
   
   /**
    * Constructor from JSON.
+   * @param json A JSON representation of the object to construct.
    */
   public Upload(JsonObject json) {
     if (json.containsKey("id")) {

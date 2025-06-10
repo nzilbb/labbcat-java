@@ -57,7 +57,7 @@ import nzilbb.util.Timers;
  * conditions comparison. Then simultaneous clients are started, each repeating the
  * task. When all have finished, the mean time for each of the above is shown. 
  * <p> To invoke the load tester from the command line:<br>
- * <tt>java -classpath lib/nzilbb.ag.jar:bin/nzilbb.labbcat.jar nzilbb.labbcat.util.LoadTester --labbcaturl=<i>url</i> --username=<i>user</i> --password=<i>password</i></tt>
+ * <code>java -classpath lib/nzilbb.ag.jar:bin/nzilbb.labbcat.jar nzilbb.labbcat.util.LoadTester --labbcaturl=<i>url</i> --username=<i>user</i> --password=<i>password</i></code>
  * <p>Other command line options include:
  * <ul>
  *  <li>--clients=<i>n</i> - Number of clients to simulate (default is 3).</li>
@@ -92,7 +92,11 @@ import nzilbb.util.Timers;
 
 @ProgramDescription("A utility for load-testing LaBB-CAT servers.")
 public class LoadTester extends CommandLineProgram {
-   
+
+  /**
+   * Main entrypoint.
+   * @param argv An array of command line parameters.
+   */
    public static void main(String argv[]) {
       LoadTester application = new LoadTester();
       if (application.processArguments(argv)) {
@@ -102,6 +106,7 @@ public class LoadTester extends CommandLineProgram {
 
    // Attributes:
 
+  /** Decimal format for seconds.  */
    public static DecimalFormat seconds = new DecimalFormat("#,##0.000"); 
    
    /**
@@ -118,6 +123,7 @@ public class LoadTester extends CommandLineProgram {
    /**
     * Setter for {@link #labbcatUrl}: Base URL for the LaBB-CAT server.
     * @param newLabbcatUrl Base URL for the LaBB-CAT server.
+    * @return A reference to this object, so that setters can be chained.
     */
    @Switch(value="Base URL for the LaBB-CAT server.",compulsory=true)
    public LoadTester setLabbcatUrl(String newLabbcatUrl) { labbcatUrl = newLabbcatUrl; return this; }
@@ -136,6 +142,7 @@ public class LoadTester extends CommandLineProgram {
    /**
     * Setter for {@link #username}: Username for LaBB-CAT.
     * @param newUsername Username for LaBB-CAT.
+    * @return A reference to this object, so that setters can be chained.
     */
    @Switch("Username for LaBB-CAT.")
    public LoadTester setUsername(String newUsername) { username = newUsername; return this; }
@@ -154,6 +161,7 @@ public class LoadTester extends CommandLineProgram {
    /**
     * Setter for {@link #password}: Password for LaBB-CAT.
     * @param newPassword Password for LaBB-CAT.
+    * @return A reference to this object, so that setters can be chained.
     */
    @Switch("Password for LaBB-CAT.")
    public LoadTester setPassword(String newPassword) { password = newPassword; return this; }
@@ -172,6 +180,7 @@ public class LoadTester extends CommandLineProgram {
    /**
     * Setter for {@link #clients}: Number of clients to simulate.
     * @param newClients Number of clients to simulate.
+    * @return A reference to this object, so that setters can be chained.
     */
    @Switch("Number of clients to simulate (default is 3).")
    public LoadTester setClients(Integer newClients) { clients = newClients; return this; }   
@@ -190,6 +199,7 @@ public class LoadTester extends CommandLineProgram {
    /**
     * Setter for {@link #repetitions}: Number of times each client should repeat the test task.
     * @param newRepetitions Number of times each client should repeat the test task.
+    * @return A reference to this object, so that setters can be chained.
     */
    @Switch("Number of times each client should repeat the test task (default is 1).")
    public LoadTester setRepetitions(Integer newRepetitions) { repetitions = newRepetitions; return this; }
@@ -208,6 +218,7 @@ public class LoadTester extends CommandLineProgram {
    /**
     * Setter for {@link #clientDelay}: Number of seconds to wait before starting each new client.
     * @param newClientDelay Number of seconds to wait before starting each new client.
+    * @return A reference to this object, so that setters can be chained.
     */
    @Switch("Number of seconds to wait before starting each new client (default is 5).")
    public LoadTester setClientDelay(Integer newClientDelay) { clientDelay = newClientDelay; return this; }
@@ -226,6 +237,7 @@ public class LoadTester extends CommandLineProgram {
    /**
     * Setter for {@link #searchFor}: The orthography to search for when running searches.
     * @param newSearchFor The orthography to search for when running searches.
+    * @return A reference to this object, so that setters can be chained.
     */
    @Switch("The orthography to search for when running searches (default is \"i\").")
    public LoadTester setSearchFor(String newSearchFor) { searchFor = newSearchFor; return this; }
@@ -248,6 +260,7 @@ public class LoadTester extends CommandLineProgram {
     * annotations from (default is "phonemes"). 
     * @param newOtherLayer ID of other layer (apart from orthography) to get annotations
     * from (default is "phonemes"). 
+    * @return A reference to this object, so that setters can be chained.
     */
    @Switch("ID of other layer (apart from orthography) to get annotations from (default is \"phonemes\").")
    public LoadTester setOtherLayer(String newOtherLayer) { otherLayer = newOtherLayer; return this; }
@@ -269,6 +282,7 @@ public class LoadTester extends CommandLineProgram {
     * annotations and fragments). 
     * @param newMaxMatches The maximum number of matches to process (for annotations and
     * fragments). 
+    * @return A reference to this object, so that setters can be chained.
     */
    @Switch("The maximum number of matches to process (default is 200).")
    public LoadTester setMaxMatches(Integer newMaxMatches) { maxMatches = newMaxMatches; return this; }
@@ -287,6 +301,7 @@ public class LoadTester extends CommandLineProgram {
    /**
     * Setter for {@link #matchAnnotations}: Call getMatchAnnotations as part of the test.
     * @param newMatchAnnotations Call getMatchAnnotations as part of the test.
+    * @return A reference to this object, so that setters can be chained.
     */
    @Switch("Call getMatchAnnotations as part of the test (default is TRUE).")
    public LoadTester setMatchAnnotations(Boolean newMatchAnnotations) { matchAnnotations = newMatchAnnotations; return this; }
@@ -305,6 +320,7 @@ public class LoadTester extends CommandLineProgram {
    /**
     * Setter for {@link #fragments}: Call getFragments as part of the test.
     * @param newFragments Call getFragments as part of the test.
+    * @return A reference to this object, so that setters can be chained.
     */
    @Switch("Call getFragments as part of the test (default is TRUE).")
    public LoadTester setFragments(Boolean newFragments) { fragments = newFragments; return this; }
@@ -323,6 +339,7 @@ public class LoadTester extends CommandLineProgram {
    /**
     * Setter for {@link #soundFragments}: Call getSoundFragments as part of the test.
     * @param newSoundFragments Call getSoundFragments as part of the test.
+    * @return A reference to this object, so that setters can be chained.
     */
    @Switch("Call getSoundFragments as part of the test (default is TRUE).")
    public LoadTester setSoundFragments(Boolean newSoundFragments) { soundFragments = newSoundFragments; return this; }
@@ -341,6 +358,7 @@ public class LoadTester extends CommandLineProgram {
    /**
     * Setter for {@link #verbose}: Whether to produce verbose logging.
     * @param newVerbose Whether to produce verbose logging.
+    * @return A reference to this object, so that setters can be chained.
     */
    @Switch("Whether to produce verbose logging.")
    public LoadTester setVerbose(Boolean newVerbose) { verbose = newVerbose; return this; }

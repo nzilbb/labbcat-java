@@ -116,6 +116,7 @@ public class LabbcatEdit extends LabbcatView implements GraphStore {
    * Constructor from string URL.
    * @param labbcatUrl The base URL of the LaBB-CAT server -
    * e.g. https://labbcat.canterbury.ac.nz/demo/
+   * @throws MalformedURLException If the URL is invalid.
    */
   public LabbcatEdit(String labbcatUrl) throws MalformedURLException {
     super(labbcatUrl);
@@ -127,6 +128,7 @@ public class LabbcatEdit extends LabbcatView implements GraphStore {
    * e.g. https://labbcat.canterbury.ac.nz/demo/
    * @param username LaBB-CAT username.
    * @param password LaBB-CAT password.
+   * @throws MalformedURLException If the URL is invalid.
    */
   public LabbcatEdit(String labbcatUrl, String username, String password)
     throws MalformedURLException {
@@ -155,7 +157,7 @@ public class LabbcatEdit extends LabbcatView implements GraphStore {
 
   /**
    * Constructs a URL for the given resource.
-   * @param resource
+   * @param resource The relative name of the resource.
    * @return A URL for the given resource.
    * @throws StoreException If the URL is malformed.
    */
@@ -478,7 +480,9 @@ public class LabbcatEdit extends LabbcatView implements GraphStore {
    * Delete a given media or episode document file.
    * @param id The associated transcript ID.
    * @param fileName The media/document file name, e.g. {@link MediaFile#name}.
-   * @throws StoreException, PermissionException, GraphNotFoundException
+   * @throws StoreException If an error prevents the operation.
+   * @throws PermissionException If the operation is not permitted.
+   * @throws GraphNotFoundException If the transcript doesn't exist.
    */
   public void deleteMedia(String id, String fileName)
     throws StoreException, PermissionException, GraphNotFoundException {
@@ -569,8 +573,8 @@ public class LabbcatEdit extends LabbcatView implements GraphStore {
    *   <dt> labbcat_generate </dt>
    *       <dd> Whether to re-regenerate layers of automated annotations or not. </dd> 
    *  </dl> 
-   * @throws IOException
-   * @throws ResponseException
+   * @throws IOException If a communications error occurs.
+   * @throws StoreException If the server returns an error.
    */
   public Upload transcriptUpload(File transcript, boolean merge)
     throws IOException, StoreException {
@@ -601,8 +605,8 @@ public class LabbcatEdit extends LabbcatView implements GraphStore {
    *   <dt> labbcat_generate </dt>
    *       <dd> Whether to re-regenerate layers of automated annotations or not. </dd> 
    *  </dl> 
-   * @throws IOException
-   * @throws ResponseException
+   * @throws IOException If a communications error occurs.
+   * @throws StoreException If the server returns an error.
    */
   public Upload transcriptUpload(File transcript, File[] media, boolean merge)
     throws IOException, StoreException {
@@ -634,8 +638,8 @@ public class LabbcatEdit extends LabbcatView implements GraphStore {
    *   <dt> labbcat_generate </dt>
    *       <dd> Whether to re-regenerate layers of automated annotations or not. </dd> 
    *  </dl> 
-   * @throws IOException
-   * @throws ResponseException
+   * @throws IOException If a communications error occurs.
+   * @throws StoreException If the server returns an error.
    */
   public Upload transcriptUpload(File transcript, Map<String,File[]> media, boolean merge)
     throws IOException, StoreException {
@@ -672,7 +676,8 @@ public class LabbcatEdit extends LabbcatView implements GraphStore {
    * @return The ID and a transcript-ID to thread-ID map ({@link Upload#transcripts}) for
    * transcripts that are being finalized (and any further parameters required to complete
    * the upload). 
-   * @throws IOException, StoreException
+   * @throws IOException If a communications error occurs.
+   * @throws StoreException If the server returns an error.
    */
   public Upload transcriptUploadParameters(Upload upload) throws IOException, StoreException {
     try {
@@ -699,7 +704,8 @@ public class LabbcatEdit extends LabbcatView implements GraphStore {
   /**
    * Delete an upload made by {@link #transcriptUpload(File,Map,boolean)}.
    * @param upload Response from {@link #transcriptUpload(File,Map,boolean)}.
-   * @throws IOException, StoreException
+   * @throws IOException If a communications error occurs.
+   * @throws StoreException If the server returns an error.
    */
   public void transcriptUploadDelete(Upload upload) throws IOException, StoreException {
     transcriptUploadDelete(upload.getId());
@@ -708,7 +714,8 @@ public class LabbcatEdit extends LabbcatView implements GraphStore {
   /**
    * Delete an upload made by {@link #transcriptUpload(File,Map,boolean)}.
    * @param id The ID of the upload as returned by {@link #transcriptUpload(File,Map,boolean)}.
-   * @throws IOException, StoreException
+   * @throws IOException If a communications error occurs.
+   * @throws StoreException If the server returns an error.
    */
   public void transcriptUploadDelete(String id) throws IOException, StoreException {
     try {
@@ -734,8 +741,8 @@ public class LabbcatEdit extends LabbcatView implements GraphStore {
    * @param corpus The corpus for the transcript.
    * @param episode The episode the transcript belongs to.
    * @return The taskId of the server task processing the upload. 
-   * @throws IOException
-   * @throws ResponseException
+   * @throws IOException If a communications error occurs.
+   * @throws StoreException If the server returns an error.
    */
   public String newTranscript(File transcript, File[] media, String trackSuffix, String transcriptType, String corpus, String episode)
     throws IOException, StoreException {
@@ -809,10 +816,10 @@ public class LabbcatEdit extends LabbcatView implements GraphStore {
 
   /**
    * Uploads a new version of an existing transcript.
-   * @param transcript
+   * @param transcript The transcript file to upload.
    * @return The taskId of the server task processing the upload. 
-   * @throws IOException
-   * @throws ResponseException
+   * @throws IOException If a communications error occurs.
+   * @throws StoreException If the server returns an error.
    */
   public String updateTranscript(File transcript)
     throws IOException, StoreException {
@@ -821,11 +828,11 @@ public class LabbcatEdit extends LabbcatView implements GraphStore {
   
   /**
    * Uploads a new version of an existing transcript.
-   * @param transcript
+   * @param transcript The transcript to upload.
    * @param generate Whether to regenerate automatic annotation layers or not.
    * @return The taskId of the server task processing the upload. 
-   * @throws IOException
-   * @throws ResponseException
+   * @throws IOException If a communications error occurs.
+   * @throws StoreException If the server returns an error.
    */
   public String updateTranscript(File transcript, boolean generate)
     throws IOException, StoreException {
@@ -919,7 +926,7 @@ public class LabbcatEdit extends LabbcatView implements GraphStore {
    * @param layerId The ID of the layer with a dictionary configured to manage it.
    * @param key The key (word) in the dictionary to add an entry for.
    * @param entry The value (definition) for the given key.
-   * @throws StoreException
+   * @throws StoreException If the server returns an error.
    */
   public void addLayerDictionaryEntry(String layerId, String key, String entry)
     throws StoreException {
@@ -945,7 +952,7 @@ public class LabbcatEdit extends LabbcatView implements GraphStore {
    * @param key The key (word) in the dictionary to remove an entry for.
    * @param entry The value (definition) to remove, or null to remove all the entries for
    * <var>key</var>. 
-   * @throws StoreException
+   * @throws StoreException If the server returns an error.
    */
   public void removeLayerDictionaryEntry(String layerId, String key, String entry)
     throws StoreException {
@@ -972,7 +979,7 @@ public class LabbcatEdit extends LabbcatView implements GraphStore {
    * {@link LabbcatView#getDictionaries()}
    * @param key The key (word) in the dictionary to add an entry for.
    * @param entry The value (definition) for the given key.
-   * @throws StoreException
+   * @throws StoreException If the server returns an error.
    */
   public void addDictionaryEntry(String managerId, String dictionaryId, String key, String entry)
     throws StoreException {
@@ -1001,7 +1008,7 @@ public class LabbcatEdit extends LabbcatView implements GraphStore {
    * {@link LabbcatView#getDictionaries()}
    * @param key The key (word) in the dictionary to remove an entry for.
    * @param entry The value (definition) to remove, or None to remove all the entries for key.
-   * @throws StoreException
+   * @throws StoreException If the server returns an error.
    */
   public void removeDictionaryEntry(
     String managerId, String dictionaryId, String key, String entry) throws StoreException {
@@ -1035,7 +1042,7 @@ public class LabbcatEdit extends LabbcatView implements GraphStore {
    * @param resource The name of the file to retrieve or instance method (function) to
    * invoke. Possible values for this depend on the specific annotator being interrogated.
    * @return The resource requested.
-   * @throws StoreException
+   * @throws StoreException If the server returns an error.
    */
   public String annotatorExt(String annotatorId, String resource)
     throws StoreException {
@@ -1057,7 +1064,7 @@ public class LabbcatEdit extends LabbcatView implements GraphStore {
    * invoke. Possible values for this depend on the specific annotator being interrogated.
    * @param parameters Optional list of ordered parameters for the instance method (function).
    * @return The resource requested.
-   * @throws StoreException
+   * @throws StoreException If the server returns an error.
    */
   public String annotatorExt(String annotatorId, String resource, String[] parameters)
     throws StoreException {

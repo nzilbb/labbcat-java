@@ -56,6 +56,7 @@ public class Match {
     * utterance by which participant of which transcript matched. 
     * @param newMatchId The match ID, which encodes which token in which utterance by
     * which participant of which transcript matched. 
+    * @return A reference to this object, so that setters can be chained.
     */
    public Match setMatchId(String newMatchId) { MatchId = newMatchId; return this; }
 
@@ -75,6 +76,7 @@ public class Match {
     * Setter for {@link #Transcript}: The name of the transcript document that the match
     * is from. 
     * @param newTranscript The name of the transcript document that the match is from.
+    * @return A reference to this object, so that setters can be chained.
     */
    public Match setTranscript(String newTranscript) { Transcript = newTranscript; return this; }
 
@@ -92,6 +94,7 @@ public class Match {
    /**
     * Setter for {@link #Participant}: The name of the participant who uttered the match.
     * @param newParticipant The name of the participant who uttered the match.
+    * @return A reference to this object, so that setters can be chained.
     */
    public Match setParticipant(String newParticipant) { Participant = newParticipant; return this; }
 
@@ -109,6 +112,7 @@ public class Match {
    /**
     * Setter for {@link #Corpus}: The corpus the match comes from
     * @param newCorpus The corpus the match comes from
+    * @return A reference to this object, so that setters can be chained.
     */
    public Match setCorpus(String newCorpus) { Corpus = newCorpus; return this; }
 
@@ -126,6 +130,7 @@ public class Match {
    /**
     * Setter for {@link #Line}: The start time of the utterance.
     * @param newLine The start time of the utterance.
+    * @return A reference to this object, so that setters can be chained.
     */
    public Match setLine(Double newLine) { Line = newLine; return this; }
 
@@ -143,6 +148,7 @@ public class Match {
    /**
     * Setter for {@link #LineEnd}: The end time of the utterance.
     * @param newLineEnd The end time of the utterance.
+    * @return A reference to this object, so that setters can be chained.
     */
    public Match setLineEnd(Double newLineEnd) { LineEnd = newLineEnd; return this; }
 
@@ -160,6 +166,7 @@ public class Match {
    /**
     * Setter for {@link #BeforeMatch}: The context before the match.
     * @param newBeforeMatch The context before the match.
+    * @return A reference to this object, so that setters can be chained.
     */
    public Match setBeforeMatch(String newBeforeMatch) { BeforeMatch = newBeforeMatch; return this; }
 
@@ -177,6 +184,7 @@ public class Match {
    /**
     * Setter for {@link #Text}: The match text.
     * @param newText The match text.
+    * @return A reference to this object, so that setters can be chained.
     */
    public Match setText(String newText) { Text = newText; return this; }
 
@@ -194,6 +202,7 @@ public class Match {
    /**
     * Setter for {@link #AfterMatch}: The context after the match.
     * @param newAfterMatch The context after the match.
+    * @return A reference to this object, so that setters can be chained.
     */
    public Match setAfterMatch(String newAfterMatch) { AfterMatch = newAfterMatch; return this; }
    
@@ -207,6 +216,7 @@ public class Match {
    
    /**
     * Constructor from JSON.
+    * @param json A JSON representation of the match.
     */
    public Match(JsonObject json) {
       

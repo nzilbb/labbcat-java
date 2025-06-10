@@ -89,6 +89,7 @@ public class LabbcatAdmin extends LabbcatEdit implements GraphStoreAdministratio
    * Constructor from string URL.
    * @param labbcatUrl The base URL of the LaBB-CAT server -
    * e.g. https://labbcat.canterbury.ac.nz/demo/
+   * @throws MalformedURLException If the URL is invalid.
    */
   public LabbcatAdmin(String labbcatUrl) throws MalformedURLException {
     super(labbcatUrl);
@@ -100,6 +101,7 @@ public class LabbcatAdmin extends LabbcatEdit implements GraphStoreAdministratio
    * e.g. https://labbcat.canterbury.ac.nz/demo/
    * @param username LaBB-CAT username.
    * @param password LaBB-CAT password.
+   * @throws MalformedURLException If the URL is invalid.
    */
   public LabbcatAdmin(String labbcatUrl, String username, String password)
     throws MalformedURLException {
@@ -128,7 +130,7 @@ public class LabbcatAdmin extends LabbcatEdit implements GraphStoreAdministratio
 
   /**
    * Constructs a store URL for the given resource.
-   * @param resource
+   * @param resource The relative name of the resource.
    * @return A URL for the given resource.
    * @throws StoreException If the URL is malformed.
    */
@@ -315,7 +317,8 @@ public class LabbcatAdmin extends LabbcatEdit implements GraphStoreAdministratio
    * Creates a new corpus record.
    * @param corpus The corpus details to save.
    * @return The corpus just created.
-   * @throws StoreException, PermissionException
+   * @throws StoreException If an error prevents the operation.
+   * @throws PermissionException If the operation is not permitted.
    * @see #readCorpora()
    * @see #readCorpora(Integer,Integer)
    * @see #updateCorpus(Corpus)
@@ -339,7 +342,8 @@ public class LabbcatAdmin extends LabbcatEdit implements GraphStoreAdministratio
   /**
    * Reads a list of corpus records.
    * @return A list of corpora.
-   * @throws StoreException, PermissionException
+   * @throws StoreException If an error prevents the operation.
+   * @throws PermissionException If the operation is not permitted.
    * @see #createCorpus(Corpus)
    * @see #readCorpora(Integer,Integer)
    * @see #updateCorpus(Corpus)
@@ -356,7 +360,8 @@ public class LabbcatAdmin extends LabbcatEdit implements GraphStoreAdministratio
    * will be returned). 
    * @param pageLength The length of pages (if null, the default page length is 20).
    * @return A list of corpora.
-   * @throws StoreException, PermissionException
+   * @throws StoreException If an error prevents the operation.
+   * @throws PermissionException If the operation is not permitted.
    * @see #createCorpus(Corpus)
    * @see #readCorpora()
    * @see #updateCorpus(Corpus)
@@ -390,7 +395,8 @@ public class LabbcatAdmin extends LabbcatEdit implements GraphStoreAdministratio
    * Updates an existing corpus record.
    * @param corpus The corpus details to save.
    * @return The corpus just updated.
-   * @throws StoreException, PermissionException
+   * @throws StoreException If an error prevents the operation.
+   * @throws PermissionException If the operation is not permitted.
    * @see #createCorpus(Corpus)
    * @see #readCorpora()
    * @see #readCorpora(Integer,Integer)
@@ -414,7 +420,8 @@ public class LabbcatAdmin extends LabbcatEdit implements GraphStoreAdministratio
   /**
    * Deletes an existing corpus record.
    * @param corpus The corpus to delete.
-   * @throws StoreException, PermissionException
+   * @throws StoreException If an error prevents the operation.
+   * @throws PermissionException If the operation is not permitted.
    * @see #createCorpus(Corpus)
    * @see #readCorpora()
    * @see #readCorpora(Integer,Integer)
@@ -428,7 +435,8 @@ public class LabbcatAdmin extends LabbcatEdit implements GraphStoreAdministratio
   /**
    * Deletes an existing corpus record.
    * @param name The name/ID of the corpus to delete.
-   * @throws StoreException, PermissionException
+   * @throws StoreException If an error prevents the operation.
+   * @throws PermissionException If the operation is not permitted.
    * @see #createCorpus(Corpus)
    * @see #readCorpora()
    * @see #readCorpora(Integer,Integer)
@@ -450,7 +458,8 @@ public class LabbcatAdmin extends LabbcatEdit implements GraphStoreAdministratio
    * Creates a new project record.
    * @param project The project details to save.
    * @return The project just created.
-   * @throws StoreException, PermissionException
+   * @throws StoreException If an error prevents the operation.
+   * @throws PermissionException If the operation is not permitted.
    * @see #createCategory(Category)
    * @deprecated 
    * Projects are now layer categories - a type of {@link Category} with classId = "layer".
@@ -465,7 +474,8 @@ public class LabbcatAdmin extends LabbcatEdit implements GraphStoreAdministratio
   /**
    * Reads a list of project records.
    * @return A list of projects.
-   * @throws StoreException, PermissionException
+   * @throws StoreException If an error prevents the operation.
+   * @throws PermissionException If the operation is not permitted.
    * @see #readCategories(String)
    * @deprecated 
    * Projects are now layer categories - a type of {@link Category} with classId = "layer".
@@ -482,7 +492,8 @@ public class LabbcatAdmin extends LabbcatEdit implements GraphStoreAdministratio
    * will be returned). 
    * @param pageLength The length of pages (if null, the default page length is 20).
    * @return A list of projects.
-   * @throws StoreException, PermissionException
+   * @throws StoreException If an error prevents the operation.
+   * @throws PermissionException If the operation is not permitted.
    * @see #readCategories(String,Integer,Integer)
    * @deprecated 
    * Projects are now layer categories - a type of {@link Category} with classId = "layer".
@@ -503,7 +514,8 @@ public class LabbcatAdmin extends LabbcatEdit implements GraphStoreAdministratio
    * Updates an existing project record.
    * @param project The project details to save.
    * @return The project just updated.
-   * @throws StoreException, PermissionException
+   * @throws StoreException If an error prevents the operation.
+   * @throws PermissionException If the operation is not permitted.
    * @see #updateCategory(Category)
    * @deprecated 
    * Projects are now layer categories - a type of {@link Category} with classId = "layer".
@@ -518,7 +530,8 @@ public class LabbcatAdmin extends LabbcatEdit implements GraphStoreAdministratio
   /**
    * Deletes an existing project record.
    * @param project The project to delete.
-   * @throws StoreException, PermissionException
+   * @throws StoreException If an error prevents the operation.
+   * @throws PermissionException If the operation is not permitted.
    * @see #deleteCategory(Category)
    * @deprecated 
    * Projects are now layer categories - a type of {@link Category} with classId = "layer".
@@ -532,7 +545,8 @@ public class LabbcatAdmin extends LabbcatEdit implements GraphStoreAdministratio
   /**
    * Deletes an existing project record.
    * @param name The name/ID of the project to delete.
-   * @throws StoreException, PermissionException
+   * @throws StoreException If an error prevents the operation.
+   * @throws PermissionException If the operation is not permitted.
    * @see #deleteCategory(String,String)
    * @deprecated 
    * Projects are now layer categories - a type of {@link Category} with classId = "layer".
@@ -547,7 +561,8 @@ public class LabbcatAdmin extends LabbcatEdit implements GraphStoreAdministratio
    * Creates a new category record.
    * @param category The category details to save.
    * @return The category just created.
-   * @throws StoreException, PermissionException
+   * @throws StoreException If an error prevents the operation.
+   * @throws PermissionException If the operation is not permitted.
    * @see #readCategories(String)
    * @see #readCategories(String,Integer,Integer)
    * @see #updateCategory(Category)
@@ -572,7 +587,8 @@ public class LabbcatAdmin extends LabbcatEdit implements GraphStoreAdministratio
    * Reads a list of category records.
    * @param classId What to read the categories of - "trascript" or "participant".
    * @return A list of categories.
-   * @throws StoreException, PermissionException
+   * @throws StoreException If an error prevents the operation.
+   * @throws PermissionException If the operation is not permitted.
    * @see #createCategory(Category)
    * @see #readCategories(String,Integer,Integer)
    * @see #updateCategory(Category)
@@ -590,7 +606,8 @@ public class LabbcatAdmin extends LabbcatEdit implements GraphStoreAdministratio
    * will be returned). 
    * @param pageLength The length of pages (if null, the default page length is 20).
    * @return A list of categories.
-   * @throws StoreException, PermissionException
+   * @throws StoreException If an error prevents the operation.
+   * @throws PermissionException If the operation is not permitted.
    * @see #createCategory(Category)
    * @see #readCategories(String)
    * @see #updateCategory(Category)
@@ -626,7 +643,8 @@ public class LabbcatAdmin extends LabbcatEdit implements GraphStoreAdministratio
    * Updates an existing category record.
    * @param category The category details to save.
    * @return The category just updated.
-   * @throws StoreException, PermissionException
+   * @throws StoreException If an error prevents the operation.
+   * @throws PermissionException If the operation is not permitted.
    * @see #createCategory(Category)
    * @see #readCategories(String)
    * @see #readCategories(String,Integer,Integer)
@@ -650,7 +668,8 @@ public class LabbcatAdmin extends LabbcatEdit implements GraphStoreAdministratio
   /**
    * Deletes an existing category record.
    * @param category The category to delete.
-   * @throws StoreException, PermissionException
+   * @throws StoreException If an error prevents the operation.
+   * @throws PermissionException If the operation is not permitted.
    * @see #createCategory(Category)
    * @see #readCategories(String)
    * @see #readCategories(String,Integer,Integer)
@@ -665,7 +684,8 @@ public class LabbcatAdmin extends LabbcatEdit implements GraphStoreAdministratio
    * Deletes an existing category record.
    * @param classId The scope of the category - "trascript" or "participant".
    * @param name The name/ID of the category to delete.
-   * @throws StoreException, PermissionException
+   * @throws StoreException If an error prevents the operation.
+   * @throws PermissionException If the operation is not permitted.
    * @see #createCategory(Category)
    * @see #readCategories(String)
    * @see #readCategories(String,Integer,Integer)
@@ -687,7 +707,8 @@ public class LabbcatAdmin extends LabbcatEdit implements GraphStoreAdministratio
    * Creates a new media track record.
    * @param mediaTrack The mediaTrack details to save.
    * @return The mediaTrack just created.
-   * @throws StoreException, PermissionException
+   * @throws StoreException If an error prevents the operation.
+   * @throws PermissionException If the operation is not permitted.
    * @see #readMediaTracks()
    * @see #readMediaTracks(Integer,Integer)
    * @see #updateMediaTrack(MediaTrack)
@@ -712,7 +733,8 @@ public class LabbcatAdmin extends LabbcatEdit implements GraphStoreAdministratio
   /**
    * Reads a list of mediaTrack records.
    * @return A list of mediaTracks.
-   * @throws StoreException, PermissionException
+   * @throws StoreException If an error prevents the operation.
+   * @throws PermissionException If the operation is not permitted.
    * @see #createMediaTrack(MediaTrack)
    * @see #readMediaTracks(Integer,Integer)
    * @see #updateMediaTrack(MediaTrack)
@@ -729,7 +751,8 @@ public class LabbcatAdmin extends LabbcatEdit implements GraphStoreAdministratio
    * will be returned). 
    * @param pageLength The length of pages (if null, the default page length is 20).
    * @return A list of mediaTracks.
-   * @throws StoreException, PermissionException
+   * @throws StoreException If an error prevents the operation.
+   * @throws PermissionException If the operation is not permitted.
    * @see #createMediaTrack(MediaTrack)
    * @see #readMediaTracks()
    * @see #updateMediaTrack(MediaTrack)
@@ -764,7 +787,8 @@ public class LabbcatAdmin extends LabbcatEdit implements GraphStoreAdministratio
    * Updates an existing media track record.
    * @param mediaTrack The mediaTrack details to save.
    * @return The mediaTrack just updated.
-   * @throws StoreException, PermissionException
+   * @throws StoreException If an error prevents the operation.
+   * @throws PermissionException If the operation is not permitted.
    * @see #createMediaTrack(MediaTrack)
    * @see #readMediaTracks()
    * @see #readMediaTracks(Integer,Integer)
@@ -789,7 +813,8 @@ public class LabbcatAdmin extends LabbcatEdit implements GraphStoreAdministratio
   /**
    * Deletes an existing media track record.
    * @param mediaTrack The mediaTrack to delete.
-   * @throws StoreException, PermissionException
+   * @throws StoreException If an error prevents the operation.
+   * @throws PermissionException If the operation is not permitted.
    * @see #createMediaTrack(MediaTrack)
    * @see #readMediaTracks()
    * @see #readMediaTracks(Integer,Integer)
@@ -803,7 +828,8 @@ public class LabbcatAdmin extends LabbcatEdit implements GraphStoreAdministratio
   /**
    * Deletes an existing media track record.
    * @param suffix The suffix of the mediaTrack to delete.
-   * @throws StoreException, PermissionException
+   * @throws StoreException If an error prevents the operation.
+   * @throws PermissionException If the operation is not permitted.
    * @see #createMediaTrack(MediaTrack)
    * @see #readMediaTracks()
    * @see #readMediaTracks(Integer,Integer)
@@ -825,7 +851,8 @@ public class LabbcatAdmin extends LabbcatEdit implements GraphStoreAdministratio
    * Creates a new role record.
    * @param role The role details to save.
    * @return The role just created.
-   * @throws StoreException, PermissionException
+   * @throws StoreException If an error prevents the operation.
+   * @throws PermissionException If the operation is not permitted.
    * @see #readRoles()
    * @see #readRoles(Integer,Integer)
    * @see #updateRole(Role)
@@ -849,7 +876,8 @@ public class LabbcatAdmin extends LabbcatEdit implements GraphStoreAdministratio
   /**
    * Reads a list of role records.
    * @return A list of roles.
-   * @throws StoreException, PermissionException
+   * @throws StoreException If an error prevents the operation.
+   * @throws PermissionException If the operation is not permitted.
    * @see #createRole(Role)
    * @see #readRoles(Integer,Integer)
    * @see #updateRole(Role)
@@ -866,7 +894,8 @@ public class LabbcatAdmin extends LabbcatEdit implements GraphStoreAdministratio
    * will be returned). 
    * @param pageLength The length of pages (if null, the default page length is 20).
    * @return A list of roles.
-   * @throws StoreException, PermissionException
+   * @throws StoreException If an error prevents the operation.
+   * @throws PermissionException If the operation is not permitted.
    * @see #createRole(Role)
    * @see #readRoles()
    * @see #updateRole(Role)
@@ -901,7 +930,8 @@ public class LabbcatAdmin extends LabbcatEdit implements GraphStoreAdministratio
    * Updates an existing role record.
    * @param role The role details to save.
    * @return The role just updated.
-   * @throws StoreException, PermissionException
+   * @throws StoreException If an error prevents the operation.
+   * @throws PermissionException If the operation is not permitted.
    * @see #createRole(Role)
    * @see #readRoles()
    * @see #readRoles(Integer,Integer)
@@ -925,7 +955,8 @@ public class LabbcatAdmin extends LabbcatEdit implements GraphStoreAdministratio
   /**
    * Deletes an existing role record.
    * @param role The role to delete.
-   * @throws StoreException, PermissionException
+   * @throws StoreException If an error prevents the operation.
+   * @throws PermissionException If the operation is not permitted.
    * @see #createRole(Role)
    * @see #readRoles()
    * @see #readRoles(Integer,Integer)
@@ -939,7 +970,8 @@ public class LabbcatAdmin extends LabbcatEdit implements GraphStoreAdministratio
   /**
    * Deletes an existing role record.
    * @param name The name/ID of the role to delete.
-   * @throws StoreException, PermissionException
+   * @throws StoreException If an error prevents the operation.
+   * @throws PermissionException If the operation is not permitted.
    * @see #createRole(Role)
    * @see #readRoles()
    * @see #readRoles(Integer,Integer)
@@ -961,7 +993,8 @@ public class LabbcatAdmin extends LabbcatEdit implements GraphStoreAdministratio
    * Creates a new role permission record.
    * @param rolePermission The rolePermission details to save.
    * @return The rolePermission just created.
-   * @throws StoreException, PermissionException
+   * @throws StoreException If an error prevents the operation.
+   * @throws PermissionException If the operation is not permitted.
    * @see #readRolePermissions(String)
    * @see #readRolePermissions(String,Integer,Integer)
    * @see #updateRolePermission(RolePermission)
@@ -987,7 +1020,8 @@ public class LabbcatAdmin extends LabbcatEdit implements GraphStoreAdministratio
    * Reads a list of role permission records.
    * @param roleId The ID of the user role to get permissions for.
    * @return A list of rolePermissions.
-   * @throws StoreException, PermissionException
+   * @throws StoreException If an error prevents the operation.
+   * @throws PermissionException If the operation is not permitted.
    * @see #createRolePermission(RolePermission)
    * @see #readRolePermissions(String,Integer,Integer)
    * @see #updateRolePermission(RolePermission)
@@ -1006,7 +1040,8 @@ public class LabbcatAdmin extends LabbcatEdit implements GraphStoreAdministratio
    * will be returned). 
    * @param pageLength The length of pages (if null, the default page length is 20).
    * @return A list of rolePermissions.
-   * @throws StoreException, PermissionException
+   * @throws StoreException If an error prevents the operation.
+   * @throws PermissionException If the operation is not permitted.
    * @see #createRolePermission(RolePermission)
    * @see #readRolePermissions(String)
    * @see #updateRolePermission(RolePermission)
@@ -1041,7 +1076,8 @@ public class LabbcatAdmin extends LabbcatEdit implements GraphStoreAdministratio
    * Updates an existing role permission record.
    * @param rolePermission The rolePermission details to save.
    * @return The rolePermission just updated.
-   * @throws StoreException, PermissionException
+   * @throws StoreException If an error prevents the operation.
+   * @throws PermissionException If the operation is not permitted.
    * @see #createRolePermission(RolePermission)
    * @see #readRolePermissions(String)
    * @see #readRolePermissions(String,Integer,Integer)
@@ -1066,7 +1102,8 @@ public class LabbcatAdmin extends LabbcatEdit implements GraphStoreAdministratio
   /**
    * Deletes an existing role permission record.
    * @param rolePermission The rolePermission to delete.
-   * @throws StoreException, PermissionException
+   * @throws StoreException If an error prevents the operation.
+   * @throws PermissionException If the operation is not permitted.
    * @see #createRolePermission(RolePermission)
    * @see #readRolePermissions(String)
    * @see #readRolePermissions(String,Integer,Integer)
@@ -1082,7 +1119,8 @@ public class LabbcatAdmin extends LabbcatEdit implements GraphStoreAdministratio
    * Deletes an existing role permission record.
    * @param roleId The name/ID of the role.
    * @param entity The entity of the permission.
-   * @throws StoreException, PermissionException
+   * @throws StoreException If an error prevents the operation.
+   * @throws PermissionException If the operation is not permitted.
    * @see #createRolePermission(RolePermission)
    * @see #readRolePermissions(String)
    * @see #readRolePermissions(String,Integer,Integer)
@@ -1104,7 +1142,8 @@ public class LabbcatAdmin extends LabbcatEdit implements GraphStoreAdministratio
   /**
    * Reads a list of system_attribute records.
    * @return A list of system attributes.
-   * @throws StoreException, PermissionException
+   * @throws StoreException If an error prevents the operation.
+   * @throws PermissionException If the operation is not permitted.
    * @see #updateSystemAttribute(SystemAttribute)
    */
   public SystemAttribute[] readSystemAttributes()
@@ -1135,7 +1174,7 @@ public class LabbcatAdmin extends LabbcatEdit implements GraphStoreAdministratio
    * @param value The new value of the attribute.
    * @return The systemAttribute just updated.
    * @throws StoreException If the attribute doesn't exist or its type is "readonly".
-   * @throws PermissionException
+   * @throws PermissionException If the operation is not permitted.
    * @see #readSystemAttributes()
    * @see #updateSystemAttribute(SystemAttribute)
    */
@@ -1148,7 +1187,8 @@ public class LabbcatAdmin extends LabbcatEdit implements GraphStoreAdministratio
    * Updates an existing systemAttribute record.
    * @param systemAttribute The systemAttribute details to save.
    * @return The systemAttribute just updated.
-   * @throws StoreException, PermissionException
+   * @throws StoreException If an error prevents the operation.
+   * @throws PermissionException If the operation is not permitted.
    * @see #readSystemAttributes()
    * @see #updateSystemAttribute(String,String)
    */
@@ -1169,7 +1209,8 @@ public class LabbcatAdmin extends LabbcatEdit implements GraphStoreAdministratio
   /**
    * Saves the store's information document.
    * @param html An HTML document with information about the corpus as a whole.
-   * @throws StoreException, PermissionException
+   * @throws StoreException If an error prevents the operation.
+   * @throws PermissionException If the operation is not permitted.
    * @see LabbcatView#getInfo()
    */
   public void updateInfo(String html) throws StoreException, PermissionException {
@@ -1188,7 +1229,8 @@ public class LabbcatAdmin extends LabbcatEdit implements GraphStoreAdministratio
    * Creates a new user record.
    * @param user The user details to save.
    * @return The user just created.
-   * @throws StoreException, PermissionException
+   * @throws StoreException If an error prevents the operation.
+   * @throws PermissionException If the operation is not permitted.
    * @see #readUsers()
    * @see #readUsers(Integer,Integer)
    * @see #updateUser(User)
@@ -1212,7 +1254,8 @@ public class LabbcatAdmin extends LabbcatEdit implements GraphStoreAdministratio
   /**
    * Reads a list of user records.
    * @return A list of users.
-   * @throws StoreException, PermissionException
+   * @throws StoreException If an error prevents the operation.
+   * @throws PermissionException If the operation is not permitted.
    * @see #createUser(User)
    * @see #readUsers(Integer,Integer)
    * @see #updateUser(User)
@@ -1229,7 +1272,8 @@ public class LabbcatAdmin extends LabbcatEdit implements GraphStoreAdministratio
    * will be returned). 
    * @param pageLength The length of pages (if null, the default page length is 20).
    * @return A list of users.
-   * @throws StoreException, PermissionException
+   * @throws StoreException If an error prevents the operation.
+   * @throws PermissionException If the operation is not permitted.
    * @see #createUser(User)
    * @see #readUsers()
    * @see #updateUser(User)
@@ -1264,7 +1308,8 @@ public class LabbcatAdmin extends LabbcatEdit implements GraphStoreAdministratio
    * Updates an existing user record.
    * @param user The user details to save.
    * @return The user just updated.
-   * @throws StoreException, PermissionException
+   * @throws StoreException If an error prevents the operation.
+   * @throws PermissionException If the operation is not permitted.
    * @see #createUser(User)
    * @see #readUsers()
    * @see #readUsers(Integer,Integer)
@@ -1288,7 +1333,8 @@ public class LabbcatAdmin extends LabbcatEdit implements GraphStoreAdministratio
   /**
    * Deletes an existing user record.
    * @param user The user to delete.
-   * @throws StoreException, PermissionException
+   * @throws StoreException If an error prevents the operation.
+   * @throws PermissionException If the operation is not permitted.
    * @see #createUser(User)
    * @see #readUsers()
    * @see #readUsers(Integer,Integer)
@@ -1302,7 +1348,8 @@ public class LabbcatAdmin extends LabbcatEdit implements GraphStoreAdministratio
   /**
    * Deletes an existing user record.
    * @param user The ID of the user to delete.
-   * @throws StoreException, PermissionException
+   * @throws StoreException If an error prevents the operation.
+   * @throws PermissionException If the operation is not permitted.
    * @see #createUser(User)
    * @see #readUsers()
    * @see #readUsers(Integer,Integer)
@@ -1435,8 +1482,8 @@ public class LabbcatAdmin extends LabbcatEdit implements GraphStoreAdministratio
   
   /**
    * Delete a previously loaded lexicon.
-   * @param lexicon
-   * @throws StoreException
+   * @param lexicon The lexicon to delete.
+   * @throws StoreException If an error prevents the operation.
    * @see #loadLexicon(File,String,String,String,String,String,boolean)
    */
   public void deleteLexicon(String lexicon) throws StoreException {

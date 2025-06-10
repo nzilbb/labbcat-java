@@ -31,19 +31,19 @@ import java.util.Map;
  * 	<li>
  * 		when there's a defining annotation UID:<br>
  * 		g_<i>ag_id</i>;<em>uid</em><br>
- * 		e.g. <tt>g_243;em_12_20035</tt></li>
+ * 		e.g. <code>g_243;em_12_20035</code></li>
  * 	<li>
  * 		when there's anchor IDs:<br>
  * 		g_<i>ag_id</i>;<em>startuid</em>-<em>enduid</em><br>
- * 		e.g. <tt>g_243;n_72700-n_72709</tt></li>
+ * 		e.g. <code>g_243;n_72700-n_72709</code></li>
  * 	<li>
  * 		when there's anchor offsets:<br>
  * 		g_<i>ag_id</i>;<em>startoffset</em>-<em>endoffset</em><br>
- * 		e.g. <tt>g_243;39.400-46.279</tt></li>
+ * 		e.g. <code>g_243;39.400-46.279</code></li>
  * 	<li>
  * 		when there's a participant/speaker number, it will be appended:<br>
  * 		<em>...</em>;p_<em>speakernumber</em><br>
- * 		e.g.&nbsp;<tt>g_243;n_72700-n_72709;p_76</tt></li>
+ * 		e.g.&nbsp;<code>g_243;n_72700-n_72709;p_76</code></li>
  * 	<li>
  * 		a target annotation by appending a uid prefixed by <samp>#=</samp>:<br>
  * 		...;#=<em>uid</em><br>
@@ -51,7 +51,8 @@ import java.util.Map;
  * 	<li>
  * 		other items (search name or prefix) could then come after all that, and key=value pairs:<br>
  * 		...;<em>key</em>=<em>value</em><br>
- * 		e.g.&nbsp;<tt>g_243;n_72700-n_72709;ew_0_123-ew_0_234;prefix=024-;name=the_aeiou</tt></li>
+ * 		e.g.&nbsp;<code>g_243;n_72700-n_72709;ew_0_123-ew_0_234;prefix=024-;name=the_aeiou</code></li>
+ * </ul>
  * <p>These can be something like:
  * <ul>
  * <li><q>g_3;em_11_23;n_19985-n_20003;p_4;#=ew_0_12611;prefix=001-;[0]=ew_0_12611</q></li>
@@ -174,13 +175,15 @@ public class MatchId {
    
    /**
     * String constructor.
+    * @param matchId An composite ID that identifies the match.
     */
    public MatchId(String matchId) {
       parseId(matchId);
    } // end of constructor
 
    /**
-    * String constructor.
+    * Constructor.
+    * @param match An ID that identifies the match.
     */
    public MatchId(Match match) {
       parseId(match.getMatchId());
@@ -188,7 +191,7 @@ public class MatchId {
 
    /**
     * Parses the given match ID string.
-    * @param matchId
+    * @param matchId The composite string ID that identifies the match.
     * @return A reference to this object.
     */
    public MatchId parseId(String matchId) {

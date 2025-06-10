@@ -50,6 +50,7 @@ public class TaskStatus {
    /**
     * Setter for {@link #threadId}: ID of the task.
     * @param newThreadId ID of the task.
+    * @return A reference to this object, so that setters can be chained.
     */
    public TaskStatus setThreadId(String newThreadId) { threadId = newThreadId; return this; }
 
@@ -67,7 +68,8 @@ public class TaskStatus {
    /**
     * Setter for {@link #threadName}: Name of the task.
     * @param newThreadName Name of the task.
-    */
+    * @return A reference to this object, so that setters can be chained.
+x    */
    public TaskStatus setThreadName(String newThreadName) { threadName = newThreadName; return this; }
 
    /**
@@ -84,6 +86,7 @@ public class TaskStatus {
    /**
     * Setter for {@link #running}: Whether the task is currently running (true) or complete (false).
     * @param newRunning Whether the task is currently running (true) or complete (false).
+    * @return A reference to this object, so that setters can be chained.
     */
    public TaskStatus setRunning(boolean newRunning) { running = newRunning; return this; }
 
@@ -101,6 +104,7 @@ public class TaskStatus {
    /**
     * Setter for {@link #duration}: Duration in seconds.
     * @param newDuration Duration in seconds.
+    * @return A reference to this object, so that setters can be chained.
     */
    public TaskStatus setDuration(int newDuration) { duration = newDuration; return this; }
 
@@ -118,6 +122,7 @@ public class TaskStatus {
    /**
     * Setter for {@link #percentComplete}: Percent complete.
     * @param newPercentComplete Percent complete.
+    * @return A reference to this object, so that setters can be chained.
     */
    public TaskStatus setPercentComplete(int newPercentComplete) { percentComplete = newPercentComplete; return this; }
 
@@ -135,6 +140,7 @@ public class TaskStatus {
    /**
     * Setter for {@link #status}: Last status message.
     * @param newStatus Last status message.
+    * @return A reference to this object, so that setters can be chained.
     */
    public TaskStatus setStatus(String newStatus) { status = newStatus; return this; }
 
@@ -152,6 +158,7 @@ public class TaskStatus {
    /**
     * Setter for {@link #refreshSeconds}: Suggested status refresh interval.
     * @param newRefreshSeconds Suggested status refresh interval.
+    * @return A reference to this object, so that setters can be chained.
     */
    public TaskStatus setRefreshSeconds(int newRefreshSeconds) { refreshSeconds = newRefreshSeconds; return this; }
    
@@ -169,6 +176,7 @@ public class TaskStatus {
    /**
     * Setter for {@link #resultUrl}: URL for task results, if any.
     * @param newResultUrl URL for task results, if any.
+    * @return A reference to this object, so that setters can be chained.
     */
    public TaskStatus setResultUrl(String newResultUrl) { resultUrl = newResultUrl; return this; }
 
@@ -186,6 +194,7 @@ public class TaskStatus {
    /**
     * Setter for {@link #resultText}: The label for the results.
     * @param newResultText The label for the results.
+    * @return A reference to this object, so that setters can be chained.
     */
    public TaskStatus setResultText(String newResultText) { resultText = newResultText; return this; }
 
@@ -199,6 +208,7 @@ public class TaskStatus {
    
    /**
     * Constructor from JSON.
+    * @param json A JSON representation of the object to construct.
     */
    public TaskStatus(JsonObject json) {
       

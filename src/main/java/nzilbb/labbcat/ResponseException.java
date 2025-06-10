@@ -48,6 +48,7 @@ public class ResponseException
    
    /**
     * Constructor.
+    * @param response The response object.
     */
    public ResponseException(Response response) {
       

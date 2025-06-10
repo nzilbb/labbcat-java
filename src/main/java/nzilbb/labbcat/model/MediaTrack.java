@@ -49,6 +49,7 @@ public class MediaTrack {
    /**
     * Setter for {@link #suffix}: The suffix associated with the media track.
     * @param newSuffix The suffix associated with the media track.
+    * @return A reference to this object, so that setters can be chained.
     */
    public MediaTrack setSuffix(String newSuffix) { suffix = newSuffix; return this; }
 
@@ -66,6 +67,7 @@ public class MediaTrack {
    /**
     * Setter for {@link #description}: Description of the media track.
     * @param newDescription Description of the media track.
+    * @return A reference to this object, so that setters can be chained.
     */
    public MediaTrack setDescription(String newDescription) { description = newDescription; return this; }
    
@@ -83,6 +85,7 @@ public class MediaTrack {
    /**
     * Setter for {@link #displayOrder}: The position of the media track amongst other tracks.
     * @param newDisplayOrder The position of the media track amongst other tracks.
+    * @return A reference to this object, so that setters can be chained.
     */
    public MediaTrack setDisplayOrder(int newDisplayOrder) { displayOrder = newDisplayOrder; return this; }
    // Methods:
@@ -95,6 +98,7 @@ public class MediaTrack {
    
    /**
     * Constructor from JSON.
+    * @param json A JSON representation of the object to construct.
     */
    public MediaTrack(JsonObject json) {      
       suffix = json.getString("suffix");

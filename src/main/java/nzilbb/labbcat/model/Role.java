@@ -49,6 +49,7 @@ public class Role {
    /**
     * Setter for {@link #roleId}: Role name/ID.
     * @param newRoleId Role name/ID.
+    * @return A reference to this object, so that setters can be chained.
     */
    public Role setRoleId(String newRoleId) { roleId = newRoleId; return this; }
 
@@ -66,6 +67,7 @@ public class Role {
    /**
     * Setter for {@link #description}: Description of the role.
     * @param newDescription Description of the role.
+    * @return A reference to this object, so that setters can be chained.
     */
    public Role setDescription(String newDescription) { description = newDescription; return this; }
    
@@ -79,6 +81,7 @@ public class Role {
    
    /**
     * Constructor from JSON.
+    * @param json A JSON representation of the object to construct.
     */
    public Role(JsonObject json) {      
       roleId = json.getString("role_id");

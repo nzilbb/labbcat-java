@@ -53,6 +53,7 @@ public class HttpRequestGet {
    /**
     * Setter for {@link #urlBaseUrl}: Base URL for the request
     * @param urlNewBaseUrl Base URL for the request
+    * @return A reference to this object, so that setters can be chained.
     */
    public HttpRequestGet setBaseUrl(URL urlNewBaseUrl) {
       
@@ -74,6 +75,7 @@ public class HttpRequestGet {
    /**
     * Setter for {@link #mParameters}: Resuest parameters
     * @param mNewParameters Resuest parameters
+    * @return A reference to this object, so that setters can be chained.
     */
    public HttpRequestGet setParameters(HashMap<String,Object> mNewParameters) { mParameters = mNewParameters; return this; }
 
@@ -91,6 +93,7 @@ public class HttpRequestGet {
    /**
     * Setter for {@link #mHeaders}: HTTP request headers.
     * @param mNewHeaders HTTP request headers.
+    * @return A reference to this object, so that setters can be chained.
     */
    public HttpRequestGet setHeaders(HashMap<String,String> mNewHeaders) { mHeaders = mNewHeaders; return this; }   
    
@@ -108,6 +111,7 @@ public class HttpRequestGet {
    /**
     * Setter for {@link #sAuthorization}: The HTTP authorization string, or null if not required.
     * @param sNewAuthorization The HTTP authorization string, or null if not required.
+    * @return A reference to this object, so that setters can be chained.
     */
    public HttpRequestGet setAuthorization(String sNewAuthorization) { sAuthorization = sNewAuthorization; return this; }
   
@@ -125,20 +129,24 @@ public class HttpRequestGet {
   /**
    * Setter for {@link #method}: HTTP method.
    * @param newMethod HTTP method.
+   * @return A reference to this object, so that setters can be chained.
    */
   public HttpRequestGet setMethod(String newMethod) { method = newMethod; return this; }
   
   // Methods:
   
    /**
-    * Constructor
+    * Constructor.
+    * @param baseUrl URL for LaBB-CAT server.
     */
    public HttpRequestGet(URL baseUrl) {
       setBaseUrl(baseUrl);
    } // end of constructor
    
    /**
-    * Constructor
+    * Constructor.
+    * @param baseUrl Base URL of the LaBB-CAT server.
+    * @throws MalformedURLException If the URL is invalid.
     */
    public HttpRequestGet(String baseUrl)
       throws MalformedURLException {
@@ -146,7 +154,9 @@ public class HttpRequestGet {
    } // end of constructor
    
    /**
-    * Constructor
+    * Constructor.
+    * @param baseUrl Base URL of the LaBB-CAT server.
+    * @param authorization Authorization string if any - e.g. value for "Authorization" header.
     */
    public HttpRequestGet(URL baseUrl, String authorization) {
       setBaseUrl(baseUrl);
@@ -154,7 +164,10 @@ public class HttpRequestGet {
    } // end of constructor
    
    /**
-    * Constructor
+    * Constructor.
+    * @param baseUrl Base URL of the LaBB-CAT server.
+    * @param authorization Authorization string if any - e.g. value for "Authorization" header.
+    * @throws MalformedURLException If the URL is invalid.
     */
    public HttpRequestGet(String baseUrl, String authorization)
       throws MalformedURLException {
@@ -164,6 +177,7 @@ public class HttpRequestGet {
    
    /**
     * Sets the user-agent header to indicate the name/version of the library.
+    * @return A reference to this object, so that setters can be chained.
     */
    public HttpRequestGet setUserAgent() { // TODO use pom.xml Implementation-Title/Version
       if (UserAgent == null) {
@@ -190,8 +204,9 @@ public class HttpRequestGet {
      
    /**
     * Sets a request parameter value
-    * @param sParameter
-    * @param oValue
+    * @param sParameter Parameter name.
+    * @param oValue Paremeter value.
+    * @return A reference to this object, so that setters can be chained.
     */
    public HttpRequestGet setParameter(String sParameter, Object oValue) {
       
@@ -201,8 +216,9 @@ public class HttpRequestGet {
    
    /**
     * Sets a request parameter value
-    * @param sKey
-    * @param sValue
+    * @param sKey Header name.
+    * @param sValue header value.
+    * @return A reference to this object, so that setters can be chained.
     */
    public HttpRequestGet setHeader(String sKey, String sValue) {
       
@@ -213,8 +229,8 @@ public class HttpRequestGet {
    /**
     * Fetches the request response
     * @return Connection for the response
-    * @throws IOException
-    * @throws MalformedURLException
+    * @throws IOException If an IO error occurs.
+    * @throws MalformedURLException If the URL is invalid.
     */
    public HttpURLConnection getConnection() throws IOException, MalformedURLException {
       
@@ -240,6 +256,7 @@ public class HttpRequestGet {
    /**
     * Generates the query string.
     * @return The query string.
+    * @throws UnsupportedEncodingException If an encoding error occurs.
     */
    public String getQueryString() throws UnsupportedEncodingException {
       
@@ -277,8 +294,8 @@ public class HttpRequestGet {
    /**
     * Fetches the request response
     * @return Input stream of the response
-    * @throws IOException
-    * @throws MalformedURLException
+    * @throws IOException If an IO error occurs.
+    * @throws MalformedURLException If the URL is invalid.
     */
    public HttpURLConnection get()
       throws IOException, MalformedURLException {
