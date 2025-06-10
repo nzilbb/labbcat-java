@@ -35,7 +35,6 @@ import java.util.jar.JarFile;
 
 public class HttpRequestGet {
 
-   static Object cookieHandlerSynchronizer = new Object();
    static String UserAgent = null;
    
    // Attributes:
@@ -58,13 +57,6 @@ public class HttpRequestGet {
    public HttpRequestGet setBaseUrl(URL urlNewBaseUrl) {
       
       urlBaseUrl = urlNewBaseUrl; 
-      // double-check there's a cookie handler
-      synchronized (cookieHandlerSynchronizer) {
-         if (CookieHandler.getDefault() == null)
-         {
-            CookieHandler.setDefault(new ListCookieHandler());
-         }
-      }
       return this;
    }
     
@@ -236,7 +228,11 @@ public class HttpRequestGet {
          connection.setRequestProperty(sKey, mHeaders.get(sKey));
       } // next header
       if (sAuthorization != null) {
-         connection.setRequestProperty("Authorization", sAuthorization);
+        if (sAuthorization.startsWith("Cookie ")) { // set Cookie header
+          connection.setRequestProperty("Cookie", sAuthorization.substring(7));
+        } else { // set Authorization header
+          connection.setRequestProperty("Authorization", sAuthorization);
+        }
       }
       return (HttpURLConnection)connection;
    } // end of getConnection()

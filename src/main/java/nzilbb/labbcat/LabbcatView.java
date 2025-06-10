@@ -1,5 +1,5 @@
 //
-// Copyright 2020-2022 New Zealand Institute of Language, Brain and Behaviour, 
+// Copyright 2020-2025 New Zealand Institute of Language, Brain and Behaviour, 
 // University of Canterbury
 // Written by Robert Fromont - robert.fromont@canterbury.ac.nz
 //
@@ -332,17 +332,64 @@ public class LabbcatView implements GraphStoreQuery {
           + testConnection.getResponseCode());
       }            
       if (testConnection.getResponseCode() == HttpURLConnection.HTTP_UNAUTHORIZED) {
+        // auth method is the first word of the www-authenticate, or otherwise Form
+        String authMethod = Optional.ofNullable(
+          testConnection.getHeaderField("www-authenticate"))
+          .orElse("Form")
+          .split(" ")[0];
+        
         if (batchMode) { // can only try with username/password once
           if (username != null && password != null) {
-            authorization = "Basic " + new String(
-              Base64.getMimeEncoder().encode(
-                (username+":"+password).getBytes()), StandardCharsets.UTF_8);
             testConnection.disconnect();
-            testConnection = (HttpURLConnection)testUrl.openConnection();
-            testConnection.setRequestProperty("Authorization", authorization);
+            
+            if (authMethod.equals("Form")) {
+              
+              // we need the JSESSIONID cookie that we were given above
+              String setCookieHeader = testConnection.getHeaderField("set-cookie");
+              String cookieName = null;
+              String cookieValue = null;
+              if (setCookieHeader != null) {
+                String cookie = setCookieHeader.split(";")[0];
+                String[] keyValue = cookie.split("=", 2);
+                if (keyValue.length > 1) {
+                  cookieName = keyValue[0];
+                  cookieValue = keyValue[1];
+                }
+              }
+              
+              // post credentials
+              HttpRequestPost request = new HttpRequestPost(
+                makeUrl("j_security_check"), "")
+                .setUserAgent().setLanguage(language);
+              if (cookieName != null) {
+                request.setHeader("Cookie", cookieName+"="+cookieValue);
+              }
+              request.setParameter("j_username", username)
+                .setParameter("j_password", password);
+              testConnection = request.post();
+
+              // we need the new JSESSIONID
+              setCookieHeader = testConnection.getHeaderField("set-cookie");
+              if (setCookieHeader != null) {
+                String cookie = setCookieHeader.split(";")[0];
+                String[] keyValue = cookie.split("=", 2);
+                if (keyValue.length > 1) {
+                  authorization = "Cookie "+keyValue[0]+"="+keyValue[1];
+                }
+              }
+              
+            } else { // authMethod == "Basic"
+              
+              authorization = "Basic " + new String(
+                Base64.getMimeEncoder().encode(
+                  (username+":"+password).getBytes()), StandardCharsets.UTF_8);
+              testConnection = (HttpURLConnection)testUrl.openConnection();
+              testConnection.setRequestProperty("Authorization", authorization);
+              
+            } // authMethod == "Basic"
             try { 
-              InputStream is = testConnection.getInputStream(); 
-              response = new Response(is, verbose);
+              InputStream is = testConnection.getInputStream();
+              String response = IO.InputStreamToString(is);
             } catch (IOException xx) {
               if (verbose) {
                 System.out.println(
@@ -375,12 +422,53 @@ public class LabbcatView implements GraphStoreQuery {
                 null, txtPassword, "Password", JOptionPane.QUESTION_MESSAGE);
               password = new String(txtPassword.getPassword());
             }
-            authorization = "Basic " + new String(
-              Base64.getMimeEncoder().encode(
-                (username+":"+password).getBytes()), StandardCharsets.UTF_8);
-            testConnection.disconnect();
-            testConnection = (HttpURLConnection)testUrl.openConnection();
-            testConnection.setRequestProperty("Authorization", authorization);
+            if (authMethod.equals("Form")) {
+              
+              // we need the JSESSIONID cookie that we were given above
+              String setCookieHeader = testConnection.getHeaderField("set-cookie");
+              String cookieName = null;
+              String cookieValue = null;
+              if (setCookieHeader != null) {
+                String cookie = setCookieHeader.split(";")[0];
+                String[] keyValue = cookie.split("=", 2);
+                if (keyValue.length > 1) {
+                  cookieName = keyValue[0];
+                  cookieValue = keyValue[1];
+                }
+              }
+              
+              // post credentials
+              HttpRequestPost request = new HttpRequestPost(
+                makeUrl("j_security_check"), "")
+                .setUserAgent().setLanguage(language);
+              if (cookieName != null) {
+                request.setHeader("Cookie", cookieName+"="+cookieValue);
+              }
+              request.setParameter("j_username", username)
+                .setParameter("j_password", password);
+              testConnection = request.post();
+
+              // we need the new JSESSIONID
+              setCookieHeader = testConnection.getHeaderField("set-cookie");
+              if (setCookieHeader != null) {
+                String cookie = setCookieHeader.split(";")[0];
+                String[] keyValue = cookie.split("=", 2);
+                if (keyValue.length > 1) {
+                  authorization = "Cookie "+keyValue[0]+"="+keyValue[1];
+                }
+              }
+              
+            } else { // authMethod == "Basic"
+              
+              authorization = "Basic " + new String(
+                Base64.getMimeEncoder().encode(
+                  (username+":"+password).getBytes()), StandardCharsets.UTF_8);
+              testConnection.disconnect();
+              testConnection = (HttpURLConnection)testUrl.openConnection();
+              testConnection.setRequestProperty("Authorization", authorization);
+              
+            } // authMethod == "Basic"
+            
             try { 
               InputStream is = testConnection.getInputStream(); 
               response = new Response(is, verbose);

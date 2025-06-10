@@ -145,8 +145,11 @@ public class HttpRequestPostMultipart {
       this.connection = connection;
       connection.setUseCaches(false);
       if (sAuthorization != null) {
-         connection.setRequestProperty(
-            "Authorization", sAuthorization);
+        if (sAuthorization.startsWith("Cookie ")) { // set Cookie header
+          connection.setRequestProperty("Cookie", sAuthorization.substring(7));
+        } else { // set Authorization header
+          connection.setRequestProperty("Authorization", sAuthorization);
+        }
       }
       connection.setDoOutput(true);
       connection.setRequestProperty(

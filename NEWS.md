@@ -1,3 +1,7 @@
+# 1.3.1
+
+- Add support for servers with FORM based user auth.
+
 # 1.3.0
 
 - New functions
