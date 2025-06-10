@@ -1,1 +1,1 @@
-packageSearchIndex = [{"l":"All Packages","url":"allpackages-index.html"},{"l":"nzilbb.labbcat"},{"l":"nzilbb.labbcat.http"},{"l":"nzilbb.labbcat.model"},{"l":"nzilbb.labbcat.util"}]
+packageSearchIndex = [{"l":"All Packages","u":"allpackages-index.html"},{"l":"nzilbb.labbcat"},{"l":"nzilbb.labbcat.http"},{"l":"nzilbb.labbcat.model"},{"l":"nzilbb.labbcat.util"}];updateSearchResults();

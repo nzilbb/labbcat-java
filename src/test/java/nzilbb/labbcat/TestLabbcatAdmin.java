@@ -337,7 +337,9 @@ public class TestLabbcatAdmin {
     }
   }
 
-  /** Test deprecated project CRUD operations. */
+  /** Test deprecated project CRUD operations.
+   * @throws Exception If an error occurs.
+   */
   @Test public void newProjectUpdateProjectAndDeleteProject() throws Exception {
     Project originalProject = (Project)new Project()
       .setProject("unit-test")
@@ -1249,7 +1251,7 @@ public class TestLabbcatAdmin {
    * Reads a CSV file into a map of lists, and then deletes the file.
    * @param csv Dictionary file.
    * @return A map of keys to values.
-   * @throws IOException
+   * @throws Exception If an error occurs.
    */
   public Map<String,List<String>> readEntries(File csv) throws Exception {
     // load csv file into map
