@@ -88,6 +88,26 @@ mvn package
 mvn test
 ```
 
+The following are prerequisites for the tests to succeed:
+
+- A test LaBB-CAT instance available at http://localhost:8080/labbcat/
+- Password protection
+- An 'admin' user with the credentials specified in\
+  `src/test/java/nzilbb/labbcat/TestLabbcatEdit.java`
+- A 'view'-only user with the credentials specified in\
+  `src/test/java/nzilbb/labbcat/TestLabbcatEdit.java`
+- Some transcripts uploaded (e.g. the Demo corpus)
+- One transcript that matches the pattern `AP511.+\.eaf`
+- No empty corpora
+- A layer called `phonemes` with annotations
+- The first participant on the 'participants' page to have a value for `participant_gender`
+  and for `participant_notes`
+- The first participant must have been force-aligned
+- The FlatFileDictionary layer manager must be installed
+- The plain text formatter installed
+- The Praat TextGrid formatter installed
+
+
 ## Build documentation site
 
 ```

@@ -140,6 +140,7 @@ public class HttpRequestPost {
    public HttpRequestPost(HttpURLConnection connection, String sAuthorization) throws IOException {
       
       this.connection = connection;
+      connection.setRequestMethod("POST");
       connection.setUseCaches(false);
       connection.setInstanceFollowRedirects(false);
       if (sAuthorization != null) {

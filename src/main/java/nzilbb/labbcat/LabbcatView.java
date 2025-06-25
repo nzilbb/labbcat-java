@@ -329,8 +329,10 @@ public class LabbcatView implements GraphStoreQuery {
       
     if (authorization != null) return authorization;
       
-    URL testUrl = url(""); // store URL with no path
+    URL testUrl = url("getId"); // something that will return a version
     HttpURLConnection testConnection = (HttpURLConnection)testUrl.openConnection();
+    // don't follow redirects, because for Form auth, we need the cookie the redirect sets
+    testConnection.setInstanceFollowRedirects(false);
     response = null;
     try {
       InputStream is = testConnection.getInputStream();
@@ -338,168 +340,201 @@ public class LabbcatView implements GraphStoreQuery {
     } catch (IOException x) {
       if (verbose) {
         System.out.println(
-          "First connection test status ("+(batchMode?"batch":"interacive")+" mode): "
-          + testConnection.getResponseCode());
+          "First connection test error "+testUrl+" status ("+(batchMode?"batch":"interacive")+" mode): "
+          + x);
       }            
-      if (testConnection.getResponseCode() == HttpURLConnection.HTTP_UNAUTHORIZED) {
-        // auth method is the first word of the www-authenticate, or otherwise Form
-        String authMethod = Optional.ofNullable(
-          testConnection.getHeaderField("www-authenticate"))
-          .orElse("Form")
-          .split(" ")[0];
-        
-        if (batchMode) { // can only try with username/password once
-          if (username != null && password != null) {
-            testConnection.disconnect();
-            
-            if (authMethod.equals("Form")) {
-              
-              // we need the JSESSIONID cookie that we were given above
-              String setCookieHeader = testConnection.getHeaderField("set-cookie");
-              String cookieName = null;
-              String cookieValue = null;
-              if (setCookieHeader != null) {
-                String cookie = setCookieHeader.split(";")[0];
-                String[] keyValue = cookie.split("=", 2);
-                if (keyValue.length > 1) {
-                  cookieName = keyValue[0];
-                  cookieValue = keyValue[1];
-                }
-              }
-              
-              // post credentials
-              HttpRequestPost request = new HttpRequestPost(
-                makeUrl("j_security_check"), "")
-                .setUserAgent().setLanguage(language);
-              if (cookieName != null) {
-                request.setHeader("Cookie", cookieName+"="+cookieValue);
-              }
-              request.setParameter("j_username", username)
-                .setParameter("j_password", password);
-              testConnection = request.post();
-
-              // we need the new JSESSIONID
-              setCookieHeader = testConnection.getHeaderField("set-cookie");
-              if (setCookieHeader != null) {
-                String cookie = setCookieHeader.split(";")[0];
-                String[] keyValue = cookie.split("=", 2);
-                if (keyValue.length > 1) {
-                  authorization = "Cookie "+keyValue[0]+"="+keyValue[1];
-                }
-              }
-              
-            } else { // authMethod == "Basic"
-              
-              authorization = "Basic " + new String(
-                Base64.getMimeEncoder().encode(
-                  (username+":"+password).getBytes()), StandardCharsets.UTF_8);
-              testConnection = (HttpURLConnection)testUrl.openConnection();
-              testConnection.setRequestProperty("Authorization", authorization);
-              
-            } // authMethod == "Basic"
-            try { 
-              InputStream is = testConnection.getInputStream();
-              String response = IO.InputStreamToString(is);
-            } catch (IOException xx) {
-              if (verbose) {
-                System.out.println(
-                  "Second connection test status in batch mode: "
-                  + testConnection.getResponseCode());
-              }            
-              if (testConnection.getResponseCode() == HttpURLConnection.HTTP_UNAUTHORIZED) {
-                authorization = null;
-                username = null;
-                password = null;
-                throw new IOException("Username/password invalid");
-              } else {
-                throw xx;
-              }
-            }
-          } else {
-            throw new IOException("Username/password required");
-          }
-        } else { // not batchMode
-          JPasswordField txtPassword = new JPasswordField();
-          // loop until a username/password works
-          while (authorization == null) {
-            if (username == null) {
-              username = JOptionPane.showInputDialog(null, "Username", username);
-            }
-            if (username == null) throw new IOException("Cancelled");
-            txtPassword.setText("");
-            if (password == null || password.length() == 0) {
-              JOptionPane.showMessageDialog(
-                null, txtPassword, "Password", JOptionPane.QUESTION_MESSAGE);
-              password = new String(txtPassword.getPassword());
-            }
-            if (authMethod.equals("Form")) {
-              
-              // we need the JSESSIONID cookie that we were given above
-              String setCookieHeader = testConnection.getHeaderField("set-cookie");
-              String cookieName = null;
-              String cookieValue = null;
-              if (setCookieHeader != null) {
-                String cookie = setCookieHeader.split(";")[0];
-                String[] keyValue = cookie.split("=", 2);
-                if (keyValue.length > 1) {
-                  cookieName = keyValue[0];
-                  cookieValue = keyValue[1];
-                }
-              }
-              
-              // post credentials
-              HttpRequestPost request = new HttpRequestPost(
-                makeUrl("j_security_check"), "")
-                .setUserAgent().setLanguage(language);
-              if (cookieName != null) {
-                request.setHeader("Cookie", cookieName+"="+cookieValue);
-              }
-              request.setParameter("j_username", username)
-                .setParameter("j_password", password);
-              testConnection = request.post();
-
-              // we need the new JSESSIONID
-              setCookieHeader = testConnection.getHeaderField("set-cookie");
-              if (setCookieHeader != null) {
-                String cookie = setCookieHeader.split(";")[0];
-                String[] keyValue = cookie.split("=", 2);
-                if (keyValue.length > 1) {
-                  authorization = "Cookie "+keyValue[0]+"="+keyValue[1];
-                }
-              }
-              
-            } else { // authMethod == "Basic"
-              
-              authorization = "Basic " + new String(
-                Base64.getMimeEncoder().encode(
-                  (username+":"+password).getBytes()), StandardCharsets.UTF_8);
-              testConnection.disconnect();
-              testConnection = (HttpURLConnection)testUrl.openConnection();
-              testConnection.setRequestProperty("Authorization", authorization);
-              
-            } // authMethod == "Basic"
-            
-            try { 
-              InputStream is = testConnection.getInputStream(); 
-              response = new Response(is, verbose);
-            } catch (Exception xx) {
-              if (verbose) {
-                System.out.println(
-                  "Next connection test status in interactive mode: "
-                  + testConnection.getResponseCode());
-              }
-              if (testConnection.getResponseCode() == HttpURLConnection.HTTP_UNAUTHORIZED) {
-                authorization = null;
-                username = null;
-                password = null;
-              }
-            }
-          } // next attempt
-        } // not batchMode
-      } else { // not HTTP_UNAUTHORIZED returned
-        throw x;
+    }
+    if (verbose) {
+      System.out.println(
+        "First connection test "+testUrl+" status ("+(batchMode?"batch":"interacive")+" mode): "
+        + testConnection.getResponseCode());
+    }
+    if (testConnection.getResponseCode() == HttpURLConnection.HTTP_UNAUTHORIZED
+        || testConnection.getResponseCode() == HttpURLConnection.HTTP_MOVED_TEMP) {
+      // auth method is the first word of the www-authenticate, or otherwise Form
+      String authMethod = Optional.ofNullable(
+        testConnection.getHeaderField("www-authenticate"))
+        .orElse("Form")
+        .split(" ")[0];
+      if (verbose) {
+        System.out.println("authMethod " + authMethod);          
       }
-    } // exception getting content
+      
+      if (batchMode) { // can only try with username/password once
+        if (username != null && password != null) {
+          testConnection.disconnect();
+          
+          if (authMethod.equals("Form")) {
+            
+            // we need the JSESSIONID cookie that we were given above
+            String setCookieHeader = testConnection.getHeaderField("set-cookie");
+            String cookieName = null;
+            String cookieValue = null;
+            if (setCookieHeader != null) {
+              String cookie = setCookieHeader.split(";")[0];
+              String[] keyValue = cookie.split("=", 2);
+              if (keyValue.length > 1) {
+                cookieName = keyValue[0];
+                cookieValue = keyValue[1];
+                if (verbose) {
+                  System.out.println(cookieName+" = "+cookieValue);
+                }
+              }
+            }
+              
+            // post credentials            
+            HttpRequestPost request = new HttpRequestPost(
+              makeUrl("j_security_check"),
+              cookieName == null?null:"Cookie "+cookieName+"="+cookieValue)
+              .setUserAgent().setLanguage(language);
+            request.setParameter("j_username", username)
+              .setParameter("j_password", password);
+            testConnection = request.post();
+            
+            // we need the new JSESSIONID
+            setCookieHeader = testConnection.getHeaderField("set-cookie");
+            if (setCookieHeader != null) {
+              String cookie = setCookieHeader.split(";")[0];
+              String[] keyValue = cookie.split("=", 2);
+              if (keyValue.length > 1) {
+                authorization = "Cookie "+keyValue[0]+"="+keyValue[1];
+                if (verbose) {
+                  System.out.println("Form auth "+authorization);
+                }
+              }
+            }
+            
+          } else { // authMethod == "Basic"
+            
+            authorization = "Basic " + new String(
+              Base64.getMimeEncoder().encode(
+                (username+":"+password).getBytes()), StandardCharsets.UTF_8);
+            testConnection = (HttpURLConnection)testUrl.openConnection();
+            testConnection.setRequestProperty("Authorization", authorization);
+            
+          } // authMethod == "Basic"
+
+          // if the last response was a redirect
+          if (testConnection.getResponseCode() == HttpURLConnection.HTTP_SEE_OTHER) {
+            // follow it
+            if (verbose) {
+              System.out.println(
+                "Following redirect "+testConnection.getHeaderField("Location"));
+            }
+            testConnection = new HttpRequestGet(
+              new URL(testUrl, testConnection.getHeaderField("Location")),
+              authorization).get();
+          }
+          try { 
+            InputStream is = testConnection.getInputStream();
+            response = new Response(is, verbose);
+          } catch (IOException xx) {
+            if (verbose) {
+              System.out.println(
+                "Second connection test status in batch mode: "
+                + testConnection.getResponseCode()
+                + " : " + testConnection.getHeaderField("Location"));
+            }            
+            if (testConnection.getResponseCode() == HttpURLConnection.HTTP_UNAUTHORIZED) {
+              authorization = null;
+              username = null;
+              password = null;
+              throw new IOException("Username/password invalid");
+            } else {
+              throw xx;
+            }
+          }
+        } else {
+          throw new IOException("Username/password required");
+        }
+      } else { // not batchMode
+        JPasswordField txtPassword = new JPasswordField();
+        // loop until a username/password works
+        while (authorization == null) {
+          if (username == null) {
+            username = JOptionPane.showInputDialog(null, "Username", username);
+          }
+          if (username == null) throw new IOException("Cancelled");
+          txtPassword.setText("");
+          if (password == null || password.length() == 0) {
+            JOptionPane.showMessageDialog(
+              null, txtPassword, "Password", JOptionPane.QUESTION_MESSAGE);
+            password = new String(txtPassword.getPassword());
+          }
+          if (authMethod.equals("Form")) {
+              
+            // we need the JSESSIONID cookie that we were given above
+            String setCookieHeader = testConnection.getHeaderField("set-cookie");
+            String cookieName = null;
+            String cookieValue = null;
+            if (setCookieHeader != null) {
+              String cookie = setCookieHeader.split(";")[0];
+              String[] keyValue = cookie.split("=", 2);
+              if (keyValue.length > 1) {
+                cookieName = keyValue[0];
+                cookieValue = keyValue[1];
+              }
+            }
+              
+            // post credentials
+            HttpRequestPost request = new HttpRequestPost(
+              makeUrl("j_security_check"),
+              cookieName == null?null:"Cookie "+cookieName+"="+cookieValue)
+              .setUserAgent().setLanguage(language);
+            request.setParameter("j_username", username)
+              .setParameter("j_password", password);
+            testConnection = request.post();
+
+            // we need the new JSESSIONID
+            setCookieHeader = testConnection.getHeaderField("set-cookie");
+            if (setCookieHeader != null) {
+              String cookie = setCookieHeader.split(";")[0];
+              String[] keyValue = cookie.split("=", 2);
+              if (keyValue.length > 1) {
+                authorization = "Cookie "+keyValue[0]+"="+keyValue[1];
+              }
+            }
+              
+          } else { // authMethod == "Basic"
+              
+            authorization = "Basic " + new String(
+              Base64.getMimeEncoder().encode(
+                (username+":"+password).getBytes()), StandardCharsets.UTF_8);
+            testConnection.disconnect();
+            testConnection = (HttpURLConnection)testUrl.openConnection();
+            testConnection.setRequestProperty("Authorization", authorization);
+              
+          } // authMethod == "Basic"
+            
+            // if the last response was a redirect
+          if (testConnection.getResponseCode() == HttpURLConnection.HTTP_SEE_OTHER) {
+            // follow it
+            if (verbose) {
+              System.out.println(
+                "Following redirect "+testConnection.getHeaderField("Location"));
+            }
+            testConnection = new HttpRequestGet(
+              new URL(testUrl, testConnection.getHeaderField("Location")),
+              authorization).get();
+          }
+          try { 
+            InputStream is = testConnection.getInputStream(); 
+            response = new Response(is, verbose);
+          } catch (Exception xx) {
+            if (verbose) {
+              System.out.println(
+                "Next connection test status in interactive mode: "
+                + testConnection.getResponseCode());
+            }
+            if (testConnection.getResponseCode() == HttpURLConnection.HTTP_UNAUTHORIZED) {
+              authorization = null;
+              username = null;
+              password = null;
+            }
+          }
+        } // next attempt
+      } // not batchMode
+    } // status indicates needing auth
 
     if (response != null) { // got a response
       // check server version
@@ -510,7 +545,6 @@ public class LabbcatView implements GraphStoreQuery {
           + " but the minimum required version is " + minLabbcatVersion);
       }
     }
-      
     return authorization;
   } // end of getRequiredHttpAuthorization()
    

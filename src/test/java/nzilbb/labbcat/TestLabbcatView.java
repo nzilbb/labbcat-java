@@ -110,6 +110,7 @@ public class TestLabbcatView {
 
   @Test public void getId()
     throws Exception {
+    // labbcat.setVerbose(true);
     String id = labbcat.getId();
     assertEquals("ID matches the url",
                  labbcatUrl, id);
@@ -752,7 +753,7 @@ public class TestLabbcatView {
     String[] ids = labbcat.getMatchingParticipantIds("/BR.+/.test(id)");
     assertTrue("Some IDs are returned",
                ids.length > 0);
-    String[] layerIds = { "participant_gender", "participant_nodes" };      
+    String[] layerIds = { "participant_gender", "participant_notes" };      
 
     File csv = labbcat.getParticipantAttributes(ids, layerIds);
     assertNotNull("File returned", csv);
