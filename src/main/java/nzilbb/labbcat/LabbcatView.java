@@ -49,6 +49,7 @@ import javax.json.Json;
 import javax.json.JsonArray;
 import javax.json.JsonNumber;
 import javax.json.JsonObject;
+import javax.json.JsonObjectBuilder;
 import javax.json.JsonString;
 import javax.swing.JOptionPane;
 import javax.swing.JPasswordField;
@@ -3225,6 +3226,30 @@ public class LabbcatView implements GraphStoreQuery {
       throw new StoreException("Could not get response.", x);
     }
   } // end of getDictionaryEntries()
+
+  
+  /**
+   * Change the password of the currently-logged-in user.
+   * @param currentPassword The user's current password.
+   * @param newPassword The new password.
+   * @throws StoreException If an error occurs, e.g. there is no
+   * current user, or the <var>currentPassword</var> is incorrect.
+   */
+  public void changePassword(String currentPassword, String newPassword)
+    throws StoreException {
+    try {
+      HttpRequestPost request = put("api/password")
+        .setHeader("Accept", "application/json");
+      if (verbose) System.out.println("changePassword -> " + request);
+      JsonObjectBuilder json = Json.createObjectBuilder();
+      if (currentPassword != null) json.add("currentPassword", currentPassword);
+      if (newPassword != null) json.add("newPassword", newPassword);
+      response = new Response(request.post(json.build()), verbose);
+      response.checkForErrors(); // throws a StoreException on error
+    } catch(IOException x) {
+      throw new StoreException("Could not get response.", x);
+    }
+  } // end of changePassword()
   
   /**
    * Infers the filename from a given Content-Disposition header.

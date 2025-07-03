@@ -1,6 +1,8 @@
 # 1.3.1
 
 - Add support for servers with FORM based user auth.
+- New functions
+  + LabbcatView.changePassword().
 
 # 1.3.0
 

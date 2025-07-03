@@ -1,5 +1,5 @@
 //
-// Copyright 2020-2024 New Zealand Institute of Language, Brain and Behaviour, 
+// Copyright 2020-2025 New Zealand Institute of Language, Brain and Behaviour, 
 // University of Canterbury
 // Written by Robert Fromont - robert.fromont@canterbury.ac.nz
 //
@@ -809,6 +809,20 @@ public class TestLabbcatView {
     assertNotNull("Has info", descriptor.getInfo());
     assertNotNull("Has task parameter info", descriptor.getTaskParameterInfo());
     assertNotNull("Has version", descriptor.getVersion());
+  }
+
+  /** Test the /api/password request is generally handled. */
+  @Test public void changePassword() throws Exception {
+    // make a valid request (but leave the password the same)
+    labbcat.changePassword(password, password);
+    
+    // send an invalid current password (but leave the password the same)
+    try {
+      labbcat.changePassword("wrong current password", password);
+      fail("Incorrect password throws exception");
+    } catch(StoreException exception) {
+      // System.out.println(""+exception);
+    }
   }
   
   /**
