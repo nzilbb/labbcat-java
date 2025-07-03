@@ -4,6 +4,8 @@
 - New functions
   + LabbcatView.changePassword().
 
+Minimum LaBB-CAT version *20250703.1313*
+
 # 1.3.0
 
 - New functions
