@@ -2894,17 +2894,28 @@ public class LabbcatView implements GraphStoreQuery {
   public File getParticipantAttributes(String[] participantIds, String[] layerIds) 
     throws IOException, StoreException {
       
-    URL url = makeUrl("participants");
+    URL url = makeUrl("api/participant/attributes");
     HttpRequestPost request = new HttpRequestPost(url, getRequiredHttpAuthorization())
       .setUserAgent()
-      .setHeader("Accept", "text/csv")
-      .setParameter("type", "participant")
-      .setParameter("content-type", "text/csv")
       .setParameter("csvFieldDelimiter", ",")
-      .setParameter("participantId", participantIds)
+      .setParameter("id", participantIds)
       .setParameter("layer", layerIds);
     if (verbose) System.out.println("getParticipantAttributes -> " + request);
     HttpURLConnection connection = request.post();
+    if (connection.getResponseCode() == HttpURLConnection.HTTP_NOT_FOUND) {
+      // fall back to old API
+      url = makeUrl("participantsExport");
+      request = new HttpRequestPost(url, getRequiredHttpAuthorization())
+        .setUserAgent()
+        .setHeader("Accept", "text/csv")
+        .setParameter("type", "participant")
+        .setParameter("content-type", "text/csv")
+        .setParameter("csvFieldDelimiter", ",")
+        .setParameter("participantId", participantIds)
+        .setParameter("layer", layerIds);
+      if (verbose) System.out.println("getParticipantAttributes -> " + request);
+      connection = request.post();
+    }
     if (connection.getResponseCode() != HttpURLConnection.HTTP_OK) {
       response = new Response(connection, verbose);
       response.checkForErrors(); // throws a ResponseException on error
