@@ -1,10 +1,11 @@
 # 1.3.1
 
 - Add support for servers with FORM based user auth.
+- Add support for changed annotation extraction API.
 - New functions
   + LabbcatView.changePassword().
 
-Minimum LaBB-CAT version *20250703.1313*
+Minimum LaBB-CAT version *20250716.1022*
 
 # 1.3.0
 

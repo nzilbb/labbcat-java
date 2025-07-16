@@ -2420,39 +2420,94 @@ public class LabbcatView implements GraphStoreQuery {
       for (String matchId : matchIds) csvOut.println(matchId);
       csvOut.close();
       if (verbose) System.out.println("matchIds written to: " + csvUpload.getPath());
-         
-      URL url = makeUrl("api/getMatchAnnotations");
+
+      // reload the results
+      URL url = makeUrl("api/results/upload");
       postRequest = new HttpRequestPostMultipart(url, getRequiredHttpAuthorization())
         .setUserAgent()
         .setHeader("Accept", "application/json")
-        .setParameter("layer", layerIds)
-        .setParameter("targetOffset", targetOffset)
-        .setParameter("annotationsPerLayer", annotationsPerLayer)
         .setParameter("csvFieldDelimiter", ",")
-        .setParameter("targetColumn", 0)
-        .setParameter("copyColumns", false)
-        .setParameter("uploadfile", csvUpload);
+        .setParameter("targetColumn", "MatchId")
+        .setParameter("results", csvUpload);
       if (verbose) System.out.println("getMatchAnnotations -> " + postRequest);
       response = new Response(postRequest.post(), verbose);
-      response.checkForErrors(); // throws a ResponseException on error
-         
-      // extract the MatchIds from model
-      JsonArray model = (JsonArray)response.getModel();
-      int annotationsPerMatch = layerIds.length*annotationsPerLayer;
-      Annotation[][] result = new Annotation[matchIds.length][annotationsPerMatch];
-      for (int m = 0; m < matchIds.length; m++) {
-        JsonArray annotations = model.getJsonArray(m);
-        for (int a = 0; a < annotationsPerMatch; a++)
-        {
-          Annotation annotation = null;
-          if (!annotations.isNull(a))
+      if (response.getHttpStatus() != 404) { // endpoint found
+        response.checkForErrors(); // throws a ResponseException on error
+        JsonObject uploadModel = (JsonObject)response.getModel();
+        String threadId = uploadModel.getString("threadId");
+        try {
+          waitForTask(threadId, 0);
+          
+          // get the desired annotations
+          url = makeUrl("api/results");
+          HttpRequestPost postRequest = new HttpRequestPost(url, getRequiredHttpAuthorization())
+            .setUserAgent()
+            .setHeader("Accept", "application/json")
+            .setParameter("threadId", threadId)
+            .setParameter("csv_layer", layerIds)
+            .setParameter("targetOffset", targetOffset)
+            .setParameter("annotationsPerLayer", annotationsPerLayer);
+          if (verbose) System.out.println("getMatchAnnotations -> " + postRequest);
+          response = new Response(postRequest.post(), verbose);
+          response.checkForErrors(); // throws a ResponseException on error
+          
+          // extract the MatchIds from model
+          JsonObject model = (JsonObject)response.getModel();
+          JsonArray matches = (JsonArray)model.getJsonArray("matches");
+          int annotationsPerMatch = layerIds.length*annotationsPerLayer;
+          Annotation[][] result = new Annotation[matchIds.length][annotationsPerMatch];
+          for (int m = 0; m < matchIds.length; m++) {
+            JsonObject annotations = matches.getJsonObject(m);
+            int a = 0;
+            for (String layerId : layerIds) {
+              JsonArray layer = annotations.getJsonArray(layerId);
+              for (int v = 0; v < annotationsPerLayer; v++) {
+                Annotation annotation = null;
+                if (!layer.isNull(v)) {
+                  annotation = (Annotation)new Annotation().fromJson(layer.getJsonObject(v));
+                }
+                result[m][a++] = annotation;
+              } // next variant in the layer
+            } // next layer
+          } // next match
+          return result;
+        } finally {
+          releaseTask(threadId);
+        }
+      } else { // endpoint not found, use deprecated endpoint
+        url = makeUrl("api/getMatchAnnotations");
+        postRequest = new HttpRequestPostMultipart(url, getRequiredHttpAuthorization())
+          .setUserAgent()
+          .setHeader("Accept", "application/json")
+          .setParameter("layer", layerIds)
+          .setParameter("targetOffset", targetOffset)
+          .setParameter("annotationsPerLayer", annotationsPerLayer)
+          .setParameter("csvFieldDelimiter", ",")
+          .setParameter("targetColumn", 0)
+          .setParameter("copyColumns", false)
+          .setParameter("uploadfile", csvUpload);
+        if (verbose) System.out.println("getMatchAnnotations -> " + postRequest);
+        response = new Response(postRequest.post(), verbose);
+        response.checkForErrors(); // throws a ResponseException on error
+        
+        // extract the MatchIds from model
+        JsonArray model = (JsonArray)response.getModel();
+        int annotationsPerMatch = layerIds.length*annotationsPerLayer;
+        Annotation[][] result = new Annotation[matchIds.length][annotationsPerMatch];
+        for (int m = 0; m < matchIds.length; m++) {
+          JsonArray annotations = model.getJsonArray(m);
+          for (int a = 0; a < annotationsPerMatch; a++)
           {
-            annotation = (Annotation)new Annotation().fromJson(annotations.getJsonObject(a));
-          }
-          result[m][a] = annotation;
-        } // next annotation
-      } // next match
-      return result;
+            Annotation annotation = null;
+            if (!annotations.isNull(a))
+            {
+              annotation = (Annotation)new Annotation().fromJson(annotations.getJsonObject(a));
+            }
+            result[m][a] = annotation;
+          } // next annotation
+        } // next match
+        return result;
+      } // deprecated endpoint
     } finally {
       // delete temporary file
       csvUpload.delete();
@@ -2536,7 +2591,7 @@ public class LabbcatView implements GraphStoreQuery {
       if (cancelling) break;
       if (transcriptIds[i] == null || startOffsets[i] == null || endOffsets[i] == null) continue;
 
-      URL url = makeUrl("soundfragment");
+      URL url = makeUrl("api/media/fragments");
       HttpRequestGet request = new HttpRequestGet(url, getRequiredHttpAuthorization())
         .setUserAgent()
         .setHeader("Accept", "audio/wav")
@@ -2546,6 +2601,18 @@ public class LabbcatView implements GraphStoreQuery {
       if (sampleRate != null) request.setParameter("sampleRate", sampleRate);
       if (verbose) System.out.println("getSoundFragments -> " + request);
       HttpURLConnection connection = request.get();
+      // if (connection.getResponseCode() == HttpURLConnection.HTTP_NOT_FOUND) {
+      //   // might need to use the old API endpoint
+      //   url = makeUrl("soundfragment");
+      //   request = new HttpRequestGet(url, getRequiredHttpAuthorization())
+      //     .setUserAgent()
+      //     .setHeader("Accept", "audio/wav")
+      //     .setParameter("id", transcriptIds[i])
+      //     .setParameter("start", startOffsets[i])
+      //     .setParameter("end", endOffsets[i]);
+      //   if (sampleRate != null) request.setParameter("sampleRate", sampleRate);
+      //   if (verbose) System.out.println("getSoundFragments -> " + request);
+      // }
       if (connection.getResponseCode() != HttpURLConnection.HTTP_OK) {
         if (connection.getResponseCode() != HttpURLConnection.HTTP_NOT_FOUND) {
           System.err.println(
