@@ -3,7 +3,9 @@
 - Add support for servers with FORM based user auth.
 - Add support for changed annotation extraction API.
 - New functions
-  + LabbcatView.changePassword().
+  + LabbcatView.changePassword()
+- Changed functions
+  + LabbcatView.taskStatus() now has optional *log* and *keepalive* parameters.
 
 Minimum LaBB-CAT version *20250716.1022*
 

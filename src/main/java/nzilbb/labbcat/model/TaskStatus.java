@@ -1,5 +1,5 @@
 //
-// Copyright 2020 New Zealand Institute of Language, Brain and Behaviour, 
+// Copyright 2020-2025 New Zealand Institute of Language, Brain and Behaviour, 
 // University of Canterbury
 // Written by Robert Fromont - robert.fromont@canterbury.ac.nz
 //
@@ -198,6 +198,23 @@ public class TaskStatus {
    */
   public TaskStatus setResultText(String newResultText) { resultText = newResultText; return this; }
 
+  /**
+   * The task log.
+   * @see #getLog()
+   * @see #setLog(String)
+   */
+  protected String log;
+  /**
+   * Getter for {@link #log}: The task log.
+   * @return The task log.
+   */
+  public String getLog() { return log; }
+  /**
+   * Setter for {@link #log}: The task log.
+   * @param newLog The task log.
+   */
+  public TaskStatus setLog(String newLog) { log = newLog; return this; }
+  
   // Methods:
    
   /**
@@ -230,6 +247,8 @@ public class TaskStatus {
       resultText = json.getString("resultText");
     if (json.containsKey("status"))
       status = json.getString("status");
+    if (json.containsKey("log"))
+      log = json.get("log").toString();
   } // end of constructor
    
   /**

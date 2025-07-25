@@ -84,6 +84,15 @@ import nzilbb.labbcat.model.User;
 import nzilbb.util.IO;
 import nzilbb.util.MonitorableSeries;
 
+// TODO methods 
+//  + *resultsUpload* - reload CSV results for subsequent call to *getMatchAnnotations*
+//  + *intervalAnnotations* - Concatenates annotation labels for given labels contained in given time intervals
+//  + *getDashboardItems* - list available corpus statistics
+//  + *getDashboardItem* - get the value of a specific corpus statistic
+//  + *getCorpusInfo* - gets statistics about a given corpus
+//  + *getFragment* - gets a fragment of a transcript, as defined a given annotation
+// tests for  + *getDictionaries* - Lists generic dictionaries published by layer managers
+
 /**
  * Client-side implementation of 
  * <a href="https://nzilbb.github.io/ag/apidocs/nzilbb/ag/GraphStoreQuery.html">nzilbb.ag.GraphStoreQuery</a>.
@@ -1854,13 +1863,28 @@ public class LabbcatView implements GraphStoreQuery {
    */
   public TaskStatus taskStatus(String threadId)
     throws IOException, StoreException {
+    return taskStatus(threadId, false, true);
+  }
+      
+  /**
+   * Gets the current state of the given task.
+   * @param threadId The ID of the task.
+   * @param log Whether to include the task log with the status.
+   * @param keepalive Whether querying the status should keep the task alive or not.
+   * @return The status of the task
+   * @throws IOException If a communications error occurs.
+   * @throws StoreException If the server returns an error.
+   */
+  public TaskStatus taskStatus(String threadId, boolean log, boolean keepalive)
+    throws IOException, StoreException {
       
     cancelling = false;
-    URL url = makeUrl("thread");
+    URL url = makeUrl("api/task/"+threadId);
     HttpRequestGet request = new HttpRequestGet(url, getRequiredHttpAuthorization())
       .setUserAgent()
       .setHeader("Accept", "application/json")
-      .setParameter("threadId", threadId);
+      .setParameter("keepalive", keepalive);
+    if (log) request.setParameter("log", log);
     if (verbose) System.out.println("taskStatus -> " + request);
     response = new Response(request.get(), verbose);
     response.checkForErrors(); // throws a ResponseException on error

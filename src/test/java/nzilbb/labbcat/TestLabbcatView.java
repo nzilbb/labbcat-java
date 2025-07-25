@@ -461,15 +461,29 @@ public class TestLabbcatView {
 
   @Test public void taskStatus()
     throws Exception {
-    // first get a list of tasks
-    Map<String,TaskStatus> tasks = labbcat.getTasks();
-    if (tasks.size() == 0) {
-      System.out.println("There are no tasks, so can't test getTask");
-    } else {
-      String threadId = tasks.keySet().iterator().next();
+    // ensure there a task
+    JsonObject pattern = Json.createObjectBuilder()
+      .add("columns", Json.createArrayBuilder()
+           .add(Json.createObjectBuilder()
+                .add("layers", Json.createObjectBuilder()
+                     .add("orthography", Json.createObjectBuilder()
+                          .add("pattern", "xxx")))))
+      .build();
+    String threadId = labbcat.search(pattern, null, null, false, null, null, null);
+    try {
       TaskStatus task = labbcat.taskStatus(threadId);
-      assertEquals("Correct task",
-                   threadId, task.getThreadId());
+      assertEquals("Correct task", threadId, task.getThreadId());
+      assertNotNull("Has a status", task.getStatus());
+      assertNull("Has no log", task.getLog());
+
+      // ask for log
+      task = labbcat.taskStatus(threadId, true, false);
+      assertEquals("Correct task", threadId, task.getThreadId());
+      assertNotNull("Has a status", task.getStatus());
+      assertNotNull("Has log", task.getLog());
+      
+    } finally {
+      labbcat.releaseTask(threadId);
     }
   }
 
