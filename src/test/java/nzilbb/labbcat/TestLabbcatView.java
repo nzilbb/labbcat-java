@@ -164,6 +164,15 @@ public class TestLabbcatView {
                ids.length > 0);
   }
 
+  /** Ensure corpus statistics can be retrieved. */
+  @Test public void getCorpusInfo() throws Exception {
+    String[] ids = labbcat.getCorpusIds();
+    assertTrue("Some IDs are returned", ids.length > 0);
+    Map<String,String> stats = labbcat.getCorpusInfo(ids[0]);
+    assertTrue("Some stats are returned", stats.size() > 0);
+    // System.out.println(""+stats);
+  }
+
   @Test public void getParticipantIds() throws Exception {
     String[] ids = labbcat.getParticipantIds();
     // for (String id : ids) System.out.println("participant " + id);

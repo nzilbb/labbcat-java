@@ -6,6 +6,7 @@
   + LabbcatView.changePassword()
   + LabbcatView.getDashboardItems() - list available corpus statistics
   + LabbcatView.getDashboardItem() - get the value of a specific corpus statistic
+  + LabbcatView.getCorpusInfo() - gets statistics about a given corpus
 - Changed functions
   + LabbcatView.taskStatus() now has optional *log* and *keepalive* parameters.
 

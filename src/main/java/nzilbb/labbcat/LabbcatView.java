@@ -88,7 +88,6 @@ import nzilbb.util.MonitorableSeries;
 // TODO methods 
 //  + *resultsUpload* - reload CSV results for subsequent call to *getMatchAnnotations*
 //  + *intervalAnnotations* - Concatenates annotation labels for given labels contained in given time intervals
-//  + *getCorpusInfo* - gets statistics about a given corpus
 //  + *getFragment* - gets a fragment of a transcript, as defined a given annotation
 // tests for  + *getDictionaries* - Lists generic dictionaries published by layer managers
 
@@ -3408,6 +3407,32 @@ public class LabbcatView implements GraphStoreQuery {
       throw new StoreException("Could not get response.", x);
     }
   } // end of getDashboardItem()
+  
+  /**
+   * Gets statistics about a given corpus.
+   * @param corpusId ID of the corpus.
+   * @return A map of statistic names to their and the values.
+   * @throws StoreException If an error prevents the operation.
+   */
+  public Map<String,String> getCorpusInfo(String corpusId) throws StoreException {
+    try {
+      HttpRequestGet request = get("api/corpus/"+corpusId) 
+        .setHeader("Accept", "application/json");
+      if (verbose) System.out.println("getCorpusInfo -> " + request);
+      response = new Response(request.get(), verbose);
+      response.checkForErrors(); // throws a StoreException on error
+      if (response.isModelNull()) return null;
+      JsonObject model = (JsonObject)response.getModel();
+      Map<String,String> stats = new TreeMap<String,String>();
+      for (String stat : model.keySet()) {
+        String value = model.getString(stat);
+        stats.put(stat, value);
+      }
+      return stats;
+    } catch(IOException x) {
+      throw new StoreException("Could not get response.", x);
+    }
+  } // end of getCorpusInfo()
   
   /**
    * Infers the filename from a given Content-Disposition header.
