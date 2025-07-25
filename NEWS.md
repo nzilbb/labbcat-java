@@ -4,6 +4,8 @@
 - Add support for changed annotation extraction API.
 - New functions
   + LabbcatView.changePassword()
+  + LabbcatView.getDashboardItems() - list available corpus statistics
+  + LabbcatView.getDashboardItem() - get the value of a specific corpus statistic
 - Changed functions
   + LabbcatView.taskStatus() now has optional *log* and *keepalive* parameters.
 

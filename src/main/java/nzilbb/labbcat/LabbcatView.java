@@ -77,6 +77,7 @@ import nzilbb.ag.serialize.util.Utility;
 import nzilbb.configure.ParameterSet;
 import nzilbb.labbcat.http.*;
 import nzilbb.labbcat.model.AnnotatorDescriptorWrapper;
+import nzilbb.labbcat.model.DashboardItem;
 import nzilbb.labbcat.model.Match;
 import nzilbb.labbcat.model.MatchId;
 import nzilbb.labbcat.model.TaskStatus;
@@ -87,8 +88,6 @@ import nzilbb.util.MonitorableSeries;
 // TODO methods 
 //  + *resultsUpload* - reload CSV results for subsequent call to *getMatchAnnotations*
 //  + *intervalAnnotations* - Concatenates annotation labels for given labels contained in given time intervals
-//  + *getDashboardItems* - list available corpus statistics
-//  + *getDashboardItem* - get the value of a specific corpus statistic
 //  + *getCorpusInfo* - gets statistics about a given corpus
 //  + *getFragment* - gets a fragment of a transcript, as defined a given annotation
 // tests for  + *getDictionaries* - Lists generic dictionaries published by layer managers
@@ -3352,6 +3351,63 @@ public class LabbcatView implements GraphStoreQuery {
       throw new StoreException("Could not get response.", x);
     }
   } // end of changePassword()
+  
+  /**
+   * Lists configured items for the given dashboard.
+   * @param dashboard Which dashboard to get items for "home", "statistics", or "express"
+   * @return A list of dashboard items for the given dashboard.
+   * @throws StoreException If an error prevents the operation.
+   */
+  public DashboardItem[] getDashboardItems(String dashboard) throws StoreException {
+    cancelling = false;
+    if (dashboard == null) dashboard = "home";
+    URL url = makeUrl("api/dashboard"+(dashboard=="home"?"":"/"+dashboard));
+    try {
+      HttpRequestGet request = new HttpRequestGet(url, getRequiredHttpAuthorization())
+        .setUserAgent()
+        .setHeader("Accept", "application/json");
+      if (verbose) System.out.println("getDashboardItems -> " + request);
+      response = new Response(request.get(), verbose);
+      response.checkForErrors(); // throws a ResponseException on error
+      if (response.isModelNull()) return null;
+      JsonArray array = (JsonArray)response.getModel();
+      Vector<DashboardItem> items = new Vector<DashboardItem>();
+      if (array != null) {
+        for (int i = 0; i < array.size(); i++) {
+          items.add(new DashboardItem(array.getJsonObject(i)));
+        }
+      }
+      return items.toArray(new DashboardItem[0]);
+    } catch(IOException x) {
+      throw new StoreException("Could not get response.", x);
+    }
+  } // end of getDashboardItems()
+
+  
+  /**
+   * Gets the value of one dashboard item.
+   * @param itemId The ID of the item.
+   * @return The value of the item.
+   * @throws StoreException If an error prevents the operation.
+   */
+  public String getDashboardItem(int itemId) throws StoreException {    
+    try {
+      URL url = makeUrl("api/dashboard/item/"+itemId);
+      HttpRequestGet request = new HttpRequestGet(url, getRequiredHttpAuthorization())
+        .setUserAgent().setLanguage(language).setHeader("Accept", "text/plain");
+      if (verbose) System.out.println("getDashboardItem -> " + request);
+      HttpURLConnection connection = request.get();
+      if (connection.getResponseCode() != HttpURLConnection.HTTP_OK) {
+        throw new StoreException(
+          "Error " + connection.getResponseCode()
+          + " " + connection.getResponseMessage() + " - " + request);
+      } else {
+        return IO.InputStreamToString(connection.getInputStream());
+      } // response ok
+    } catch(IOException x) {
+      throw new StoreException("Could not get response.", x);
+    }
+  } // end of getDashboardItem()
   
   /**
    * Infers the filename from a given Content-Disposition header.

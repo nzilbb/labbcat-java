@@ -838,6 +838,23 @@ public class TestLabbcatView {
       // System.out.println(""+exception);
     }
   }
+
+  /** Ensure dashboard items can be retrieved. */
+  @Test public void getDashboardItems() throws Exception {
+    DashboardItem[] items = labbcat.getDashboardItems("home");
+    assertTrue("Some items are returned", items.length > 0);
+  }
+  
+  /** Ensure a single dashboard item value can be retrieved. */
+  @Test public void getDashboardItem() throws Exception {
+    // get items
+    DashboardItem[] items = labbcat.getDashboardItems("statistics");
+    assertTrue("Some items are returned", items.length > 0);
+    // now get the first item's value
+    String value = labbcat.getDashboardItem(items[0].getItemId());
+    assertNotNull("Value was returned", value);
+    assertTrue("Value is not empty", value.length() > 0);
+  }
   
   /**
    * Directory for text files.
