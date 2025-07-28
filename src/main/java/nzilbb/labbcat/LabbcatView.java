@@ -77,6 +77,7 @@ import nzilbb.ag.serialize.util.Utility;
 import nzilbb.configure.ParameterSet;
 import nzilbb.labbcat.http.*;
 import nzilbb.labbcat.model.AnnotatorDescriptorWrapper;
+import nzilbb.labbcat.model.Category;
 import nzilbb.labbcat.model.DashboardItem;
 import nzilbb.labbcat.model.Match;
 import nzilbb.labbcat.model.MatchId;
@@ -87,9 +88,8 @@ import nzilbb.util.MonitorableSeries;
 
 // TODO methods 
 //  + *resultsUpload* - reload CSV results for subsequent call to *getMatchAnnotations*
-//  + *intervalAnnotations* - Concatenates annotation labels for given labels contained in given time intervals
 //  + *getFragment* - gets a fragment of a transcript, as defined a given annotation
-// tests for  + *getDictionaries* - Lists generic dictionaries published by layer managers
+// tests for + *getDictionaries* - Lists generic dictionaries published by layer managers
 
 /**
  * Client-side implementation of 
@@ -687,8 +687,43 @@ public class LabbcatView implements GraphStoreQuery {
   }
    
   /**
+   * Gets version information of all components of LaBB-CAT.
+   * @return A map of section names to sub-component version info,
+   * each section being a map of component names to versions.
+   * @throws StoreException If an error occurs.
+   */
+  public Map<String,Map<String,String>> versionInfo()
+    throws StoreException {
+      
+    try {
+      URL url = makeUrl("api/versions");
+      HttpRequestGet request = new HttpRequestGet(url, getRequiredHttpAuthorization())
+        .setUserAgent().setLanguage(language).setHeader("Accept", "application/json");
+      if (verbose) System.out.println("versionInfo -> " + request);
+      response = new Response(request.get(), verbose);
+      response.checkForErrors(); // throws a StoreException on error
+      if (response.isModelNull()) return null;
+      Map<String,Map<String,String>> sections =
+        new TreeMap<String,Map<String,String>>();
+      JsonObject model = (JsonObject)response.getModel();
+      for (String sectionId : model.keySet()) {
+        Map<String,String> section = new TreeMap<String,String>();
+        sections.put(sectionId, section);
+        JsonObject sectionModel = model.getJsonObject(sectionId);
+        for (String module : sectionModel.keySet()) {
+          section.put(module, sectionModel.getString(module));
+        } // next module/version
+      } // next section
+      return sections;
+    } catch(IOException x) {
+      throw new StoreException("Could not get response.", x);
+    }
+  }
+   
+  /**
    * Gets the store's information document.
-   * @return An HTML document providing information about the corpus.
+   * @return An HTML document providing information about the corpus, or null if no
+   * document has been created.
    * @throws StoreException If an error occurs.
    * @throws PermissionException If the operation is not permitted.
    */
@@ -701,6 +736,39 @@ public class LabbcatView implements GraphStoreQuery {
         .setUserAgent().setLanguage(language).setHeader("Accept", "text/html");
       if (verbose) System.out.println("getInfo -> " + request);
       HttpURLConnection connection = request.get();
+      if (connection.getResponseCode() == HttpURLConnection.HTTP_NOT_FOUND) {
+        return null;
+      }
+      if (connection.getResponseCode() != HttpURLConnection.HTTP_OK) {
+        throw new StoreException(
+          "Error " + connection.getResponseCode()
+          + " " + connection.getResponseMessage() + " - " + request);
+      } else {
+        return IO.InputStreamToString(connection.getInputStream());
+      } // response ok
+    } catch(IOException x) {
+      throw new StoreException("Could not get response.", x);
+    }
+  }
+   
+  /**
+   * Reads the current data access license agreement (HTML) document.
+   * @return An HTML document containing the data access license
+   * agreement, or null if there is none.
+   * @throws StoreException If an error occurs.
+   */
+  public String readAgreement()
+    throws StoreException {
+      
+    try {
+      URL url = makeUrl("agreement.html");
+      HttpRequestGet request = new HttpRequestGet(url, getRequiredHttpAuthorization())
+        .setUserAgent().setLanguage(language).setHeader("Accept", "text/html");
+      if (verbose) System.out.println("getInfo -> " + request);
+      HttpURLConnection connection = request.get();
+      if (connection.getResponseCode() == HttpURLConnection.HTTP_NOT_FOUND) {
+        return null;
+      }
       if (connection.getResponseCode() != HttpURLConnection.HTTP_OK) {
         throw new StoreException(
           "Error " + connection.getResponseCode()
@@ -1932,14 +2000,11 @@ public class LabbcatView implements GraphStoreQuery {
   public void cancelTask(String threadId) throws IOException, StoreException {
       
     cancelling = false;
-    URL url = makeUrl("threads");
-    HttpRequestGet request = new HttpRequestGet(url, getRequiredHttpAuthorization())
-      .setUserAgent()
+    HttpRequestPost request = delete("api/task/"+threadId)
       .setHeader("Accept", "application/json")
-      .setParameter("threadId", threadId)
-      .setParameter("command", "cancel");
-    if (verbose) System.out.println("taskStatus -> " + request);
-    response = new Response(request.get(), verbose);
+      .setParameter("cancel", true);
+    if (verbose) System.out.println("cacelTask -> " + request);
+    response = new Response(request.post(), verbose);
     response.checkForErrors(); // throws a ResponseException on error
   } // end of cancelTask()
 
@@ -1952,27 +2017,24 @@ public class LabbcatView implements GraphStoreQuery {
   public void releaseTask(String threadId) throws IOException, StoreException {
       
     cancelling = false;
-    URL url = makeUrl("threads");
-    HttpRequestGet request = new HttpRequestGet(url, getRequiredHttpAuthorization())
-      .setUserAgent()
+    HttpRequestPost request = delete("api/task/"+threadId)
       .setHeader("Accept", "application/json")
-      .setParameter("threadId", threadId)
-      .setParameter("command", "release");
-    if (verbose) System.out.println("taskStatus -> " + request);
-    response = new Response(request.get(), verbose);
+      .setParameter("release", true);
+    if (verbose) System.out.println("cacelTask -> " + request);
+    response = new Response(request.post(), verbose);
     response.checkForErrors(); // throws a ResponseException on error
   } // end of releaseTask()
 
   /**
    * Gets a list of all tasks on the server.
-   * @return A list of all task statuses.
+   * @return A list of all task IDs.
    * @throws IOException If a communications error occurs.
    * @throws StoreException If the server returns an error.
    */
-  public Map<String,TaskStatus> getTasks() throws IOException, StoreException {
+  public String[] getTasks() throws IOException, StoreException {
       
     cancelling = false;
-    URL url = makeUrl("threads");
+    URL url = makeUrl("api/task/");
     HttpRequestGet request = new HttpRequestGet(url, getRequiredHttpAuthorization())
       .setUserAgent()
       .setHeader("Accept", "application/json");
@@ -1980,13 +2042,12 @@ public class LabbcatView implements GraphStoreQuery {
     response = new Response(request.get(), verbose);
     response.checkForErrors(); // throws a ResponseException on error
     if (response.isModelNull()) return null;
-    JsonObject model = (JsonObject)response.getModel();
-    HashMap<String,TaskStatus> result = new HashMap<String,TaskStatus>();
-    for (String threadId : model.keySet()) {
-      result.put(threadId,
-                 new TaskStatus(model.getJsonObject(threadId)));
+    JsonArray model = (JsonArray)response.getModel();
+    Vector<String> result = new Vector<String>();
+    for (int t = 0; t < model.size(); t++) {
+      result.add(model.getString(t));
     } // next task
-    return result;
+    return result.toArray(new String[0]);
   } // end of getTasks()
    
   boolean cancelling = false;
@@ -2863,7 +2924,8 @@ public class LabbcatView implements GraphStoreQuery {
    * variable called <var>participant_gender$</var> available to the praat script, whose 
    * value will be the gender of the speaker for that segment.
    * @return The threadId of the resulting task, the result of which will be a CSV file
-   * containing acoustic measurs. The threadId can be passed in to {@link #taskStatus(String)},
+   * containing acoustic measures.
+   * The threadId can be passed in to {@link #taskStatus(String)},
    * {@link #waitForTask(String,int)}, etc.
    * @throws IOException If a communications error occurs.
    * @throws StoreException If the server returns an error.
@@ -2930,6 +2992,120 @@ public class LabbcatView implements GraphStoreQuery {
       csvUpload.delete();
     }
   } // end of processWithPraat()
+
+  /**
+   * Concatenates annotation labels for given labels contained in
+   * given time intervals, using a space delimiter for labels, and
+   * requiring complete (rather than partial) containment.   
+   * @param transcriptIds An array of Transcript IDs identifying the recording that the
+   * sample comes from. 
+   * @param participantIds An array of Participant IDs, which must have the same
+   * number of elements as <var>transcriptIds</var>, identifying the speaker of the
+   * speech sample (e.g. so that their gender can be identified, for calibrating script
+   * parameters). 
+   * @param startOffsets An array of start times in seconds, which must have the same
+   * number of elements as <var>transcriptIds</var>.
+   * @param endOffsets An array of end times in seconds, which must have the same
+   * number of elements as <var>transcriptIds</var>.
+   * @param layerIds IDs of layers to extract.
+   * @return The threadId of the resulting task, the result of which will be a CSV file
+   * with columns containing the annotation labels.
+   * The threadId can be passed in to {@link #taskStatus(String)},
+   * {@link #waitForTask(String,int)}, etc.
+   * @throws IOException If a communications error occurs.
+   * @throws StoreException If the server returns an error.
+   */
+  public String intervalAnnotations(
+    String[] transcriptIds, String[] participantIds, Double[] startOffsets,
+    Double[] endOffsets, String[] layerIds, String labelDelimiter,
+    boolean partialContainment) throws IOException, StoreException {
+    return intervalAnnotations(
+      transcriptIds, participantIds, startOffsets, endOffsets, layerIds, " ", false);
+  }
+  
+  /**
+   * Concatenates annotation labels for given labels contained in given time intervals.
+   * @param transcriptIds An array of Transcript IDs identifying the recording that the
+   * sample comes from. 
+   * @param participantIds An array of Participant IDs, which must have the same
+   * number of elements as <var>transcriptIds</var>, identifying the speaker of the
+   * speech sample (e.g. so that their gender can be identified, for calibrating script
+   * parameters). 
+   * @param startOffsets An array of start times in seconds, which must have the same
+   * number of elements as <var>transcriptIds</var>.
+   * @param endOffsets An array of end times in seconds, which must have the same
+   * number of elements as <var>transcriptIds</var>.
+   * @param layerIds IDs of layers to extract.
+   * @param labelDelimiter Delimiter to use between labels. Defaults to a space " ".
+   * @param partialContainment false if the annotations must be
+   * entirely between the start and end times, true if they can extend
+   * before the start or after the end.   
+   * @return The threadId of the resulting task, the result of which will be a CSV file
+   * with columns containing the annotation labels.
+   * The threadId can be passed in to {@link #taskStatus(String)},
+   * {@link #waitForTask(String,int)}, etc.
+   * @throws IOException If a communications error occurs.
+   * @throws StoreException If the server returns an error.
+   */
+  public String intervalAnnotations(
+    String[] transcriptIds, String[] participantIds, Double[] startOffsets,
+    Double[] endOffsets, String[] layerIds, String labelDelimiter,
+    boolean partialContainment) throws IOException, StoreException {
+    
+    cancelling = false;
+    
+    if (transcriptIds.length != participantIds.length
+        || transcriptIds.length != startOffsets.length
+        || transcriptIds.length != endOffsets.length) {
+      throw new StoreException(
+        "transcriptIds ("+transcriptIds.length +"), participantIds ("+participantIds.length
+        +"), startOffsets ("+startOffsets.length
+        +"), and endOffsets ("+endOffsets.length+") must be arrays of equal size.");
+    }
+
+    // write the IDs to a temporary file for upload
+    File csvUpload = File.createTempFile("intervalAnnotations_",".csv");
+    try {
+      csvUpload.deleteOnExit();
+      PrintWriter csvOut = new PrintWriter(csvUpload, "UTF-8");
+      csvOut.print("Transcript,Participant,StartOffset,EndOffset");
+      for (int i = 0; i < transcriptIds.length; i++) {
+        csvOut.println();      
+        csvOut.print(transcriptIds[i]);
+        csvOut.print(",");
+        csvOut.print(participantIds[i]);
+        csvOut.print(",");
+        csvOut.print(startOffsets[i]);
+        csvOut.print(",");
+        csvOut.print(endOffsets[i]);
+      }
+      csvOut.close();
+      if (verbose) System.out.println("matchIds written to: " + csvUpload.getPath());
+      
+      URL url = makeUrl("api/annotation/intervals");
+      postRequest = new HttpRequestPostMultipart(url, getRequiredHttpAuthorization())
+        .setUserAgent()
+        .setHeader("Accept", "application/json");
+      postRequest.setParameter("transcriptColumn", "0")
+        .setParameter("participantColumn", "1")
+        .setParameter("startTimeColumn", "2")
+        .setParameter("endTimeColumn", "3")
+        .setParameter("layerId", layerIds)
+        .setParameter("passThroughData", "false")
+        .setParameter("labelDelimiter", labelDelimiter)
+        .setParameter("containment", partialContainment?"partial":"entire")
+        .setParameter("csv", csvUpload);
+      if (verbose) System.out.println("intervalAnnotations -> " + postRequest);
+      response = new Response(postRequest.post(), verbose);
+      response.checkForErrors(); // throws a ResponseException on error
+      
+      // extract the threadId from model.threadId
+      JsonObject model = (JsonObject)response.getModel();
+      return ""+model.getInt("threadId");
+    } finally {
+      csvUpload.delete();
+    }
+  } // end of intervalAnnotations()
 
   /**
    * Gets transcript attribute values for given transcript IDs.
@@ -3433,6 +3609,52 @@ public class LabbcatView implements GraphStoreQuery {
       throw new StoreException("Could not get response.", x);
     }
   } // end of getCorpusInfo()
+
+  /**
+   * Reads a list of category records.
+   * @param classId What to read the categories of - "trascript" or "participant".
+   * @return A list of categories.
+   * @throws StoreException If an error prevents the operation.
+   * @see #readCategories(String,Integer,Integer)
+   */
+  public Category[] readCategories(String classId) throws StoreException, PermissionException {
+    return readCategories(classId, null, null);
+  }
+  
+  /**
+   * Reads a list of category records.
+   * @param classId What to read the categories of - "trascript" or "participant".
+   * @param pageNumber The zero-based  page of records to return (if null, all records
+   * will be returned). 
+   * @param pageLength The length of pages (if null, the default page length is 20).
+   * @return A list of categories.
+   * @throws StoreException If an error prevents the operation.
+   * @see #readCategories(String)
+   */
+  public Category[] readCategories(String classId, Integer pageNumber, Integer pageLength)
+    throws StoreException, PermissionException {
+    if ("participant".equals(classId)) classId = "speaker";
+    try {
+      HttpRequestGet request = get("api/categories/"+classId)
+        .setHeader("Accept", "application/json");
+      if (pageLength != null) request.setParameter("pageNumber", pageLength);
+      if (pageNumber != null) request.setParameter("pageLength", pageNumber);
+      if (verbose) System.out.println("readCategories -> " + request);
+      response = new Response(request.get(), verbose);
+      response.checkForErrors(); // throws a StoreException on error
+      if (response.isModelNull()) return null;
+      JsonArray array = (JsonArray)response.getModel();
+      Vector<Category> categories = new Vector<Category>();
+      if (array != null) {
+        for (int i = 0; i < array.size(); i++) {
+          categories.add(new Category(array.getJsonObject(i)));
+        }
+      }
+      return categories.toArray(new Category[0]);
+    } catch(IOException x) {
+      throw new StoreException("Could not get response.", x);
+    }
+  } // end of readCategories()
   
   /**
    * Infers the filename from a given Content-Disposition header.

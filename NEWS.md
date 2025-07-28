@@ -3,11 +3,17 @@
 - Add support for servers with FORM based user auth.
 - Add support for changed annotation extraction API.
 - New functions
+  + LabbcatView.versionInfo() - version information of all components of LaBB-CAT
+  + LabbcatView.readAgreement() - data access license agreement
   + LabbcatView.changePassword()
   + LabbcatView.getDashboardItems() - list available corpus statistics
   + LabbcatView.getDashboardItem() - get the value of a specific corpus statistic
   + LabbcatView.getCorpusInfo() - gets statistics about a given corpus
+  + LabbcatView.readCategories() - list category records
+  + LabbcatView.intervalAnnotations() - gets annotations within given time intervals
+  
 - Changed functions
+  + LabbcatView.getTasks() now returns an array of task IDs.
   + LabbcatView.taskStatus() now has optional *log* and *keepalive* parameters.
 
 Minimum LaBB-CAT version *20250716.1022*

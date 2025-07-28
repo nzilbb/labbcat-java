@@ -116,10 +116,27 @@ public class TestLabbcatView {
                  labbcatUrl, id);
   }
 
+  @Test public void versionInfo()
+    throws Exception {
+    // labbcat.setVerbose(true);
+    Map<String,Map<String,String>> versions = labbcat.versionInfo();
+    assertNotNull("Versions returned", versions);
+    assertTrue("System info present", versions.containsKey("System"));
+    assertTrue("Format info present", versions.containsKey("Formats"));
+    assertTrue("LaBB-CAT version present", versions.get("System").containsKey("LaBB-CAT"));
+  }
+
+  @Test public void readAgreement()
+    throws Exception {
+    String agreement = labbcat.readAgreement();
+    // could be a string, or null. The test is that no exception was thrown.
+    System.out.println("Data access agreement: " + agreement);
+  }
+
   @Test public void getInfo()
     throws Exception {
     String info = labbcat.getInfo();
-    assertNotNull("There is info", info);
+    // could be a string, or null. The test is that no exception was thrown.
     System.out.println("Corpus info: " + info);
   }
 
@@ -462,15 +479,29 @@ public class TestLabbcatView {
 
   @Test public void getTasks()
     throws Exception {
-    Map<String,TaskStatus> tasks = labbcat.getTasks();
-    // not sure what we expect, but let's just print out what we got
-    System.out.println("Some tasks:");
-    for (String id : tasks.keySet()) System.out.println("task " + id + ": " + tasks.get(id));
+    // ensure there's at least one task
+    JsonObject pattern = Json.createObjectBuilder()
+      .add("columns", Json.createArrayBuilder()
+           .add(Json.createObjectBuilder()
+                .add("layers", Json.createObjectBuilder()
+                     .add("orthography", Json.createObjectBuilder()
+                          .add("pattern", "xxx")))))
+      .build();
+    String threadId = labbcat.search(pattern, null, null, false, null, null, null);
+    try {
+   
+      String[] tasks = labbcat.getTasks();
+      assertNotNull("tasks were returned", tasks);
+      assertTrue("At least one task was returned", tasks.length > 0);
+      
+    } finally {
+      labbcat.releaseTask(threadId);
+    }    
   }
 
   @Test public void taskStatus()
     throws Exception {
-    // ensure there a task
+    // ensure there's a task
     JsonObject pattern = Json.createObjectBuilder()
       .add("columns", Json.createArrayBuilder()
            .add(Json.createObjectBuilder()
@@ -498,16 +529,22 @@ public class TestLabbcatView {
 
   @Test public void waitForTask()
     throws Exception {
-    // first get a list of tasks
-    Map<String,TaskStatus> tasks = labbcat.getTasks();
-    if (tasks.size() == 0) {
-      System.out.println("There are no tasks, so can't test waitForTask");
-    } else {
-      String threadId = tasks.keySet().iterator().next();
+    // ensure there's at least one task
+    JsonObject pattern = Json.createObjectBuilder()
+      .add("columns", Json.createArrayBuilder()
+           .add(Json.createObjectBuilder()
+                .add("layers", Json.createObjectBuilder()
+                     .add("orthography", Json.createObjectBuilder()
+                          .add("pattern", "xxx")))))
+      .build();
+    String threadId = labbcat.search(pattern, null, null, false, null, null, null);
+    try {  
       TaskStatus task = labbcat.waitForTask(threadId, 1);
-      assertEquals("Correct task",
-                   threadId, task.getThreadId());
-    }
+      assertEquals("Correct task", threadId, task.getThreadId());
+      
+    } finally {
+      labbcat.releaseTask(threadId);
+    }    
   }
 
   /** Ensure searching with an invalid pattern correctly fails. */
@@ -756,6 +793,75 @@ public class TestLabbcatView {
     }
   }
 
+  /** Test that annotation labels between start/end times can be extracted. */
+  @Test public void intervalAnnotations()
+    throws Exception {
+    // get a participant ID to use
+    String[] ids = labbcat.getParticipantIds();
+    assertTrue("getParticipantIds: Some IDs are returned",
+               ids.length > 0);
+    String[] participantId = { ids[0] };      
+    
+    // all instances of and
+    JsonObject pattern = new PatternBuilder().addMatchLayer("orthography", "and").build();
+    String searchThreadId = labbcat.search(pattern, participantId, null, false, null, null, null);
+    try {
+      TaskStatus task = labbcat.waitForTask(searchThreadId, 30);
+      // if the task is still running, it's taking too long, so cancel it
+      if (task.getRunning()) {
+        try { labbcat.cancelTask(searchThreadId); } catch(Exception exception) {}
+      }
+      assertFalse("Search task finished in a timely manner", task.getRunning());
+
+      String[] layerIds = { "orthography" };
+      Match[] matches = labbcat.getMatches(searchThreadId, 2);
+      if (matches.length == 0) {
+        fail("getMatches: No matches were returned, cannot test processWithPraat");
+      } else {
+        int upTo = Math.min(5, matches.length);
+        Match[] subset = Arrays.copyOfRange(matches, 0, upTo);
+        String[] transcriptIds = Arrays.stream(subset)
+          .map(match -> match.getTranscript())
+          .collect(Collectors.toList()).toArray(new String[0]);
+        String[] participantIds = Arrays.stream(subset)
+          .map(match -> match.getParticipant())
+          .collect(Collectors.toList()).toArray(new String[0]);
+        Double[] startOffsets = Arrays.stream(subset)
+          .map(match -> match.getLine())
+          .collect(Collectors.toList()).toArray(new Double[0]);
+        Double[] endOffsets = Arrays.stream(subset)
+          .map(match -> match.getLineEnd())
+          .collect(Collectors.toList()).toArray(new Double[0]);
+        String extractionThreadId = labbcat.intervalAnnotations(
+          transcriptIds, participantIds, startOffsets, endOffsets, layerIds, " ", false);
+        try {
+          task = labbcat.waitForTask(extractionThreadId, 30);
+          // if the task is still running, it's taking too long, so cancel it
+          if (task.getRunning()) {
+            try { labbcat.cancelTask(extractionThreadId); } catch(Exception exception) {}
+          }
+          assertFalse("Extraction task finished in a timely manner",
+                      task.getRunning());
+          
+          assertTrue("Output is a CSV URL: " + task.getResultUrl(),
+                     task.getResultUrl().endsWith(".csv"));
+          
+          // download URL
+          HttpRequestGet request = new HttpRequestGet(
+            task.getResultUrl(), labbcat.getRequiredHttpAuthorization());
+          String csv = IO.InputStreamToString(request.get().getInputStream());
+          String[] rows = csv.split("\n");
+          assertEquals("CSV header is correct: " + csv,
+                       "orthography,orthography start,orthography end", rows[0]);          
+        } finally {
+          labbcat.releaseTask(extractionThreadId);
+        }
+      }
+    } finally {
+      labbcat.releaseTask(searchThreadId);
+    }
+  }
+
   @Test public void getTranscriptAttributes()
     throws Exception {
     // get a participant ID to use
@@ -863,6 +969,15 @@ public class TestLabbcatView {
     String value = labbcat.getDashboardItem(items[0].getItemId());
     assertNotNull("Value was returned", value);
     assertTrue("Value is not empty", value.length() > 0);
+  }
+  
+  /** Ensure a list of categories can be retrieved. */
+  @Test public void readCategories() throws Exception {
+    Category[] categories = labbcat.readCategories("transcript");
+    assertNotNull("Categories returned", categories);
+    assertTrue("At least one should be returned", categories.length > 0);
+    assertEquals("Class ID correct", "transcript", categories[0].getClassId());
+    assertNotNull("Name set", categories[0].getCategory());
   }
   
   /**

@@ -283,7 +283,6 @@ public class TestLabbcatEdit {
       // upload transcript
       // labbcat.setVerbose(true);
       Upload upload = labbcat.transcriptUpload(transcript, false);
-      System.out.println("ID " + upload.getId());
 
       // delete upload
       labbcat.transcriptUploadDelete(upload);
