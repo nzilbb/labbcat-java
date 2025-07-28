@@ -1953,6 +1953,15 @@ public class LabbcatView implements GraphStoreQuery {
     if (log) request.setParameter("log", log);
     if (verbose) System.out.println("taskStatus -> " + request);
     response = new Response(request.get(), verbose);
+    if (response.getHttpStatus() == 404) { // endpoint not found, use  deprecated API
+      makeUrl("thread");
+      request = new HttpRequestGet(url, getRequiredHttpAuthorization())
+        .setUserAgent()
+        .setHeader("Accept", "application/json")
+        .setParameter("threadId", threadId);
+      if (verbose) System.out.println("taskStatus -> " + request);
+      response = new Response(request.get(), verbose);
+    }
     response.checkForErrors(); // throws a ResponseException on error
     if (response.isModelNull()) return null;
     return new TaskStatus((JsonObject)response.getModel());
@@ -2003,8 +2012,18 @@ public class LabbcatView implements GraphStoreQuery {
     HttpRequestPost request = delete("api/task/"+threadId)
       .setHeader("Accept", "application/json")
       .setParameter("cancel", true);
-    if (verbose) System.out.println("cacelTask -> " + request);
+    if (verbose) System.out.println("cancelTask -> " + request);
     response = new Response(request.post(), verbose);
+    if (response.getHttpStatus() == 404) { // endpoint not found, use  deprecated API
+      URL url = makeUrl("threads");
+      HttpRequestGet get = new HttpRequestGet(url, getRequiredHttpAuthorization())
+        .setUserAgent()
+        .setHeader("Accept", "application/json")
+        .setParameter("threadId", threadId)
+        .setParameter("command", "cancel");
+      if (verbose) System.out.println("taskStatus -> " + get);
+      response = new Response(get.get(), verbose);
+    }
     response.checkForErrors(); // throws a ResponseException on error
   } // end of cancelTask()
 
@@ -2022,6 +2041,16 @@ public class LabbcatView implements GraphStoreQuery {
       .setParameter("release", true);
     if (verbose) System.out.println("cacelTask -> " + request);
     response = new Response(request.post(), verbose);
+    if (response.getHttpStatus() == 404) { // endpoint not found, use  deprecated API
+      URL url = makeUrl("threads");
+      HttpRequestGet get = new HttpRequestGet(url, getRequiredHttpAuthorization())
+        .setUserAgent()
+        .setHeader("Accept", "application/json")
+        .setParameter("threadId", threadId)
+        .setParameter("command", "release");
+      if (verbose) System.out.println("taskStatus -> " + get);
+      response = new Response(get.get(), verbose);
+    }
     response.checkForErrors(); // throws a ResponseException on error
   } // end of releaseTask()
 
@@ -2039,14 +2068,29 @@ public class LabbcatView implements GraphStoreQuery {
       .setUserAgent()
       .setHeader("Accept", "application/json");
     if (verbose) System.out.println("getTasks -> " + request);
-    response = new Response(request.get(), verbose);
-    response.checkForErrors(); // throws a ResponseException on error
-    if (response.isModelNull()) return null;
-    JsonArray model = (JsonArray)response.getModel();
     Vector<String> result = new Vector<String>();
-    for (int t = 0; t < model.size(); t++) {
-      result.add(model.getString(t));
-    } // next task
+    response = new Response(request.get(), verbose);
+    if (response.getHttpStatus() != 404) { // endpoint ok
+      response.checkForErrors(); // throws a ResponseException on error
+      if (response.isModelNull()) return null;
+      JsonArray model = (JsonArray)response.getModel();
+      for (int t = 0; t < model.size(); t++) {
+        result.add(model.getString(t));
+      } // next task
+    } else { // endpoint not found, use  deprecated API
+      url = makeUrl("threads");
+      request = new HttpRequestGet(url, getRequiredHttpAuthorization())
+        .setUserAgent()
+        .setHeader("Accept", "application/json");
+      if (verbose) System.out.println("getTasks -> " + request);
+      response = new Response(request.get(), verbose);
+      response.checkForErrors(); // throws a ResponseException on error
+      if (response.isModelNull()) return null;
+      JsonObject model = (JsonObject)response.getModel();
+      for (String threadId : model.keySet()) {
+        result.add(threadId);
+      } // next task
+    }
     return result.toArray(new String[0]);
   } // end of getTasks()
    
@@ -3017,8 +3061,7 @@ public class LabbcatView implements GraphStoreQuery {
    */
   public String intervalAnnotations(
     String[] transcriptIds, String[] participantIds, Double[] startOffsets,
-    Double[] endOffsets, String[] layerIds, String labelDelimiter,
-    boolean partialContainment) throws IOException, StoreException {
+    Double[] endOffsets, String[] layerIds) throws IOException, StoreException {
     return intervalAnnotations(
       transcriptIds, participantIds, startOffsets, endOffsets, layerIds, " ", false);
   }
