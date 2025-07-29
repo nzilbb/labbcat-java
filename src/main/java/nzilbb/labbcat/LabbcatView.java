@@ -3476,7 +3476,7 @@ public class LabbcatView implements GraphStoreQuery {
    */
   public Map<String,List<String>> getDictionaries() throws StoreException {
     try {
-      HttpRequestGet request = get("dictionaries") 
+      HttpRequestGet request = get("api/dictionaries") 
         .setHeader("Accept", "application/json");
       if (verbose) System.out.println("getDictionaries -> " + request);
       response = new Response(request.get(), verbose);
@@ -3515,22 +3515,31 @@ public class LabbcatView implements GraphStoreQuery {
     try {
       uploadfile = File.createTempFile("getDictionaryEntries_",".csv");
       PrintWriter csv = new PrintWriter(uploadfile);
+      csv.println("Word"); // header row
       for (String key : keys) csv.println(key);
       csv.close();
     } catch(IOException x) {
       throw new StoreException("Could not save keys to local file.", x);
     }
     
-    URL url = makeUrl("dictionary");
+    URL url = makeUrl("api/dictionary");
     try {
+      // test whether it's there or not, it is a newer endpoint
+      HttpURLConnection connection = (HttpURLConnection)url.openConnection();
+      connection.connect();
+      if (connection.getResponseCode() == HttpURLConnection.HTTP_NOT_FOUND) {
+        // endpoint not found, use  deprecated API
+        url = makeUrl("dictionary");
+      }
       postRequest = new HttpRequestPostMultipart(url, getRequiredHttpAuthorization())
         .setUserAgent()
         .setHeader("Accept", "text/csv")
         .setParameter("managerId", managerId)
         .setParameter("dictionaryId", dictionaryId)
+        .setParameter("wordColumn", 0)
         .setParameter("uploadfile", uploadfile);
       if (verbose) System.out.println("getDictionaryEntries -> " + postRequest);
-      HttpURLConnection connection = postRequest.post();
+      connection = postRequest.post();
       if (connection.getResponseCode() != HttpURLConnection.HTTP_OK) {
         response = new Response(connection, verbose);
         response.checkForErrors(); // throws a ResponseException on error
