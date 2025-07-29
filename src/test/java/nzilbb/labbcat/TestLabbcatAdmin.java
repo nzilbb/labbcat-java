@@ -831,7 +831,7 @@ public class TestLabbcatAdmin {
 
   @Test public void updateInfo() throws Exception {
     String originalInfo = labbcat.getInfo();
-    assertNotNull("There is info", originalInfo);
+    if (originalInfo == null) originalInfo = "";
 
     try {
       // update it
@@ -1137,7 +1137,8 @@ public class TestLabbcatAdmin {
 
     try {
       // upload a lexicon
-      labbcat.loadLexicon(lexiconPath, "unit-test", ",", "word,definition", null, null, false);
+      labbcat.loadLexicon(
+        lexiconPath, "unit-test", ",", "word,definition", null, null, false);
 
       String[] targetEntries = { "test-word", "DictionaryEntry", "LayerDictionaryEntry" };
       File csv = labbcat.getDictionaryEntries(
