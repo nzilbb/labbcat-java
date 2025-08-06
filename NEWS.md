@@ -2,6 +2,8 @@
 
 - Add support for servers with FORM based user auth.
 - Add support for changed annotation extraction API.
+- Implementations
+  + LabbcatView.getFragment() - all three overloads
 - New functions
   + LabbcatView.versionInfo() - version information of all components of LaBB-CAT
   + LabbcatView.readAgreement() - data access license agreement

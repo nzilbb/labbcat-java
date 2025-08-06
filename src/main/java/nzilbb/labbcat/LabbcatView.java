@@ -1624,8 +1624,8 @@ public class LabbcatView implements GraphStoreQuery {
   }
 
   /**
-   * <em>NOT YET IMPLEMENTED</em> - Gets a fragment of a transcript, given its ID and the ID of an annotation in it that defines the
-   * desired fragment.
+   * Gets a fragment of a transcript, given its ID and the ID of an annotation in it that
+   * defines the desired fragment.
    * @param transcriptId The ID of the transcript.
    * @param annotationId The ID of an annotation that defines the bounds of the fragment.
    * @return The identified transcript fragment.
@@ -1635,15 +1635,54 @@ public class LabbcatView implements GraphStoreQuery {
    */
   public Graph getFragment(String transcriptId, String annotationId) 
     throws StoreException, PermissionException, GraphNotFoundException {
-    throw new StoreException("Not implemented");
+    try {
+      Schema schema = getSchema();
+      URL url = url("getFragment");
+      HttpRequestGet request = new HttpRequestGet(url, getRequiredHttpAuthorization()) 
+        .setUserAgent().setLanguage(language).setHeader("Accept", "application/json")
+        .setParameter("id", transcriptId)
+        .setParameter("annotationId", annotationId);
+      if (verbose) System.out.println("getFragment -> " + request);
+
+      HttpURLConnection connection = request.get();
+      if (connection.getResponseCode() != HttpURLConnection.HTTP_OK) {
+        if (connection.getResponseCode() != HttpURLConnection.HTTP_NOT_FOUND) {
+          throw new StoreException(
+            "Error " + connection.getResponseCode()
+            + " " + connection.getResponseMessage() + " - " + request);
+        } 
+        return null;
+      } else { // deserialize the model      
+        // JSONSerialization can parse directly from the result stream
+        JSONSerialization deserializer = new JSONSerialization();
+        deserializer.configure(deserializer.configure(new ParameterSet(), schema), schema);
+        ParameterSet parameters = deserializer.load(
+          Utility.OneNamedStreamArray(
+            new NamedStream(connection.getInputStream(), transcriptId, "application/json")),
+          schema);
+        deserializer.setParameters(parameters); // run with default values
+        Graph[] graphs = deserializer.deserialize();
+        if (graphs.length == 0) return null;
+        return graphs[0];
+      }
+    } catch(SerializationParametersMissingException x) {
+      throw new StoreException("Could not parse response.", x);
+    } catch(SerializerNotConfiguredException x) {
+      throw new StoreException("Could not parse response.", x);
+    } catch(SerializationException x) {
+      throw new StoreException("Could not parse response.", x);
+    } catch(IOException x) {
+      throw new StoreException("Could not get response.", x);
+    }
   }
 
   /**
-   * <em>NOT YET IMPLEMENTED</em> - Gets a fragment of a graph, given its ID and the ID of an annotation in it that defines the 
-   * desired fragment, and containing only the given layers.
+   * Gets a fragment of a graph, given its ID and the ID of an annotation in it that
+   * defines the desired fragment, and containing only the given layers.
    * @param transcriptId The ID of the transcript.
    * @param annotationId The ID of an annotation that defines the bounds of the fragment.
-   * @param layerIds The IDs of the layers to load, or null if only transcript data is required.
+   * @param layerIds The IDs of the layers to load, or null if only transcript data is
+   * required.
    * @return The identified transcript fragment.
    * @throws StoreException If an error occurs.
    * @throws PermissionException If the operation is not permitted.
@@ -1651,16 +1690,56 @@ public class LabbcatView implements GraphStoreQuery {
    */
   public Graph getFragment(String transcriptId, String annotationId, String[] layerIds) 
     throws StoreException, PermissionException, GraphNotFoundException {
-    throw new StoreException("Not implemented");
+    try {
+      Schema schema = getSchema();
+      URL url = url("getFragment");
+      HttpRequestGet request = new HttpRequestGet(url, getRequiredHttpAuthorization()) 
+        .setUserAgent().setLanguage(language).setHeader("Accept", "application/json")
+        .setParameter("id", transcriptId)
+        .setParameter("annotationId", annotationId)
+        .setParameter("layerIds", layerIds);
+      if (verbose) System.out.println("getFragment -> " + request);
+
+      HttpURLConnection connection = request.get();
+      if (connection.getResponseCode() != HttpURLConnection.HTTP_OK) {
+        if (connection.getResponseCode() != HttpURLConnection.HTTP_NOT_FOUND) {
+          throw new StoreException(
+            "Error " + connection.getResponseCode()
+            + " " + connection.getResponseMessage() + " - " + request);
+        } 
+        return null;
+      } else { // deserialize the model      
+        // JSONSerialization can parse directly from the result stream
+        JSONSerialization deserializer = new JSONSerialization();
+        deserializer.configure(deserializer.configure(new ParameterSet(), schema), schema);
+        ParameterSet parameters = deserializer.load(
+          Utility.OneNamedStreamArray(
+            new NamedStream(connection.getInputStream(), transcriptId, "application/json")),
+          schema);
+        deserializer.setParameters(parameters); // run with default values
+        Graph[] graphs = deserializer.deserialize();
+        if (graphs.length == 0) return null;
+        return graphs[0];
+      }
+    } catch(SerializationParametersMissingException x) {
+      throw new StoreException("Could not parse response.", x);
+    } catch(SerializerNotConfiguredException x) {
+      throw new StoreException("Could not parse response.", x);
+    } catch(SerializationException x) {
+      throw new StoreException("Could not parse response.", x);
+    } catch(IOException x) {
+      throw new StoreException("Could not get response.", x);
+    }
   }
    
   /**
-   * <em>NOT YET IMPLEMENTED</em> - Gets a fragment of a transcript, given its ID and the start/end offsets that define the
+   * Gets a fragment of a transcript, given its ID and the start/end offsets that define the
    * desired fragment, and containing only the given layers.
    * @param transcriptId The ID of the transcript.
    * @param start The start offset of the fragment.
    * @param end The end offset of the fragment.
-   * @param layerIds The IDs of the layers to load, or null if only transcript data is required.
+   * @param layerIds The IDs of the layers to load, or null if only transcript data is
+   * required.
    * @return The identified transcript fragment.
    * @throws StoreException If an error occurs.
    * @throws PermissionException If the operation is not permitted.
@@ -1668,7 +1747,48 @@ public class LabbcatView implements GraphStoreQuery {
    */
   public Graph getFragment(String transcriptId, double start, double end, String[] layerIds) 
     throws StoreException, PermissionException, GraphNotFoundException {
-    throw new StoreException("Not implemented");
+    try {
+      Schema schema = getSchema();
+      URL url = url("getFragment");
+      HttpRequestGet request = new HttpRequestGet(url, getRequiredHttpAuthorization()) 
+        .setUserAgent().setLanguage(language).setHeader("Accept", "application/json")
+        .setParameter("id", transcriptId)
+        .setParameter("start", start)
+        .setParameter("end", end)
+        .setParameter("layerIds", layerIds);
+      if (verbose) System.out.println("getFragment -> " + request);
+
+      HttpURLConnection connection = request.get();
+      if (connection.getResponseCode() != HttpURLConnection.HTTP_OK) {
+        if (connection.getResponseCode() != HttpURLConnection.HTTP_NOT_FOUND) {
+          throw new StoreException(
+            "Error " + connection.getResponseCode()
+            + " " + connection.getResponseMessage() + " - " + request);
+        } 
+        return null;
+      } else { // deserialize the model      
+        // JSONSerialization can parse directly from the result stream
+        JSONSerialization deserializer = new JSONSerialization();
+        deserializer.configure(deserializer.configure(new ParameterSet(), schema), schema);
+        ParameterSet parameters = deserializer.load(
+          Utility.OneNamedStreamArray(
+            new NamedStream(connection.getInputStream(),
+                            Graph.FragmentId(transcriptId, start, end),
+                            "application/json")), schema);
+        deserializer.setParameters(parameters); // run with default values
+        Graph[] graphs = deserializer.deserialize();
+        if (graphs.length == 0) return null;
+        return graphs[0];
+      }
+    } catch(SerializationParametersMissingException x) {
+      throw new StoreException("Could not parse response.", x);
+    } catch(SerializerNotConfiguredException x) {
+      throw new StoreException("Could not parse response.", x);
+    } catch(SerializationException x) {
+      throw new StoreException("Could not parse response.", x);
+    } catch(IOException x) {
+      throw new StoreException("Could not get response.", x);
+    }
   }
    
   /**

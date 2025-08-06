@@ -333,6 +333,50 @@ public class TestLabbcatView {
                words.length > 0);
   }
 
+  /** Graph fragments can be extracted, by offsests and by defining annotation. */
+  @Test public void getFragment() throws Exception {
+    // first get a transcript, then an utterance to get the fragment of
+    String[] ids = labbcat.getMatchingTranscriptIds("/AP511.+\\.eaf/.test(id)", 1, 0);
+    assertTrue("Some graph IDs are returned", ids.length > 0);
+    String graphId = ids[0];
+    String[] utteranceLayer = {"utterance"};
+    Graph transcript = labbcat.getTranscript(graphId, utteranceLayer);
+    assertNotNull("A graph was returned", transcript);
+    Annotation utterance = transcript.first("utterance");
+    assertNotNull("Graph has an utterance", utterance);
+
+    // now get a fragment defined by the bounds of the utterance
+    String[] layers = {"word"};
+    Graph fragment = labbcat.getFragment(
+      graphId, utterance.getStart().getOffset(), utterance.getEnd().getOffset(), layers);
+    assertNotNull("A fragment was returned",
+                  fragment);
+    Annotation[] boundaryWords = fragment.all("word");
+    assertTrue("Fragment includes annotations",
+               boundaryWords.length > 0);
+    
+    // now try getting a fragment based on the utterance
+    fragment = labbcat.getFragment(graphId, utterance.getId(), layers);
+    assertNotNull("A fragment was returned",
+                  fragment);
+    Annotation[] utteranceWords = fragment.all("word");
+    assertTrue("Fragment includes annotations",
+               utteranceWords.length > 0);
+
+    assertArrayEquals("Same word tokens returned in both fragments",
+                      boundaryWords, utteranceWords);
+
+    // now try getting a fragment based on the utterance, with all layers
+    fragment = labbcat.getFragment(graphId, utterance.getId());
+    assertNotNull("A fragment was returned",
+                  fragment);
+    Annotation[] allLayersWords = fragment.all("word");
+    assertTrue("Fragment includes annotations",
+               allLayersWords.length > 0);
+
+    assertArrayEquals("Same word tokens returned in both fragments",
+                      boundaryWords, allLayersWords);
+  }
 
   @Test public void getMedia() throws Exception {
     String[] ids = labbcat.getMatchingTranscriptIds("/AP511.+\\.eaf/.test(id)", 1, 0);
