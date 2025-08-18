@@ -1,4 +1,4 @@
-# 1.3.1
+# 1.4.0
 
 - Add support for servers with FORM based user auth.
 - Add support for changed annotation extraction API.
@@ -18,7 +18,7 @@
   + LabbcatView.getTasks() now returns an array of task IDs.
   + LabbcatView.taskStatus() now has optional *log* and *keepalive* parameters.
 
-Minimum LaBB-CAT version *20250716.1022*
+Minimum LaBB-CAT version *20250818.1200*
 
 # 1.3.0
 
