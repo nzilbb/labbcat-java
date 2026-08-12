@@ -405,7 +405,8 @@ public class HttpRequestPostMultipart {
          @SuppressWarnings("rawtypes")
 	    Iterator i = ((Iterable)object).iterator();
          while (i.hasNext()) {
-            setParameter(name, i.next().toString());
+            Object value = Optional.ofNullable(i.next()).orElse("");
+            setParameter(name, value.toString());
          }
       } else {
          setParameter(name, object.toString());
