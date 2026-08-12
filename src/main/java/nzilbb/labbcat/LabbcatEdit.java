@@ -1,5 +1,5 @@
 //
-// Copyright 2020-2025 New Zealand Institute of Language, Brain and Behaviour, 
+// Copyright 2020-2026 New Zealand Institute of Language, Brain and Behaviour, 
 // University of Canterbury
 // Written by Robert Fromont - robert.fromont@canterbury.ac.nz
 //
@@ -884,6 +884,47 @@ public class LabbcatEdit extends LabbcatView implements GraphStore {
       }
     }
   } // end of updateTranscript()
+
+  /**
+   * Uploads attribute values for multiple participants from CSV file.
+   * @param csv CSV file containing the attribute values to import.
+   * @param idColumn The (zero based) index of the column that
+   * identifies the participant; if the participant exists, its
+   * attribute values will be updated, otherwise, and new participant
+   * will be created with the specified attribute values. If set to -1,
+   * all participant are new, and created with automatically generated
+   * IDs, formatted using the <q>participantNameFormat</q> system attribute. 
+   * @param columnLayer Multiple values, where the index of the value
+   * corresponds to the (zero based) CSV column index, and the value
+   * is blank to ignore the column, the layer ID of the participant
+   * attribute to update, or <q>_password</q> if the columns contains the
+   * participants' passwords (for logging in to do elicitation tasks). 
+   * @return Two integers; the first is the number of existing
+   * participants that were updated, and the second, the number of
+   * newly-added participants.
+   * @throws StoreException
+   * @throws PermissionException
+   */
+  public int[] uploadParticipantAttributes(File csv, int idColumn, String[] columnLayer)
+    throws StoreException, PermissionException {
+    try {
+      URL url = makeUrl("api/edit/participant/attributes/upload");
+      postRequest = new HttpRequestPostMultipart(url, getRequiredHttpAuthorization())
+        .setUserAgent()
+        .setHeader("Accept", "application/json")
+        .setParameter("csv", csv)
+        .setParameter("idColumn", idColumn)
+        .setParameter("columnLayer", columnLayer);
+      if (verbose) System.out.println("uploadParticipantAttributes -> " + postRequest);
+      response = new Response(postRequest.post(), verbose);
+      response.checkForErrors(); // throws a ResponseException on error
+      JsonObject model = (JsonObject)response.getModel();
+      
+      return new int[] { model.getInt("updated"), model.getInt("created") };
+    } catch (IOException x) {
+      throw new StoreException(x);
+    }
+  } // end of uploadParticipantAttributes()
   
   /**
    * Deletes all annotations that match a particular pattern

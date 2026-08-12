@@ -1,3 +1,11 @@
+# 1.5.0
+
+- New functions
+  + LabbcatEdit.uploadParticipantAttributes() - upload participant attribute data 
+    from CSV file
+
+Minimum LaBB-CAT version *20260812.1200*
+
 # 1.4.0
 
 - Add support for servers with FORM based user auth.

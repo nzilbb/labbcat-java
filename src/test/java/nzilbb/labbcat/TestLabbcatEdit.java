@@ -1,5 +1,5 @@
 //
-// Copyright 2020-2024 New Zealand Institute of Language, Brain and Behaviour, 
+// Copyright 2020-2026 New Zealand Institute of Language, Brain and Behaviour, 
 // University of Canterbury
 // Written by Robert Fromont - robert.fromont@canterbury.ac.nz
 //
@@ -540,6 +540,60 @@ public class TestLabbcatEdit {
     labbcat.saveTranscript(graph);
   }
 
+  /** Test participant attributes can be uploaded from CSV */
+  @Test public void uploadParticipantAttributes() throws Exception {
+
+    String existingParticipantId = "UnitTester";
+    String createdParticipantId = "UnitTester-created";
+
+    try {
+      // create participant for testing
+      Annotation participant = new Annotation(null, existingParticipantId, "participant");
+      assertTrue("Test participant created", labbcat.saveParticipant(participant));
+      participant = labbcat.getParticipant(existingParticipantId, null);
+      assertNotNull("Participant exists", participant);
+      participant = labbcat.getParticipant(createdParticipantId, null);
+      assertNull("Participant to create doesn't exist", participant);
+
+      File csv = new File(getDir(), "participants.csv");
+      int idColumn = 0;
+      String[] columnLayer = { null, "participant_gender", "", "participant_notes" };
+      int[] counts = labbcat.uploadParticipantAttributes(csv, idColumn, columnLayer);
+      assertEquals("Correct number of counts returned " + Arrays.asList(counts),
+                   2, counts.length);
+      assertEquals("One participant updated", 1, counts[0]);
+      assertEquals("One participant created", 1, counts[1]);      
+      
+      String[] layerIds = { "participant_gender", "participant_notes" };
+      participant = labbcat.getParticipant(existingParticipantId, layerIds);
+      assertNotNull("Participant still exists", participant);
+      assertNotNull("Gender exists", participant.first("participant_gender"));
+      assertEquals("Gender correct",
+                   "X", participant.first("participant_gender").getLabel());
+      assertNotNull("Notes exist", participant.first("participant_notes"));
+      assertEquals("Notes correct",
+                   "UnitTester notes", participant.first("participant_notes").getLabel());
+
+      participant = labbcat.getParticipant(createdParticipantId, layerIds);
+      assertNotNull("Participant created", participant);
+      assertNotNull("Gender exists", participant.first("participant_gender"));
+      assertEquals("Gender correct",
+                   "Y", participant.first("participant_gender").getLabel());
+      assertNotNull("Notes exist", participant.first("participant_notes"));
+      assertEquals("Notes correct",
+                   "New participant", participant.first("participant_notes").getLabel());
+      
+    } finally {
+      labbcat.setVerbose(false);
+      try {
+        labbcat.deleteParticipant(existingParticipantId);
+      } catch(ResponseException exception) {}
+      try {
+        labbcat.deleteParticipant(createdParticipantId);
+      } catch(ResponseException exception) {}
+    }
+  }
+  
   /**
    * Directory for text files.
    * @see #getDir()
