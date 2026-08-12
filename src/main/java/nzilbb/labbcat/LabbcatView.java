@@ -2159,7 +2159,7 @@ public class LabbcatView implements GraphStoreQuery {
     HttpRequestPost request = delete("api/task/"+threadId)
       .setHeader("Accept", "application/json")
       .setParameter("release", true);
-    if (verbose) System.out.println("cacelTask -> " + request);
+    if (verbose) System.out.println("releaseTask -> " + request);
     response = new Response(request.post(), verbose);
     if (response.getHttpStatus() == 404) { // endpoint not found, use  deprecated API
       URL url = makeUrl("threads");
