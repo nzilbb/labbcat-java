@@ -102,10 +102,6 @@ import nzilbb.util.IO;
  */
 
 public class LabbcatEdit extends LabbcatView implements GraphStore {
-  // Attributes:
-  
-  // Methods:
-   
   /**
    * Default constructor.
    */
@@ -908,7 +904,7 @@ public class LabbcatEdit extends LabbcatView implements GraphStore {
   public int[] uploadParticipantAttributes(File csv, int idColumn, String[] columnLayer)
     throws StoreException, PermissionException {
     try {
-      URL url = makeUrl("api/edit/participant/attributes/upload");
+      URL url = makeUrl("api/edit/participants/attributes/upload");
       postRequest = new HttpRequestPostMultipart(url, getRequiredHttpAuthorization())
         .setUserAgent()
         .setHeader("Accept", "application/json")
