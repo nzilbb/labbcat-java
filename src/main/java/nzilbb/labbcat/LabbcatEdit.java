@@ -923,6 +923,43 @@ public class LabbcatEdit extends LabbcatView implements GraphStore {
   } // end of uploadParticipantAttributes()
   
   /**
+   * Uploads attribute values for multiple transcripts from CSV file.
+   * @param csv CSV file containing the attribute values to import.
+   * @param idColumn The (zero based) index of the column that
+   * identifies the transcript; if the transcript exists, its
+   * attribute values will be updated, otherwise, the row is ignored. 
+   * @param columnLayer Multiple values, where the index of the value
+   * corresponds to the (zero based) CSV column index, and the value
+   * is blank to ignore the column, the layer ID of the transcript
+   * attribute to update. 
+   * @return Two integers; the first is the number of existing
+   * transcripts that were updated, and the second, the number of
+   * transcripts that were not found.
+   * @throws StoreException
+   * @throws PermissionException
+   */
+  public int[] uploadTranscriptAttributes(File csv, int idColumn, String[] columnLayer)
+    throws StoreException, PermissionException {
+    try {
+      URL url = makeUrl("api/edit/transcripts/attributes/upload");
+      postRequest = new HttpRequestPostMultipart(url, getRequiredHttpAuthorization())
+        .setUserAgent()
+        .setHeader("Accept", "application/json")
+        .setParameter("csv", csv)
+        .setParameter("idColumn", idColumn)
+        .setParameter("columnLayer", columnLayer);
+      if (verbose) System.out.println("uploadTranscriptAttributes -> " + postRequest);
+      response = new Response(postRequest.post(), verbose);
+      response.checkForErrors(); // throws a ResponseException on error
+      JsonObject model = (JsonObject)response.getModel();
+      
+      return new int[] { model.getInt("updated"), model.getInt("missing") };
+    } catch (IOException x) {
+      throw new StoreException(x);
+    }
+  } // end of uploadTranscriptAttributes()
+  
+  /**
    * Deletes all annotations that match a particular pattern
    * @param expression An expression that determines which annotations match.
    * <p> The expression language is loosely based on JavaScript; expressions such as the

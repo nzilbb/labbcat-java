@@ -594,6 +594,52 @@ public class TestLabbcatEdit {
     }
   }
   
+  /** Test transcript attributes can be uploaded from CSV */
+  @Test public void uploadTranscriptAttributes() throws Exception {
+    
+    File transcript = new File(getDir(), "nzilbb.labbcat.test.txt");
+    String[] ids = labbcat.getCorpusIds();
+    assertTrue("There is at least one corpus", ids.length > 0);
+    String corpus = ids[0];
+    Layer typeLayer = labbcat.getLayer("transcript_type");
+    assertTrue("There is at least one transcript type", typeLayer.getValidLabels().size() > 0);
+    String transcriptType = typeLayer.getValidLabels().keySet().iterator().next();
+
+    try {
+      // create a transcript for testing
+      String threadId = labbcat.newTranscript(
+        transcript, null, null, transcriptType, corpus, "test");
+      
+      String[] layerIds = { "transcript_version", "transcript_versionDate" };
+      Graph graph = labbcat.getGraph(transcript.getName(), layerIds);
+      // exception thrown if it's not there
+
+      File csv = new File(getDir(), "transcripts.csv");
+      int idColumn = 0;
+      String[] columnLayer = {
+        null, "", "transcript_version", "transcript_versionDate" };
+      int[] counts = labbcat.uploadTranscriptAttributes(csv, idColumn, columnLayer);
+      assertEquals("Correct number of counts returned " + Arrays.asList(counts),
+                   2, counts.length);
+      assertEquals("One transcript updated", 1, counts[0]);
+      assertEquals("One transcript missing", 1, counts[1]);      
+      
+      graph = labbcat.getTranscript(transcript.getName(), layerIds);
+      assertNotNull("Version exists", graph.first("transcript_version"));
+      assertEquals("Version correct",
+                   "CSV", graph.first("transcript_version").getLabel());
+      assertNotNull("Version date exists", graph.first("transcript_versionDate"));
+      assertEquals("Version date correct",
+                   "2026-08-13", graph.first("transcript_versionDate").getLabel());
+      
+    } finally {
+      labbcat.setVerbose(false);
+      try {
+        labbcat.deleteTranscript(transcript.getName());
+      } catch(ResponseException exception) {}
+    }
+  }
+  
   /**
    * Directory for text files.
    * @see #getDir()

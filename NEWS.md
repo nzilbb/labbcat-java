@@ -3,6 +3,8 @@
 - New functions
   + LabbcatEdit.uploadParticipantAttributes() - upload participant attribute data 
     from CSV file
+  + LabbcatEdit.uploadTranscriptAttributes() - upload transcript attribute data 
+    from CSV file
 
 Minimum LaBB-CAT version *20260812.1200*
 
