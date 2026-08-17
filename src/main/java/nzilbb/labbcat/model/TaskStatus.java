@@ -248,7 +248,7 @@ public class TaskStatus {
     if (json.containsKey("status"))
       status = json.getString("status");
     if (json.containsKey("log"))
-      log = json.get("log").toString();
+      log = json.getString("log");
   } // end of constructor
    
   /**

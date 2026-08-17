@@ -639,6 +639,41 @@ public class TestLabbcatEdit {
       } catch(ResponseException exception) {}
     }
   }
+
+  /** Test token annotations can be uploaded from results CSV */
+  @Test public void uploadTokenAnnotations() throws Exception {
+    
+    File csv = new File(getDir(), "results.csv");
+    int idColumn = 8; // MatchId
+    String[] columnLayer = {
+      "","","","","","","","","","","","","","","","","","","","lexical" };
+    String threadId = labbcat.uploadTokenAnnotations(csv, idColumn, columnLayer);
+    
+    TaskStatus task = labbcat.waitForTask(threadId, 30);
+    assertFalse("Upload task finished in a timely manner",
+                task.getRunning());
+    System.out.println(task.getStatus());
+    labbcat.releaseTask(threadId);
+  }
+  
+  /** Test interval annotations can be uploaded from results CSV */
+  @Test public void uploadIntervalAnnotations() throws Exception {
+    
+    File csv = new File(getDir(), "results.csv");
+    int transcriptColumn = 4; // Transcript
+    int startTimeColumn = 14; // word start
+    int endTimeColumn = 15; // word end
+    String[] columnLayer = {
+      "","","","","","","","","","","","","","","","","","","","comment" };
+    String threadId = labbcat.uploadIntervalAnnotations(
+      csv, transcriptColumn, startTimeColumn, endTimeColumn, columnLayer);
+    
+    TaskStatus task = labbcat.waitForTask(threadId, 30);
+    assertFalse("Upload task finished in a timely manner",
+                task.getRunning());
+    System.out.println(task.getStatus());
+    labbcat.releaseTask(threadId);
+  }
   
   /**
    * Directory for text files.

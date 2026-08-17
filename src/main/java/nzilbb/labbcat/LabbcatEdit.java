@@ -930,7 +930,7 @@ public class LabbcatEdit extends LabbcatView implements GraphStore {
    * attribute values will be updated, otherwise, the row is ignored. 
    * @param columnLayer Multiple values, where the index of the value
    * corresponds to the (zero based) CSV column index, and the value
-   * is blank to ignore the column, the layer ID of the transcript
+   * is blank to ignore the column, or the layer ID of the transcript
    * attribute to update. 
    * @return Two integers; the first is the number of existing
    * transcripts that were updated, and the second, the number of
@@ -958,6 +958,82 @@ public class LabbcatEdit extends LabbcatView implements GraphStore {
       throw new StoreException(x);
     }
   } // end of uploadTranscriptAttributes()
+  
+  /**
+   * Uploads annotation labels for tagging match tokens from a results CSV file.
+   * @param csv Results CSV file containing the annotation labels to import.
+   * @param idColumn The (zero based) index of the column that contains
+   * MatchId or another identifier that identifies target token(s);
+   * If the tokens are found, they're annotated with the labels in the columns
+   * identified by <var>columnLayer</var>, otherwise, the row is ignored. 
+   * @param columnLayer Multiple values, where the index of the value
+   * corresponds to the (zero based) CSV column index, and the value
+   * is blank to ignore the column, or the ID of the layer to annotate the
+   * tokens on. 
+   * @return The taskId of the server task processing the annotations. 
+   * @throws StoreException
+   * @throws PermissionException
+   */
+  public String uploadTokenAnnotations(File csv, int idColumn, String[] columnLayer)
+    throws StoreException, PermissionException {
+    try {
+      URL url = makeUrl("api/edit/annotations/tokens");
+      postRequest = new HttpRequestPostMultipart(url, getRequiredHttpAuthorization())
+        .setUserAgent()
+        .setHeader("Accept", "application/json")
+        .setParameter("csv", csv)
+        .setParameter("idColumn", idColumn)
+        .setParameter("columnLayer", columnLayer);
+      if (verbose) System.out.println("uploadTokenAnnotations -> " + postRequest);
+      response = new Response(postRequest.post(), verbose);
+      response.checkForErrors(); // throws a ResponseException on error
+      JsonObject model = (JsonObject)response.getModel();
+      return model.getString("threadId");
+    } catch (IOException x) {
+      throw new StoreException(x);
+    }
+  } // end of uploadTokenAnnotations()
+  
+  /**
+   * Uploads annotation labels for tagging time intervals from a results CSV file.
+   * @param csv Results CSV file containing the annotation labels to import.
+   * @param transcriptColumn The (zero based) index of the column that contains
+   * the transcript name to annotate.
+   * @param startTimeColumn The (zero based) index of the column that contains the
+   * start time for the annotation.
+   * @param endTimeColumn The (zero based) index of the column that contains the
+   * end time for the annotation.
+   * @param columnLayer Multiple values, where the index of the value
+   * corresponds to the (zero based) CSV column index, and the value
+   * is blank to ignore the column, or the ID of the layer to annotate the
+   * intervals on. 
+   * @return The taskId of the server task processing the annotations. 
+   * @throws StoreException
+   * @throws PermissionException
+   */
+  public String uploadIntervalAnnotations(
+    File csv, int transcriptColumn, int startTimeColumn, int endTimeColumn,
+    String[] columnLayer)
+    throws StoreException, PermissionException {
+    try {
+      URL url = makeUrl("api/edit/annotations/intervals");
+      postRequest = new HttpRequestPostMultipart(url, getRequiredHttpAuthorization())
+        .setUserAgent()
+        .setHeader("Accept", "application/json")
+        .setParameter("csv", csv)
+        .setParameter("transcriptColumn", transcriptColumn)
+        .setParameter("startTimeColumn", startTimeColumn)
+        .setParameter("endTimeColumn", endTimeColumn)
+        .setParameter("columnLayer", columnLayer);
+      if (verbose) System.out.println("uploadIntervalAnnotations -> " + postRequest);
+      response = new Response(postRequest.post(), verbose);
+      response.checkForErrors(); // throws a ResponseException on error
+      JsonObject model = (JsonObject)response.getModel();
+      return model.getString("threadId");
+    } catch (IOException x) {
+      throw new StoreException(x);
+    }
+  } // end of uploadIntervalAnnotations()
   
   /**
    * Deletes all annotations that match a particular pattern
