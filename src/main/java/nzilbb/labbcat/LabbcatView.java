@@ -100,15 +100,16 @@ import nzilbb.util.MonitorableSeries;
  * <pre> // create LaBB-CAT client
  * LabbcatView labbcat = new {@link #LabbcatView(String,String,String) LabbcatView}("https://labbcat.canterbury.ac.nz", "demo", "demo");
  * // get some basic information
- * String id = lbbcat.{@link #getId()};
+ * String id = labbcat.{@link #getId()};
  * String[] layers = labbcat.{@link #getLayerIds()};
  * String[] corpora = labbcat.{@link #getCorpusIds()};
- * String[] documents = labbcat.{@link #getTranscriptIdsInCorpus(String) getTranscriptIdsInCorpus}(corpora[0]);
+ * String[] transcriptIds = labbcat.{@link #getTranscriptIdsInCorpus(String) getTranscriptIdsInCorpus}(corpora[0]);
  * // search for tokens of "and"
- * Matches[] matches = labbcat.{@link #getMatches(String,int) getMatches}(
+ * String[] participantIds = labbcat.{@link #getParticipantIds() getParticipantIds}();
+ * Match[] matches = labbcat.{@link #getMatches(String,int) getMatches}(
  *     labbcat.{@link #search(JsonObject,String[],String[],boolean,Integer,Integer,Integer) search}(
  *        new {@link PatternBuilder}().addMatchLayer("orthography", "and").build(),
- *        participantIds, null, true, false, null, 5), 1);
+ *        participantIds, null, true, null, null, 5), 1);
  * </pre>
  * @author Robert Fromont robert@fromont.net.nz
  */
