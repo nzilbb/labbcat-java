@@ -882,6 +882,102 @@ public class LabbcatEdit extends LabbcatView implements GraphStore {
   } // end of updateTranscript()
 
   /**
+   * Upload an annotated fragment file, as the first stage in updating a fragment
+   * (e.g. a single utterance) in LaBB-CAT. The second stage is
+   * {@link #fragmentUploadParameters(Upload)}
+   * @param fragment The fragment to upload.
+   * @param automaticMapping Indicates that default parameters
+   * for processing the upload (e.g. mappings from TextGrid tiers to LaBB-CAT layers)
+   * should be automatically applied, and the resulting data should be immediately
+   * saved, instead of using the two-step process of first uploading the file via
+   * this method and then setting parameters via {@link #fragmentUploadParameters(Upload)}.
+   * @return The ID and {@link nzilbb.labbcat.model.Upload#parameters} required to 
+   * complete the {@link #fragmentUploadParameters(Upload)}.
+   * @throws IOException If a communications error occurs.
+   * @throws StoreException If the server returns an error.
+   */
+  public Upload fragmentUpload(File fragment, boolean automaticMapping)
+    throws IOException, StoreException {
+    
+    cancelling = false;
+    URL url = makeUrl("api/edit/fragment/upload");
+    postRequest = new HttpRequestPostMultipart(url, getRequiredHttpAuthorization())
+      .setUserAgent()
+      .setHeader("Accept", "application/json")
+      .setParameter("fragment", fragment);
+    if (automaticMapping) postRequest.setParameter("automaticMapping", true);
+    if (verbose) System.out.println("fragmentUpload -> " + postRequest);
+    response = new Response(postRequest.post(), verbose);
+    response.checkForErrors(); // throws a ResponseException on error
+    
+    return new Upload((JsonObject)response.getModel());
+  } // end of fragmentUpload()
+  
+  /**
+   * The second part of a fragment upload process started by a call to
+   * {@link #fragmentUpload(File,boolean)}, which specifies values for the parameters
+   * required to save the uploaded fragment to LaBB-CAT's database. 
+   * @param upload Response from {@link #fragmentUpload(File,Map,boolean)} with
+   * parameter values filled in as required.
+   * @return The ID, transcript name, start and end time of the fragment, and URL
+   * to the fragment in context. 
+   * @throws IOException If a communications error occurs.
+   * @throws StoreException If the server returns an error.
+   */
+  public Upload fragmentUploadParameters(Upload upload) throws IOException, StoreException {
+    try {
+      URL url = makeUrl("api/edit/fragment/upload/"+URLEncoder.encode(upload.getId(), "UTF-8"));
+      HttpRequestGet request = new HttpRequestGet(url, getRequiredHttpAuthorization())
+        .setUserAgent()
+        .setHeader("Accept", "application/json")
+        .setMethod("PUT");
+      for (Parameter parameter : upload.getParameters().values()) {
+        if (parameter.getValue() != null) {
+          request.setParameter(parameter.getName(), parameter.getValue());
+        }
+      } // next parameter
+      if (verbose) System.out.println("fragmentUploadParameters -> " + request);
+      response = new Response(request.get(), verbose);
+      response.checkForErrors(); // throws a ResponseException on error
+      
+      return new Upload((JsonObject)response.getModel());
+    } catch(IOException x) {
+      throw new StoreException("Could not get response.", x);
+    }
+  } // end of fragmentUploadParameters()
+
+  /**
+   * Delete an upload made by {@link #fragmentUpload(File,boolean)}.
+   * @param upload Response from {@link #fragmentUpload(File,boolean)}.
+   * @throws IOException If a communications error occurs.
+   * @throws StoreException If the server returns an error.
+   */
+  public void fragmentUploadDelete(Upload upload) throws IOException, StoreException {
+    fragmentUploadDelete(upload.getId());
+  } // end of fragmentUploadDelete()
+  
+  /**
+   * Delete an upload made by {@link #fragmentUpload(File,boolean)}.
+   * @param id The ID of the upload as returned by {@link #fragmentUpload(File,boolean)}.
+   * @throws IOException If a communications error occurs.
+   * @throws StoreException If the server returns an error.
+   */
+  public void fragmentUploadDelete(String id) throws IOException, StoreException {
+    try {
+      URL url = makeUrl("api/edit/fragment/upload/"+URLEncoder.encode(id, "UTF-8"));
+      HttpRequestPost request = new HttpRequestPost(url, getRequiredHttpAuthorization())
+        .setUserAgent()
+        .setHeader("Accept", "application/json")
+        .setMethod("DELETE");
+      if (verbose) System.out.println("fragmentUploadDelete -> " + request);
+      response = new Response(request.post(), verbose);
+      response.checkForErrors(); // throws a ResponseException on error
+    } catch(IOException x) {
+      throw new StoreException("Could not get response.", x);
+    }
+  } // end of fragmentUploadDelete()
+
+  /**
    * Uploads attribute values for multiple participants from CSV file.
    * @param csv CSV file containing the attribute values to import.
    * @param idColumn The (zero based) index of the column that

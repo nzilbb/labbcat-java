@@ -7,6 +7,9 @@
     annotations for match tokens.
   + uploadIntervalAnnotations() - upload annotated results CSV file, to insert/update/delete
     annotations for intervals.
+  + LabbcatEdit.fragmentUpload() - start annotated fragment (e.g. TextGrid) upload
+  + LabbcatEdit.fragmentUploadParameters() - finish annotated fragment upload
+  + LabbcatEdit.fragmentUploadDelete() - delete annotated fragment upload
 
 Minimum LaBB-CAT version *20260812.1200*
 

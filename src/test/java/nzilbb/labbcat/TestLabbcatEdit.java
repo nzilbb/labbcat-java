@@ -31,6 +31,7 @@ import java.net.URL;
 import java.util.Arrays;
 import java.util.Set;
 import java.util.stream.Collectors;
+import javax.json.JsonObject;
 import nzilbb.ag.Anchor;
 import nzilbb.ag.Annotation;
 import nzilbb.ag.Graph;
@@ -538,6 +539,202 @@ public class TestLabbcatEdit {
       graph.commit();
     }
     labbcat.saveTranscript(graph);
+  }
+
+  /**
+   * Test /api/edit/fragment/* API, specifically:
+   * <ul>
+   *  <li> fragmentUpload </li>
+   *  <li> fragmentUploadDelete </li>
+   * </ul>
+   */
+  @Test public void fragmentUploadDelete()
+    throws Exception {
+    // use a real fragment...
+    
+    // get a participant ID to use
+    String[] ids = labbcat.getParticipantIds();
+    assertTrue("getParticipantIds: Some IDs are returned", ids.length > 0);
+    String[] participantId = { ids[0] };
+
+    // all instances of "and"
+    JsonObject pattern = new PatternBuilder().addMatchLayer("orthography", "and").build();
+    String threadId = labbcat.search(pattern, participantId, null, false, null, null, null);
+    TaskStatus task = labbcat.waitForTask(threadId, 30);
+    try {
+      // if the task is still running, it's taking too long, so cancel it
+      if (task.getRunning()) try { labbcat.cancelTask(threadId); } catch(Exception exception) {}
+      assertFalse("Search task finished in a timely manner", task.getRunning());
+      
+      Match[] matches = labbcat.getMatches(threadId, 2);
+      if (matches.length == 0) {
+        fail("getMatches: No matches were returned, cannot test getFragments");
+      } else {
+        Match[] match = { matches[0] };
+        
+        File dir = new File("fragmentUploadDelete");
+        String[] layerIds = { "word", "segment" };
+        File[] fragments = labbcat.getFragments(match, layerIds, "text/praat-textgrid", dir);
+        File fragment = fragments[0];
+        assertTrue("Ensure fragment exists: " + fragment.getPath(), fragment.exists());
+        try {
+          
+          // upload fragment
+          // labbcat.setVerbose(true);
+          Upload upload = labbcat.fragmentUpload(fragment, false);
+          assertEquals("Transcript is identified",
+                       match[0].getTranscript(), upload.getTranscript());
+          assertEquals("There are are two tier mappings",
+                       2, upload.getParameters().size());
+          assertTrue("First tier mapping",
+                     upload.getParameters().containsKey("tier0"));
+          assertNotNull("First tier mapping has default",
+                        upload.getParameters().get("tier0").getValue());
+          assertEquals("First tier mapping correct",
+                       "word", upload.getParameters().get("tier0").getValue().toString());
+          assertTrue("Second tier mapping",
+                     upload.getParameters().containsKey("tier1"));
+          assertNotNull("Second tier mapping has default",
+                        upload.getParameters().get("tier1").getValue());
+          assertEquals("Second tier mapping correct",
+                       "segment", upload.getParameters().get("tier1").getValue().toString());
+          
+          // delete upload
+          labbcat.fragmentUploadDelete(upload);
+          
+        } finally {
+          labbcat.setVerbose(false);
+          fragment.delete();
+          dir.delete();
+        }
+      } // there was a match
+    } finally {
+      labbcat.releaseTask(threadId);
+    }
+  }
+
+  /**
+   * Test /api/edit/fragment/* API, specifically:
+   * <ul>
+   *  <li> fragmentUpload </li>
+   *  <li> fragmentUploadParameters </li>
+   * </ul>
+   */
+  @Test public void fragmentUploadTwoPhase() throws Exception {
+    // use a real fragment...
+    
+    // get a participant ID to use
+    String[] ids = labbcat.getParticipantIds();
+    assertTrue("getParticipantIds: Some IDs are returned", ids.length > 0);
+    String[] participantId = { ids[0] };
+    
+    // all instances of "and"
+    JsonObject pattern = new PatternBuilder().addMatchLayer("orthography", "and").build();
+    String threadId = labbcat.search(pattern, participantId, null, false, null, null, null);
+    TaskStatus task = labbcat.waitForTask(threadId, 30);
+    try {
+      // if the task is still running, it's taking too long, so cancel it
+      if (task.getRunning()) try { labbcat.cancelTask(threadId); } catch(Exception exception) {}
+      assertFalse("Search task finished in a timely manner", task.getRunning());
+      
+      Match[] matches = labbcat.getMatches(threadId, 2);
+      if (matches.length == 0) {
+        fail("getMatches: No matches were returned, cannot test getFragments");
+      } else {
+        Match[] match = { matches[0] };
+        
+        File dir = new File("fragmentUploadTwoPhase");
+        String[] layerIds = { "word", "segment" };
+        File[] fragments = labbcat.getFragments(match, layerIds, "text/praat-textgrid", dir);
+        File fragment = fragments[0];
+        assertTrue("Ensure fragment exists: " + fragment.getPath(), fragment.exists());
+        
+        try {
+          // upload fragment
+          // labbcat.setVerbose(true);
+          Upload upload = labbcat.fragmentUpload(fragment, false);
+          assertEquals("Transcript is identified",
+                       match[0].getTranscript(), upload.getTranscript());
+          assertEquals("There are are two tier mappings",
+                       2, upload.getParameters().size());
+          assertTrue("First tier mapping",
+                     upload.getParameters().containsKey("tier0"));
+          assertNotNull("First tier mapping has default",
+                        upload.getParameters().get("tier0").getValue());
+          assertEquals("First tier mapping correct",
+                       "word", upload.getParameters().get("tier0").getValue().toString());
+          assertTrue("Second tier mapping",
+                     upload.getParameters().containsKey("tier1"));
+          assertNotNull("Second tier mapping has default",
+                        upload.getParameters().get("tier1").getValue());
+          assertEquals("Second tier mapping correct",
+                       "segment", upload.getParameters().get("tier1").getValue().toString());
+          
+          // finalize parameters
+          upload = labbcat.fragmentUploadParameters(upload);
+          assertNotNull("ID ", upload.getId());
+          assertNotNull("fragment URL returned", upload.getUrl());
+        } finally {
+          labbcat.setVerbose(false);
+          fragment.delete();
+          dir.delete();
+        }
+      } // there was a match
+    } finally {
+      labbcat.releaseTask(threadId);
+    }
+  }
+
+  /**
+   * Test /api/edit/fragment/* API using automaticMapping, i.e. one call to fragmentUpload.
+   */
+  @Test public void fragmentUploadAutomaticMapping() throws Exception {
+    // use a real fragment...
+    
+    // get a participant ID to use
+    String[] ids = labbcat.getParticipantIds();
+    assertTrue("getParticipantIds: Some IDs are returned", ids.length > 0);
+    String[] participantId = { ids[0] };
+    
+    // all instances of "and"
+    JsonObject pattern = new PatternBuilder().addMatchLayer("orthography", "and").build();
+    String threadId = labbcat.search(pattern, participantId, null, false, null, null, null);
+    TaskStatus task = labbcat.waitForTask(threadId, 30);
+    try {
+      // if the task is still running, it's taking too long, so cancel it
+      if (task.getRunning()) try { labbcat.cancelTask(threadId); } catch(Exception exception) {}
+      assertFalse("Search task finished in a timely manner", task.getRunning());
+      
+      Match[] matches = labbcat.getMatches(threadId, 2);
+      if (matches.length == 0) {
+        fail("getMatches: No matches were returned, cannot test getFragments");
+      } else {
+        Match[] match = { matches[0] };
+        
+        File dir = new File("fragmentUploadAutomaticMapping");
+        String[] layerIds = { "word", "segment" };
+        File[] fragments = labbcat.getFragments(match, layerIds, "text/praat-textgrid", dir);
+        File fragment = fragments[0];
+        assertTrue("Ensure fragment exists: " + fragment.getPath(), fragment.exists());
+        
+        try {
+          // upload fragment
+          // labbcat.setVerbose(true);
+          Upload upload = labbcat.fragmentUpload(fragment, true); //automaticMapping=true
+          assertEquals("Transcript is identified",
+                       match[0].getTranscript(), upload.getTranscript());
+          assertNull("There are are no parameters",
+                     upload.getParameters());
+          assertNotNull("fragment URL returned", upload.getUrl());
+        } finally {
+          labbcat.setVerbose(false);
+          fragment.delete();
+          dir.delete();
+        }
+      } // there was a match
+    } finally {
+      labbcat.releaseTask(threadId);
+    }
   }
 
   /** Test participant attributes can be uploaded from CSV */
