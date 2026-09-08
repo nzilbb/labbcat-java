@@ -44,6 +44,9 @@ import nzilbb.ag.serialize.SerializationDescriptor;
 import nzilbb.labbcat.http.*;
 import nzilbb.labbcat.model.Category;
 import nzilbb.labbcat.model.Corpus;
+import nzilbb.labbcat.model.ElicitationTask;
+import nzilbb.labbcat.model.ElicitationTaskAttributeOption;
+import nzilbb.labbcat.model.ElicitationTaskResource;
 import nzilbb.labbcat.model.MediaTrack;
 import nzilbb.labbcat.model.Project;
 import nzilbb.labbcat.model.Role;
@@ -1504,6 +1507,568 @@ public class LabbcatAdmin extends LabbcatEdit implements GraphStoreAdministratio
     }
   } // end of deleteLexicon()
 
+  /**
+   * Creates a new elicitation task.
+   * @param elicitationTask The elicitationTask details to save.
+   * @return The elicitationTask just created.
+   * @throws StoreException If an error prevents the operation.
+   * @throws PermissionException If the operation is not permitted.
+   * @see #readElicitationTasks()
+   * @see #readElicitationTasks(Integer,Integer)
+   * @see #updateElicitationTask(ElicitationTask)
+   * @see #deleteElicitationTask(ElicitationTask)
+   * @see #deleteElicitationTask(int)
+   */
+  public ElicitationTask createElicitationTask(ElicitationTask elicitationTask)
+    throws StoreException, PermissionException {
+    try {
+      HttpRequestPost request = post("api/admin/elicit/tasks")
+        .setHeader("Accept", "application/json");
+      if (verbose) System.out.println("createElicitationTask -> " + request + "\n" + elicitationTask.toJson());
+      response = new Response(request.post(elicitationTask.toJson()), verbose);
+      response.checkForErrors(); // throws a StoreException on error
+      if (response.isModelNull()) return null;
+      return new ElicitationTask((JsonObject)response.getModel());
+    } catch(IOException x) {
+      throw new StoreException("Could not get response.", x);
+    }
+  } // end of createElicitationTask()
+  
+  /**
+   * Reads a list of elicitation task records.
+   * @return A list of ElicitationTasks.
+   * @throws StoreException If an error prevents the operation.
+   * @throws PermissionException If the operation is not permitted.
+   * @see #createElicitationTask(ElicitationTask)
+   * @see #readElicitationTasks(Integer,Integer)
+   * @see #updateElicitationTask(ElicitationTask)
+   * @see #deleteElicitationTask(ElicitationTask)
+   * @see #deleteElicitationTask(int)
+   */
+  public ElicitationTask[] readElicitationTasks()
+    throws StoreException, PermissionException {
+    return readElicitationTasks(null, null);
+  }
+  
+  /**
+   * Reads a list of elicitation task records.
+   * @param pageNumber The zero-based  page of records to return (if null, all records
+   * will be returned). 
+   * @param pageLength The length of pages (if null, the default page length is 20).
+   * @return A list of ElicitationTasks.
+   * @throws StoreException If an error prevents the operation.
+   * @throws PermissionException If the operation is not permitted.
+   * @see #createElicitationTask(ElicitationTask)
+   * @see #readElicitationTasks()
+   * @see #updateElicitationTask(ElicitationTask)
+   * @see #deleteElicitationTask(ElicitationTask)
+   * @see #deleteElicitationTask(int)
+   */
+  public ElicitationTask[] readElicitationTasks(Integer pageNumber, Integer pageLength)
+    throws StoreException, PermissionException {
+    try {
+      HttpRequestGet request = get("api/admin/elicit/tasks")
+        .setHeader("Accept", "application/json");
+      if (pageLength != null) request.setParameter("pageNumber", pageLength);
+      if (pageNumber != null) request.setParameter("pageLength", pageNumber);
+      if (verbose) System.out.println("readElicitationTasks -> " + request);
+      response = new Response(request.get(), verbose);
+      response.checkForErrors(); // throws a StoreException on error
+      if (response.isModelNull()) return null;
+      JsonArray array = (JsonArray)response.getModel();
+      Vector<ElicitationTask> elicitationTasks = new Vector<ElicitationTask>();
+      if (array != null) {
+        for (int i = 0; i < array.size(); i++) {
+          elicitationTasks.add(new ElicitationTask(array.getJsonObject(i)));
+        }
+      }
+      return elicitationTasks.toArray(new ElicitationTask[0]);
+    } catch(IOException x) {
+      throw new StoreException("Could not get response.", x);
+    }
+  } // end of readElicitationTasks()
+  
+  /**
+   * Updates an existing elicitation task record.
+   * @param elicitationTask The elicitationTask details to save.
+   * @return The elicitationTask just updated.
+   * @throws StoreException If an error prevents the operation.
+   * @throws PermissionException If the operation is not permitted.
+   * @see #createElicitationTask(ElicitationTask)
+   * @see #readElicitationTasks()
+   * @see #readElicitationTasks(Integer,Integer)
+   * @see #deleteElicitationTask(ElicitationTask)
+   * @see #deleteElicitationTask(int)
+   */
+  public ElicitationTask updateElicitationTask(ElicitationTask elicitationTask)
+    throws StoreException, PermissionException {
+    try{
+      HttpRequestPost request = put("api/admin/elicit/tasks")
+        .setHeader("Accept", "application/json");
+      if (verbose) System.out.println("updateElicitationTask -> " + request);
+      response = new Response(request.post(elicitationTask.toJson()), verbose);
+      response.checkForErrors(); // throws a StoreException on error
+      if (response.isModelNull()) return null;
+      return new ElicitationTask((JsonObject)response.getModel());
+    } catch(IOException x) {
+      throw new StoreException("Could not get response.", x);
+    }
+  } // end of updateElicitationTask()
+  
+  /**
+   * Deletes an existing elicitation task record.
+   * @param elicitationTask The elicitationTask to delete.
+   * @throws StoreException If an error prevents the operation.
+   * @throws PermissionException If the operation is not permitted.
+   * @see #createElicitationTask(ElicitationTask)
+   * @see #readElicitationTasks()
+   * @see #readElicitationTasks(Integer,Integer)
+   * @see #updateElicitationTask(ElicitationTask)
+   * @see #deleteElicitationTask(int)
+   */
+  public void deleteElicitationTask(ElicitationTask elicitationTask)
+    throws StoreException, PermissionException {
+    deleteElicitationTask(elicitationTask.getTaskId());
+  }
+   
+  /**
+   * Deletes an existing elicitation task record.
+   * @param taskId The ID of the task.
+   * @throws StoreException If an error prevents the operation.
+   * @throws PermissionException If the operation is not permitted.
+   * @see #createElicitationTask(ElicitationTask)
+   * @see #readElicitationTasks()
+   * @see #readElicitationTasks(Integer,Integer)
+   * @see #updateElicitationTask(ElicitationTask)
+   * @see #deleteElicitationTask(ElicitationTask)
+   */
+  public void deleteElicitationTask(int taskId)
+    throws StoreException, PermissionException {
+    try{
+      HttpRequestPost request = delete("api/admin/elicit/tasks/" + taskId);
+      if (verbose) System.out.println("deleteElicitationTask -> " + request);
+      response = new Response(request.post(), verbose);
+      response.checkForErrors(); // throws a StoreException on error
+    } catch(IOException x) {
+      throw new StoreException("Could not get response.", x);
+    }
+  } // end of updateElicitationTask()
+  
+  /**
+   * Reads a list of elicitation task resources.
+   * @param taskId The ID of the elicitation task.
+   * @return A list of ElicitationTaskResources.
+   * @throws StoreException If an error prevents the operation.
+   * @throws PermissionException If the operation is not permitted.
+   * @see #readElicitationTaskResources(int,Integer,Integer)
+   * @see #updateElicitationTaskResource(ElicitationTaskResource)
+   */
+  public ElicitationTaskResource[] readElicitationTaskResources(int taskId)
+    throws StoreException, PermissionException {
+    return readElicitationTaskResources(taskId, null, null);
+  }
+   
+  /**
+   * Reads a list of elicitation task resource records.
+   * @param taskId The ID of elicitation task.
+   * @param pageNumber The zero-based  page of records to return (if null, all records
+   * will be returned). 
+   * @param pageLength The length of pages (if null, the default page length is 20).
+   * @return A list of ElicitationTaskResources.
+   * @throws StoreException If an error prevents the operation.
+   * @throws PermissionException If the operation is not permitted.
+   * @see #readElicitationTaskResources(int)
+   * @see #updateElicitationTaskResource(ElicitationTaskResource)
+   */
+  public ElicitationTaskResource[] readElicitationTaskResources(int taskId, Integer pageNumber, Integer pageLength)
+    throws StoreException, PermissionException {
+    try {
+      HttpRequestGet request = get("api/admin/elicit/resources/" + taskId)
+        .setHeader("Accept", "application/json");
+      if (pageLength != null) request.setParameter("pageNumber", pageLength);
+      if (pageNumber != null) request.setParameter("pageLength", pageNumber);
+      if (verbose) System.out.println("readElicitationTaskResources -> " + request);
+      response = new Response(request.get(), verbose);
+      response.checkForErrors(); // throws a StoreException on error
+      if (response.isModelNull()) return null;
+      JsonArray array = (JsonArray)response.getModel();
+      Vector<ElicitationTaskResource> rolePermissions = new Vector<ElicitationTaskResource>();
+      if (array != null) {
+        for (int i = 0; i < array.size(); i++) {
+          rolePermissions.add(new ElicitationTaskResource(array.getJsonObject(i)));
+        }
+      }
+      return rolePermissions.toArray(new ElicitationTaskResource[0]);
+    } catch(IOException x) {
+      throw new StoreException("Could not get response.", x);
+    }
+  } // end of readElicitationTaskResources()
+  
+  /**
+   * Updates an existing elicitation task resource record.
+   * @param resource The rolePermission details to save.
+   * @return The resource just updated.
+   * @throws StoreException If an error prevents the operation.
+   * @throws PermissionException If the operation is not permitted.
+   * @see #readElicitationTaskResources(String)
+   * @see #readElicitationTaskResources(String,Integer,Integer)
+   */
+  public ElicitationTaskResource updateElicitationTaskResource(ElicitationTaskResource resource)
+    throws StoreException, PermissionException {
+    try{
+      HttpRequestPost request = put("api/admin/elicit/resources")
+        .setHeader("Accept", "application/json");
+      if (verbose) System.out.println("updateElicitationTaskResource -> " + request);
+      response = new Response(request.post(resource.toJson()), verbose);
+      response.checkForErrors(); // throws a StoreException on error
+      if (response.isModelNull()) return null;
+      return new ElicitationTaskResource((JsonObject)response.getModel());
+    } catch(IOException x) {
+      throw new StoreException("Could not get response.", x);
+    }
+  } // end of updateElicitationTaskResource()
+   
+  /**
+   * Creates a new elicitation task transcript attribute option record.
+   * @param attributeOption The attributeOption details to save.
+   * @return The attributeOption just created.
+   * @throws StoreException If an error prevents the operation.
+   * @throws PermissionException If the operation is not permitted.
+   * @see #readElicitationTaskTranscriptAttributeOptions(int,String)
+   * @see #readElicitationTaskTranscriptAttributeOptions(int,String,Integer,Integer)
+   * @see #updateElicitationTaskTranscriptAttributeOption(ElicitationTaskAttributeOption)
+   * @see #deleteElicitationTaskTranscriptAttributeOption(ElicitationTaskAttributeOption)
+   * @see #deleteElicitationTaskTranscriptAttributeOption(String,String,String)
+   */
+  public ElicitationTaskAttributeOption createElicitationTaskTranscriptAttributeOption(
+    ElicitationTaskAttributeOption attributeOption)
+    throws StoreException, PermissionException {
+    try {
+      HttpRequestPost request = post(
+        "api/admin/elicit/options/transcript/"
+        +attributeOption.getTaskId()+"/"+attributeOption.getAttribute())
+        .setHeader("Accept", "application/json");
+      if (verbose) System.out.println(
+        "createElicitationTaskTranscriptAttributeOption -> " + request);
+      response = new Response(request.post(attributeOption.toJson()), verbose);
+      response.checkForErrors(); // throws a StoreException on error
+      if (response.isModelNull()) return null;
+      return new ElicitationTaskAttributeOption((JsonObject)response.getModel());
+    } catch(IOException x) {
+      throw new StoreException("Could not get response.", x);
+    }
+  } // end of createElicitationTaskAttributeOption()
+
+  /**
+   * Reads a list of elicitation task transcript attribute option records.
+   * @param taskId The ID of the elicitation task.
+   * @param attribute The attribute to list the current options for.
+   * @return A list of attributeOptions.
+   * @throws StoreException If an error prevents the operation.
+   * @throws PermissionException If the operation is not permitted.
+   * @see #createElicitationTaskTranscriptAttributeOption(ElicitationTaskAttributeOption)
+   * @see #readElicitationTaskTranscriptAttributeOptions(int,String,Integer,Integer)
+   * @see #updateElicitationTaskTranscriptAttributeOption(ElicitationTaskAttributeOption)
+   * @see #deleteElicitationTaskTranscriptAttributeOption(ElicitationTaskAttributeOption)
+   * @see #deleteElicitationTaskTranscriptAttributeOption(String,String,String)
+   */
+  public ElicitationTaskAttributeOption[] readElicitationTaskTranscriptAttributeOptions(
+    int taskId, String attribute)
+    throws StoreException, PermissionException {
+    return readElicitationTaskTranscriptAttributeOptions(taskId, attribute, null, null);
+  }
+   
+  /**
+   * Reads a list of elicitation task transcript attribute option records.
+   * @param taskId The ID of the elicitation task.
+   * @param attribute The attribute to list the current options for.
+   * @param pageNumber The zero-based  page of records to return (if null, all records
+   * will be returned). 
+   * @param pageLength The length of pages (if null, the default page length is 20).
+   * @return A list of attributeOptions.
+   * @throws StoreException If an error prevents the operation.
+   * @throws PermissionException If the operation is not permitted.
+   * @see #createElicitationTaskTranscriptAttributeOption(ElicitationTaskAttributeOption)
+   * @see #readElicitationTaskTranscriptAttributeOptions(int,String)
+   * @see #updateElicitationTaskTranscriptAttributeOption(ElicitationTaskAttributeOption)
+   * @see #deleteElicitationTaskTranscriptAttributeOption(ElicitationTaskAttributeOption)
+   * @see #deleteElicitationTaskTranscriptAttributeOption(String,String,String)
+   */
+  public ElicitationTaskAttributeOption[] readElicitationTaskTranscriptAttributeOptions(
+    int taskId, String attribute, Integer pageNumber, Integer pageLength)
+    throws StoreException, PermissionException {
+    try {
+      HttpRequestGet request = get(
+        "api/admin/elicit/options/transcript/" + taskId + "/" + attribute)
+        .setHeader("Accept", "application/json");
+      if (pageLength != null) request.setParameter("pageNumber", pageLength);
+      if (pageNumber != null) request.setParameter("pageLength", pageNumber);
+      if (verbose) System.out.println(
+        "readElicitationTaskTranscriptAttributeOptions -> " + request);
+      response = new Response(request.get(), verbose);
+      response.checkForErrors(); // throws a StoreException on error
+      if (response.isModelNull()) return null;
+      JsonArray array = (JsonArray)response.getModel();
+      Vector<ElicitationTaskAttributeOption> attributeOptions = new Vector<ElicitationTaskAttributeOption>();
+      if (array != null) {
+        for (int i = 0; i < array.size(); i++) {
+          attributeOptions.add(new ElicitationTaskAttributeOption(array.getJsonObject(i)));
+        }
+      }
+      return attributeOptions.toArray(new ElicitationTaskAttributeOption[0]);
+    } catch(IOException x) {
+      throw new StoreException("Could not get response.", x);
+    }
+  } // end of readElicitationTaskAttributeOptions()
+  
+  /**
+   * Updates an existing elicitation task transcript attribute option record.
+   * @param attributeOption The attributeOption details to save.
+   * @return The attributeOption just updated.
+   * @throws StoreException If an error prevents the operation.
+   * @throws PermissionException If the operation is not permitted.
+   * @see #createElicitationTaskTranscriptAttributeOption(ElicitationTaskAttributeOption)
+   * @see #readElicitationTaskTranscriptAttributeOptions(int,String)
+   * @see #readElicitationTaskTranscriptAttributeOptions(int,String,Integer,Integer)
+   * @see #deleteElicitationTaskTranscriptAttributeOption(ElicitationTaskAttributeOption)
+   * @see #deleteElicitationTaskTranscriptAttributeOption(String,String,String)
+   */
+  public ElicitationTaskAttributeOption updateElicitationTaskTranscriptAttributeOption(
+    ElicitationTaskAttributeOption attributeOption)
+    throws StoreException, PermissionException {
+    try{
+      HttpRequestPost request = put("api/admin/elicit/options/transcript")
+        .setHeader("Accept", "application/json");
+      if (verbose) System.out.println(
+        "updateElicitationTaskTranscriptAttributeOption -> " + request);
+      response = new Response(request.post(attributeOption.toJson()), verbose);
+      response.checkForErrors(); // throws a StoreException on error
+      if (response.isModelNull()) return null;
+      return new ElicitationTaskAttributeOption((JsonObject)response.getModel());
+    } catch(IOException x) {
+      throw new StoreException("Could not get response.", x);
+    }
+  } // end of updateElicitationTaskAttributeOption()
+  
+  /**
+   * Deletes an existing elicitation task transcript attribute option record.
+   * @param attributeOption The attributeOption to delete.
+   * @throws StoreException If an error prevents the operation.
+   * @throws PermissionException If the operation is not permitted.
+   * @see #createElicitationTaskTranscriptAttributeOption(ElicitationTaskAttributeOption)
+   * @see #readElicitationTaskTranscriptAttributeOptions(int,String)
+   * @see #readElicitationTaskTranscriptAttributeOptions(int,String,Integer,Integer)
+   * @see #updateElicitationTaskTranscriptAttributeOption(ElicitationTaskAttributeOption)
+   * @see #deleteElicitationTaskTranscriptAttributeOption(String,String,String)
+   */
+  public void deleteElicitationTaskTranscriptAttributeOption(
+    ElicitationTaskAttributeOption attributeOption)
+    throws StoreException, PermissionException {
+    deleteElicitationTaskTranscriptAttributeOption(
+      attributeOption.getTaskId(), attributeOption.getAttribute(),
+      attributeOption.getValue());
+  }
+   
+  /**
+   * Deletes an existing elicitation task transcript attribute option record.
+   * @param taskId The ID of the elicitation task.
+   * @param attribute The attribute to remove the option from.
+   * @param value The value option to remove.
+   * @throws StoreException If an error prevents the operation.
+   * @throws PermissionException If the operation is not permitted.
+   * @see #createElicitationTaskTranscriptAttributeOption(ElicitationTaskAttributeOption)
+   * @see #readElicitationTaskTranscriptAttributeOptions(int,String)
+   * @see #readElicitationTaskTranscriptAttributeOptions(int,String,Integer,Integer)
+   * @see #updateElicitationTaskTranscriptAttributeOption(ElicitationTaskAttributeOption)
+   * @see #deleteElicitationTaskTranscriptAttributeOption(ElicitationTaskAttributeOption)
+   */
+  public void deleteElicitationTaskTranscriptAttributeOption(
+    int taskId, String attribute, String value)
+    throws StoreException, PermissionException {
+    try{
+      HttpRequestPost request = delete(
+        "api/admin/elicit/options/transcript/" + taskId + "/" + attribute + "/" + value);
+      if (verbose) System.out.println(
+        "deleteElicitationTaskTranscriptAttributeOption -> " + request);
+      response = new Response(request.post(), verbose);
+      response.checkForErrors(); // throws a StoreException on error
+    } catch(IOException x) {
+      throw new StoreException("Could not get response.", x);
+    }
+  } // end of updateElicitationTaskAttributeOption()
+
+  /**
+   * Creates a new elicitation task participant attribute option record.
+   * @param attributeOption The attributeOption details to save.
+   * @return The attributeOption just created.
+   * @throws StoreException If an error prevents the operation.
+   * @throws PermissionException If the operation is not permitted.
+   * @see #readElicitationTaskParticipantAttributeOptions(int,String)
+   * @see #readElicitationTaskParticipantAttributeOptions(int,String,Integer,Integer)
+   * @see #updateElicitationTaskParticipantAttributeOption(ElicitationTaskAttributeOption)
+   * @see #deleteElicitationTaskParticipantAttributeOption(ElicitationTaskAttributeOption)
+   * @see #deleteElicitationTaskParticipantAttributeOption(String,String,String)
+   */
+  public ElicitationTaskAttributeOption createElicitationTaskParticipantAttributeOption(
+    ElicitationTaskAttributeOption attributeOption)
+    throws StoreException, PermissionException {
+    try {
+      HttpRequestPost request = post(
+        "api/admin/elicit/options/participant/"
+        +attributeOption.getTaskId()+"/"+attributeOption.getAttribute())
+        .setHeader("Accept", "application/json");
+      if (verbose) System.out.println(
+        "createElicitationTaskParticipantAttributeOption -> " + request);
+      response = new Response(request.post(attributeOption.toJson()), verbose);
+      response.checkForErrors(); // throws a StoreException on error
+      if (response.isModelNull()) return null;
+      return new ElicitationTaskAttributeOption((JsonObject)response.getModel());
+    } catch(IOException x) {
+      throw new StoreException("Could not get response.", x);
+    }
+  } // end of createElicitationTaskAttributeOption()
+
+  /**
+   * Reads a list of elicitation task participant attribute option records.
+   * @param taskId The ID of the elicitation task.
+   * @param attribute The attribute to list the current options for.
+   * @return A list of attributeOptions.
+   * @throws StoreException If an error prevents the operation.
+   * @throws PermissionException If the operation is not permitted.
+   * @see #createElicitationTaskParticipantAttributeOption(ElicitationTaskAttributeOption)
+   * @see #readElicitationTaskParticipantAttributeOptions(int,String,Integer,Integer)
+   * @see #updateElicitationTaskParticipantAttributeOption(ElicitationTaskAttributeOption)
+   * @see #deleteElicitationTaskParticipantAttributeOption(ElicitationTaskAttributeOption)
+   * @see #deleteElicitationTaskParticipantAttributeOption(String,String,String)
+   */
+  public ElicitationTaskAttributeOption[] readElicitationTaskParticipantAttributeOptions(
+    int taskId, String attribute)
+    throws StoreException, PermissionException {
+    return readElicitationTaskParticipantAttributeOptions(taskId, attribute, null, null);
+  }
+   
+  /**
+   * Reads a list of elicitation task participant attribute option records.
+   * @param taskId The ID of the elicitation task.
+   * @param attribute The attribute to list the current options for.
+   * @param pageNumber The zero-based  page of records to return (if null, all records
+   * will be returned). 
+   * @param pageLength The length of pages (if null, the default page length is 20).
+   * @return A list of attributeOptions.
+   * @throws StoreException If an error prevents the operation.
+   * @throws PermissionException If the operation is not permitted.
+   * @see #createElicitationTaskParticipantAttributeOption(ElicitationTaskAttributeOption)
+   * @see #readElicitationTaskParticipantAttributeOptions(int,String)
+   * @see #updateElicitationTaskParticipantAttributeOption(ElicitationTaskAttributeOption)
+   * @see #deleteElicitationTaskParticipantAttributeOption(ElicitationTaskAttributeOption)
+   * @see #deleteElicitationTaskParticipantAttributeOption(String,String,String)
+   */
+  public ElicitationTaskAttributeOption[] readElicitationTaskParticipantAttributeOptions(
+    int taskId, String attribute, Integer pageNumber, Integer pageLength)
+    throws StoreException, PermissionException {
+    try {
+      HttpRequestGet request = get(
+        "api/admin/elicit/options/participant/" + taskId + "/" + attribute)
+        .setHeader("Accept", "application/json");
+      if (pageLength != null) request.setParameter("pageNumber", pageLength);
+      if (pageNumber != null) request.setParameter("pageLength", pageNumber);
+      if (verbose) System.out.println(
+        "readElicitationTaskParticipantAttributeOptions -> " + request);
+      response = new Response(request.get(), verbose);
+      response.checkForErrors(); // throws a StoreException on error
+      if (response.isModelNull()) return null;
+      JsonArray array = (JsonArray)response.getModel();
+      Vector<ElicitationTaskAttributeOption> attributeOptions = new Vector<ElicitationTaskAttributeOption>();
+      if (array != null) {
+        for (int i = 0; i < array.size(); i++) {
+          attributeOptions.add(new ElicitationTaskAttributeOption(array.getJsonObject(i)));
+        }
+      }
+      return attributeOptions.toArray(new ElicitationTaskAttributeOption[0]);
+    } catch(IOException x) {
+      throw new StoreException("Could not get response.", x);
+    }
+  } // end of readElicitationTaskAttributeOptions()
+  
+  /**
+   * Updates an existing elicitation task participant attribute option record.
+   * @param attributeOption The attributeOption details to save.
+   * @return The attributeOption just updated.
+   * @throws StoreException If an error prevents the operation.
+   * @throws PermissionException If the operation is not permitted.
+   * @see #createElicitationTaskParticipantAttributeOption(ElicitationTaskAttributeOption)
+   * @see #readElicitationTaskParticipantAttributeOptions(int,String)
+   * @see #readElicitationTaskParticipantAttributeOptions(int,String,Integer,Integer)
+   * @see #deleteElicitationTaskParticipantAttributeOption(ElicitationTaskAttributeOption)
+   * @see #deleteElicitationTaskParticipantAttributeOption(String,String,String)
+   */
+  public ElicitationTaskAttributeOption updateElicitationTaskParticipantAttributeOption(
+    ElicitationTaskAttributeOption attributeOption)
+    throws StoreException, PermissionException {
+    try{
+      HttpRequestPost request = put("api/admin/elicit/options/participant")
+        .setHeader("Accept", "application/json");
+      if (verbose) System.out.println(
+        "updateElicitationTaskParticipantAttributeOption -> " + request);
+      response = new Response(request.post(attributeOption.toJson()), verbose);
+      response.checkForErrors(); // throws a StoreException on error
+      if (response.isModelNull()) return null;
+      return new ElicitationTaskAttributeOption((JsonObject)response.getModel());
+    } catch(IOException x) {
+      throw new StoreException("Could not get response.", x);
+    }
+  } // end of updateElicitationTaskAttributeOption()
+  
+  /**
+   * Deletes an existing elicitation task participant attribute option record.
+   * @param attributeOption The attributeOption to delete.
+   * @throws StoreException If an error prevents the operation.
+   * @throws PermissionException If the operation is not permitted.
+   * @see #createElicitationTaskParticipantAttributeOption(ElicitationTaskAttributeOption)
+   * @see #readElicitationTaskParticipantAttributeOptions(int,String)
+   * @see #readElicitationTaskParticipantAttributeOptions(int,String,Integer,Integer)
+   * @see #updateElicitationTaskParticipantAttributeOption(ElicitationTaskAttributeOption)
+   * @see #deleteElicitationTaskParticipantAttributeOption(String,String,String)
+   */
+  public void deleteElicitationTaskParticipantAttributeOption(
+    ElicitationTaskAttributeOption attributeOption)
+    throws StoreException, PermissionException {
+    deleteElicitationTaskParticipantAttributeOption(
+      attributeOption.getTaskId(), attributeOption.getAttribute(),
+      attributeOption.getValue());
+  }
+   
+  /**
+   * Deletes an existing elicitation task participant attribute option record.
+   * @param taskId The ID of the elicitation task.
+   * @param attribute The attribute to remove the option from.
+   * @param value The value option to remove.
+   * @throws StoreException If an error prevents the operation.
+   * @throws PermissionException If the operation is not permitted.
+   * @see #createElicitationTaskParticipantAttributeOption(ElicitationTaskAttributeOption)
+   * @see #readElicitationTaskParticipantAttributeOptions(int,String)
+   * @see #readElicitationTaskParticipantAttributeOptions(int,String,Integer,Integer)
+   * @see #updateElicitationTaskParticipantAttributeOption(ElicitationTaskAttributeOption)
+   * @see #deleteElicitationTaskParticipantAttributeOption(ElicitationTaskAttributeOption)
+   */
+  public void deleteElicitationTaskParticipantAttributeOption(
+    int taskId, String attribute, String value)
+    throws StoreException, PermissionException {
+    try{
+      HttpRequestPost request = delete(
+        "api/admin/elicit/options/participant/" + taskId + "/" + attribute + "/" + value);
+      if (verbose) System.out.println(
+        "deleteElicitationTaskParticipantAttributeOption -> " + request);
+      response = new Response(request.post(), verbose);
+      response.checkForErrors(); // throws a StoreException on error
+    } catch(IOException x) {
+      throw new StoreException("Could not get response.", x);
+    }
+  } // end of updateElicitationTaskAttributeOption()
+
+  // TODO uploadSerialization
+  // TODO installSerialization
+  // TODO uninstallSerialization
   // TODO uploadAnnotator
   // TODO installAnnotator
   // TODO uninstallAnnotator

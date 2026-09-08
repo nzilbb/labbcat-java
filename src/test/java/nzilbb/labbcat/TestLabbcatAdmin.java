@@ -31,6 +31,7 @@ import java.net.URL;
 import java.net.MalformedURLException;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -1247,7 +1248,164 @@ public class TestLabbcatAdmin {
       }
     }
   }
-  
+
+  /** Ensure elicitation task CRUD operations are supported, including tasks
+      and resource strings. */
+  @Test public void elicitationTaskCRUD() throws Exception {
+    Corpus[] corpora = labbcat.readCorpora();
+    assertTrue("readCorpora: Some IDs are returned", corpora.length > 0);
+    String corpusName = corpora[0].getName();
+    Layer transcriptTypeLayer = labbcat.getLayer("transcript_type");
+    assertTrue("transcript_type: Some valid labels are returned",
+               transcriptTypeLayer.getValidLabels().size() > 0);
+    Iterator<String> transcriptTypes = transcriptTypeLayer.getValidLabels()
+      .keySet().iterator();
+    String transcriptType = transcriptTypes.next();
+
+    int taskId = -1;
+
+    ElicitationTask task = new ElicitationTask()
+      .setTaskName("unit-test")
+      .setDescription("Temporary task for unit testing")
+      .setCorpusName(corpusName)
+      .setTranscriptType(transcriptType)
+      .setPreamble("<p>This is a test task.</p>")
+      .setConsent("<p>I consent to my recordings being used for research.</p>")
+      .setEndUrl("https://labbcat.canterbury.ac.nz/");
+    
+    try {
+      ElicitationTask newTask = labbcat.createElicitationTask(task);
+      assertNotNull("Task returned", newTask);
+      assertEquals("Name correct",
+                   task.getTaskName(), newTask.getTaskName());
+      assertEquals("Description correct",
+                   task.getDescription(), newTask.getDescription());
+      assertEquals("Preamble correct",
+                   task.getPreamble(), newTask.getPreamble());
+      assertEquals("Consent correct",
+                   task.getConsent(), newTask.getConsent());
+      assertEquals("EndUrl correct",
+                   task.getEndUrl(), newTask.getEndUrl());
+      assertEquals("corpus correct",
+                   task.getCorpusName(), newTask.getCorpusName());
+      assertEquals("transcript type correct",
+                   task.getTranscriptType(), newTask.getTranscriptType());
+      assertTrue("taskId set",
+                 newTask.getTaskId() >= 0);
+      taskId = newTask.getTaskId();
+         
+      try {
+        labbcat.createElicitationTask(task);
+        fail("Can't create a task with existing name");
+      }
+      catch(Exception exception) {}
+      
+      ElicitationTask[] tasks = labbcat.readElicitationTasks();
+      // ensure the role exists
+      ElicitationTask foundTask = null;
+      for (ElicitationTask t : tasks) {
+        if (t.getTaskId() == taskId) {
+          foundTask = t;
+          break;
+        }
+      }
+      assertNotNull("Task was added", foundTask);
+      assertEquals("Name correct",
+                   task.getTaskName(), foundTask.getTaskName());
+      assertEquals("Description correct",
+                   task.getDescription(), foundTask.getDescription());
+      assertEquals("Preamble correct",
+                   task.getPreamble(), foundTask.getPreamble());
+      assertEquals("Consent correct",
+                   task.getConsent(), foundTask.getConsent());
+      assertEquals("EndUrl correct",
+                   task.getEndUrl(), foundTask.getEndUrl());
+      assertEquals("corpus correct",
+                   task.getCorpusName(), foundTask.getCorpusName());
+      assertEquals("transcript type correct",
+                   task.getTranscriptType(), foundTask.getTranscriptType());
+
+      // update it
+      String editedCorpusName = corpora.length > 1?corpora[1].getName():corpusName;
+      String editedTranscriptType = transcriptTypes.hasNext()?transcriptTypes.next():transcriptType;
+      ElicitationTask editedTask = new ElicitationTask()
+        .setTaskId(taskId)
+        .setTaskName("unit-test-changed")
+        .setDescription("Temporary task for unit testing-changed")
+        .setCorpusName(editedCorpusName)
+        .setTranscriptType(editedTranscriptType)
+        .setPreamble("<p>This is a test task that has been changed.</p>")
+        .setConsent("<p>I don't consent to my recordings being used for research.</p>")
+        .setEndUrl("https://labbcat.canterbury.ac.nz");
+      
+      ElicitationTask updatedTask = labbcat.updateElicitationTask(editedTask);
+      assertEquals("taskId correct",
+                   taskId, updatedTask.getTaskId());
+      assertEquals("Name correct",
+                   editedTask.getTaskName(), updatedTask.getTaskName());
+      assertEquals("Description correct",
+                   editedTask.getDescription(), updatedTask.getDescription());
+      assertEquals("Preamble correct",
+                   editedTask.getPreamble(), updatedTask.getPreamble());
+      assertEquals("Consent correct",
+                   editedTask.getConsent(), updatedTask.getConsent());
+      assertEquals("EndUrl correct",
+                   editedTask.getEndUrl(), updatedTask.getEndUrl());
+      assertEquals("corpus correct",
+                   editedTask.getCorpusName(), updatedTask.getCorpusName());
+      assertEquals("transcript type correct",
+                   editedTask.getTranscriptType(), updatedTask.getTranscriptType());
+
+      // resources should exist
+      ElicitationTaskResource[] resources = labbcat.readElicitationTaskResources(taskId);
+      assertNotNull("resources returned", resources);
+      assertTrue("multiple resources returned",
+                 resources.length > 1);
+
+      // update one
+      resources[0].setMessage("unit-test");
+      ElicitationTaskResource updatedResource = labbcat.updateElicitationTaskResource(
+        resources[0]);
+      assertNotNull("resource returned", updatedResource);
+      assertEquals("Message updated",
+                   "unit-test", updatedResource.getMessage());
+
+      // delete task
+      labbcat.deleteElicitationTask(foundTask);
+      
+      ElicitationTask[] tasksAfter = labbcat.readElicitationTasks();
+      // ensure the role no longer exists
+      ElicitationTask foundAfter = null;
+      for (ElicitationTask t : tasksAfter) {
+        if (t.getTaskId() == taskId) {
+          foundAfter = t;
+          break;
+        }
+      }
+      assertNull("Task is gone", foundAfter);
+
+      // resources should be gone
+      resources = labbcat.readElicitationTaskResources(taskId);
+      assertNotNull("resources returned", resources);
+      assertTrue("list is empty", resources.length == 0);
+      
+      try {
+        // can't delete it again
+        labbcat.deleteElicitationTask(taskId);
+        fail("Can't delete task that doesn't exist");
+      } catch(Exception exception) {
+      }
+      
+    } finally {
+      // ensure it's not there
+      if (taskId >= 0) {
+        try {
+          labbcat.deleteElicitationTask(taskId);
+        } catch(Exception exception) {}
+      }
+    }
+  }
+
   /**
    * Reads a CSV file into a map of lists, and then deletes the file.
    * @param csv Dictionary file.

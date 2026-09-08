@@ -10,6 +10,21 @@
   + LabbcatEdit.fragmentUpload() - start annotated fragment (e.g. TextGrid) upload
   + LabbcatEdit.fragmentUploadParameters() - finish annotated fragment upload
   + LabbcatEdit.fragmentUploadDelete() - delete annotated fragment upload
+- New LabbcatAdmin functions for elicitation task administraion:
+  + createElicitationTask()
+  + readElicitationTasks()
+  + updateElicitationTask()
+  + deleteElicitationTask()
+  + readElicitationTaskResources()
+  + updateElicitationTaskResource()
+  + createElicitationTaskTranscriptAttributeOption()
+  + readElicitationTaskTranscriptAttributeOptions()
+  + updateElicitationTaskTranscriptAttributeOption()
+  + deleteElicitationTaskTranscriptAttributeOption()
+  + createElicitationTaskParticipantAttributeOption()
+  + readElicitationTaskParticipantAttributeOptions()
+  + updateElicitationTaskParticipantAttributeOption()
+  + deleteElicitationTaskParticipantAttributeOption()
 
 Minimum LaBB-CAT version *20260812.1200*
 

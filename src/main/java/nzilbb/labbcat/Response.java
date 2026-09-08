@@ -213,7 +213,7 @@ public class Response {
       } catch(IOException exception) {
          throw new StoreException(exception);
       }
-      if (httpStatus == HttpURLConnection.HTTP_OK)
+      if (httpStatus < 400)
       {
          try {
             load(connection.getInputStream());
@@ -327,7 +327,7 @@ public class Response {
       
       if ((errors != null && errors.size() > 0)
           || code > 0
-          || (httpStatus > 0 && httpStatus != HttpURLConnection.HTTP_OK)) {
+          || (httpStatus > 0 && httpStatus >= 400)) {
          throw new ResponseException(this);
       }
       return this;
