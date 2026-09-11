@@ -1406,6 +1406,60 @@ public class TestLabbcatAdmin {
     }
   }
 
+  /** Ensure elicitation task upload works. */
+  @Test public void elicitationTaskUpload() throws Exception {
+    File someSteps = new File(getDir(), "nonempty-unit-test-task.json");
+    assertTrue("json file exists " + someSteps.getPath(), someSteps.exists());
+    File noSteps = new File(getDir(), "empty-unit-test-task.json");
+    assertTrue("json file exists " + noSteps.getPath(), noSteps.exists());
+    File json = new File(getDir(), "unit-test-task.json");
+    IO.Copy(someSteps, json);
+    
+    // upload the task
+    int taskId = labbcat.elicitatationTaskUpload(json);
+    try {      
+      
+      ElicitationTask[] tasks = labbcat.readElicitationTasks();
+      // ensure the task exists
+      ElicitationTask foundTask = null;
+      for (ElicitationTask t : tasks) {
+        if (t.getTaskId() == taskId) {
+          foundTask = t;
+          break;
+        }
+      }
+      assertNotNull("Task was added", foundTask);
+      assertEquals("Name correct",
+                   "unit-test-task", foundTask.getTaskName());
+      assertEquals("Description correct",
+                   "This task is for automated testing purposes.",
+                   foundTask.getDescription());
+      assertEquals("Preamble correct",
+                   "<p>Preamble</p>", foundTask.getPreamble());
+      assertEquals("Consent correct",
+                   "<p>Consent</p>", foundTask.getConsent());
+      assertEquals("EndUrl correct",
+                   "https://example.com/", foundTask.getEndUrl());
+
+      // update it so it has no steps (so we can delete it)
+      IO.Copy(noSteps, json);
+      assertTrue("Can rename empty task file "
+                 + noSteps.getPath() + " -> " + json.getPath(),
+                 json.exists());
+      int emptyTaskId = labbcat.elicitatationTaskUpload(json);
+      assertEquals("Updated task_id is correct",
+                   taskId, emptyTaskId);
+
+    } finally {
+      // delete it
+      try {
+        labbcat.deleteElicitationTask(taskId);
+       } catch(Exception exception) {
+        System.out.println("Could now delete task " + taskId + ": "+exception);
+      }
+    }
+  }
+
   /**
    * Reads a CSV file into a map of lists, and then deletes the file.
    * @param csv Dictionary file.

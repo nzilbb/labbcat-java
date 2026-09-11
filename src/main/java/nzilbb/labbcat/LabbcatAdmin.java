@@ -2066,6 +2066,42 @@ public class LabbcatAdmin extends LabbcatEdit implements GraphStoreAdministratio
     }
   } // end of updateElicitationTaskAttributeOption()
 
+  /**
+   * Upload a full task definition to be added/updated from a JSON file.
+   * @param file The task definition file, the name of which must end
+   *       in <q>.json</q>. The name of the file (without the .json
+   *       extension) is taken as the name of the task being
+   *       uploaded. If there is already a task with that name, it
+   *       will be <u>replaced</u> with the task in the
+   *       file. Otherwise, a new task is created.
+   * @return The task_id of the task.
+   * @see #createElicitationTaskParticipantAttributeOption(ElicitationTaskAttributeOption)
+   * @see #readElicitationTaskParticipantAttributeOptions(int,String)
+   * @see #readElicitationTaskParticipantAttributeOptions(int,String,Integer,Integer)
+   * @see #updateElicitationTaskParticipantAttributeOption(ElicitationTaskAttributeOption)
+   * @see #deleteElicitationTaskParticipantAttributeOption(String,String,String)
+   * @see #deleteElicitationTaskParticipantAttributeOption(ElicitationTaskAttributeOption)
+   * @throws StoreException If the lexicon could not be loaded.
+   */
+  public int elicitatationTaskUpload(File file)
+    throws StoreException {
+    URL url = makeUrl("api/admin/elicit/task/upload");
+    try {
+      postRequest = new HttpRequestPostMultipart(url, getRequiredHttpAuthorization())
+        .setUserAgent()
+        //.setHeader("Accept", "application/json")
+        .setParameter("file", file);
+      if (verbose) System.out.println("elicitatationTaskUpload -> " + postRequest);
+      response = new Response(postRequest.post(), verbose);
+      response.checkForErrors(); // throws a StoreException on error
+      JsonObject model = (JsonObject)response.getModel();
+      return model.getInt("task_id");
+    } catch (IOException x) {
+      throw new StoreException("Could not get response.", x);
+    }
+  } // end of elicitatationTaskUpload()
+  
+  
   // TODO uploadSerialization
   // TODO installSerialization
   // TODO uninstallSerialization
