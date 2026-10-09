@@ -573,7 +573,7 @@ public class TestLabbcatEdit {
         Match[] match = { matches[0] };
         
         File dir = new File("fragmentUploadDelete");
-        String[] layerIds = { "word", "segment" };
+        String[] layerIds = { "utterance", "word", "segment" };
         File[] fragments = labbcat.getFragments(match, layerIds, "text/praat-textgrid", dir);
         File fragment = fragments[0];
         assertTrue("Ensure fragment exists: " + fragment.getPath(), fragment.exists());
@@ -584,20 +584,26 @@ public class TestLabbcatEdit {
           Upload upload = labbcat.fragmentUpload(fragment, false);
           assertEquals("Transcript is identified",
                        match[0].getTranscript(), upload.getTranscript());
-          assertEquals("There are are two tier mappings",
-                       2, upload.getParameters().size());
+          assertEquals("There are are three tier mappings",
+                       3, upload.getParameters().size());
           assertTrue("First tier mapping",
                      upload.getParameters().containsKey("tier0"));
           assertNotNull("First tier mapping has default",
                         upload.getParameters().get("tier0").getValue());
           assertEquals("First tier mapping correct",
-                       "word", upload.getParameters().get("tier0").getValue().toString());
+                       "utterance", upload.getParameters().get("tier0").getValue().toString());
           assertTrue("Second tier mapping",
                      upload.getParameters().containsKey("tier1"));
           assertNotNull("Second tier mapping has default",
                         upload.getParameters().get("tier1").getValue());
           assertEquals("Second tier mapping correct",
-                       "segment", upload.getParameters().get("tier1").getValue().toString());
+                       "word", upload.getParameters().get("tier1").getValue().toString());
+          assertTrue("Third tier mapping",
+                     upload.getParameters().containsKey("tier2"));
+          assertNotNull("Third tier mapping has default",
+                        upload.getParameters().get("tier2").getValue());
+          assertEquals("Third tier mapping correct",
+                       "segment", upload.getParameters().get("tier2").getValue().toString());
           
           // delete upload
           labbcat.fragmentUploadDelete(upload);
@@ -644,7 +650,7 @@ public class TestLabbcatEdit {
         Match[] match = { matches[0] };
         
         File dir = new File("fragmentUploadTwoPhase");
-        String[] layerIds = { "word", "segment" };
+        String[] layerIds = { "utterance", "word", "segment" };
         File[] fragments = labbcat.getFragments(match, layerIds, "text/praat-textgrid", dir);
         File fragment = fragments[0];
         assertTrue("Ensure fragment exists: " + fragment.getPath(), fragment.exists());
@@ -655,22 +661,29 @@ public class TestLabbcatEdit {
           Upload upload = labbcat.fragmentUpload(fragment, false);
           assertEquals("Transcript is identified",
                        match[0].getTranscript(), upload.getTranscript());
-          assertEquals("There are are two tier mappings",
-                       2, upload.getParameters().size());
+          assertEquals("There are are three tier mappings",
+                       3, upload.getParameters().size());
           assertTrue("First tier mapping",
                      upload.getParameters().containsKey("tier0"));
           assertNotNull("First tier mapping has default",
                         upload.getParameters().get("tier0").getValue());
           assertEquals("First tier mapping correct",
-                       "word", upload.getParameters().get("tier0").getValue().toString());
+                       "utterance", upload.getParameters().get("tier0").getValue().toString());
           assertTrue("Second tier mapping",
                      upload.getParameters().containsKey("tier1"));
           assertNotNull("Second tier mapping has default",
                         upload.getParameters().get("tier1").getValue());
           assertEquals("Second tier mapping correct",
-                       "segment", upload.getParameters().get("tier1").getValue().toString());
+                       "word", upload.getParameters().get("tier1").getValue().toString());
+          assertTrue("Third tier mapping",
+                     upload.getParameters().containsKey("tier2"));
+          assertNotNull("Third tier mapping has default",
+                        upload.getParameters().get("tier2").getValue());
+          assertEquals("Third tier mapping correct",
+                       "segment", upload.getParameters().get("tier2").getValue().toString());
           
           // finalize parameters
+          labbcat.setVerbose(true);
           upload = labbcat.fragmentUploadParameters(upload);
           assertNotNull("ID ", upload.getId());
           assertNotNull("fragment URL returned", upload.getUrl());
@@ -703,7 +716,9 @@ public class TestLabbcatEdit {
     try {
       // if the task is still running, it's taking too long, so cancel it
       if (task.getRunning()) try { labbcat.cancelTask(threadId); } catch(Exception exception) {}
-      assertFalse("Search task finished in a timely manner", task.getRunning());
+      assertFalse("Search task finished in a timely manner"
+                  +" (probably too many long automatic layers configured)",
+                  task.getRunning());
       
       Match[] matches = labbcat.getMatches(threadId, 2);
       if (matches.length == 0) {
@@ -712,7 +727,7 @@ public class TestLabbcatEdit {
         Match[] match = { matches[0] };
         
         File dir = new File("fragmentUploadAutomaticMapping");
-        String[] layerIds = { "word", "segment" };
+        String[] layerIds = { "utterance", "word", "segment" };
         File[] fragments = labbcat.getFragments(match, layerIds, "text/praat-textgrid", dir);
         File fragment = fragments[0];
         assertTrue("Ensure fragment exists: " + fragment.getPath(), fragment.exists());
@@ -740,8 +755,8 @@ public class TestLabbcatEdit {
   /** Test participant attributes can be uploaded from CSV */
   @Test public void uploadParticipantAttributes() throws Exception {
 
-    String existingParticipantId = "UnitTester";
-    String createdParticipantId = "UnitTester-created";
+    String existingParticipantId = "UnitTesterAttributes";
+    String createdParticipantId = "UnitTesterAttributes-created";
 
     try {
       // create participant for testing

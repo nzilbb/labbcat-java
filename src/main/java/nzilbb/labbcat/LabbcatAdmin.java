@@ -1746,7 +1746,8 @@ public class LabbcatAdmin extends LabbcatEdit implements GraphStoreAdministratio
     try {
       HttpRequestPost request = post(
         "api/admin/elicit/options/transcript/"
-        +attributeOption.getTaskId()+"/"+attributeOption.getAttribute())
+        +attributeOption.getTaskId()+"/"
+        +URLEncoder.encode(attributeOption.getAttribute(), "UTF-8"))
         .setHeader("Accept", "application/json");
       if (verbose) System.out.println(
         "createElicitationTaskTranscriptAttributeOption -> " + request);
@@ -1887,7 +1888,9 @@ public class LabbcatAdmin extends LabbcatEdit implements GraphStoreAdministratio
     throws StoreException, PermissionException {
     try{
       HttpRequestPost request = delete(
-        "api/admin/elicit/options/transcript/" + taskId + "/" + attribute + "/" + value);
+        "api/admin/elicit/options/transcript/" + taskId + "/"
+        + URLEncoder.encode(attribute,"UTF-8") + "/"
+        + URLEncoder.encode(value, "UTF-8"));
       if (verbose) System.out.println(
         "deleteElicitationTaskTranscriptAttributeOption -> " + request);
       response = new Response(request.post(), verbose);
@@ -1915,7 +1918,8 @@ public class LabbcatAdmin extends LabbcatEdit implements GraphStoreAdministratio
     try {
       HttpRequestPost request = post(
         "api/admin/elicit/options/participant/"
-        +attributeOption.getTaskId()+"/"+attributeOption.getAttribute())
+        +attributeOption.getTaskId()+"/"
+        +URLEncoder.encode(attributeOption.getAttribute(), "UTF-8"))
         .setHeader("Accept", "application/json");
       if (verbose) System.out.println(
         "createElicitationTaskParticipantAttributeOption -> " + request);
@@ -2056,7 +2060,9 @@ public class LabbcatAdmin extends LabbcatEdit implements GraphStoreAdministratio
     throws StoreException, PermissionException {
     try{
       HttpRequestPost request = delete(
-        "api/admin/elicit/options/participant/" + taskId + "/" + attribute + "/" + value);
+        "api/admin/elicit/options/participant/" + taskId + "/"
+        + URLEncoder.encode(attribute,"UTF-8") + "/"
+        + URLEncoder.encode(value, "UTF-8"));
       if (verbose) System.out.println(
         "deleteElicitationTaskParticipantAttributeOption -> " + request);
       response = new Response(request.post(), verbose);

@@ -1460,6 +1460,129 @@ public class TestLabbcatAdmin {
     }
   }
 
+  /** Elicitation task attribute options can be created, read, updated, and deleted. */
+  @Test public void elicitationTaskAttributeOptionsCRUD() throws Exception {
+    File someSteps = new File(getDir(), "nonempty-unit-test-task.json");
+    assertTrue("json file exists " + someSteps.getPath(), someSteps.exists());
+    File noSteps = new File(getDir(), "empty-unit-test-task.json");
+    assertTrue("json file exists " + noSteps.getPath(), noSteps.exists());
+    File json = new File(getDir(), "unit-test-task.json");
+    IO.Copy(someSteps, json);
+    
+    // upload the task
+    int taskId = labbcat.elicitatationTaskUpload(json);
+    try {
+
+      // participant attributes
+
+      // start with none
+      ElicitationTaskAttributeOption[] options
+        = labbcat.readElicitationTaskTranscriptAttributeOptions(taskId, "gender");
+      assertEquals("There are no options " + Arrays.asList(options),
+                   0, options.length);
+
+      // create
+      ElicitationTaskAttributeOption male = new ElicitationTaskAttributeOption()
+        .setTaskId(taskId)
+        .setAttribute("gender")
+        .setValue("M")
+        .setDescription("Masculino");
+      ElicitationTaskAttributeOption option
+        = labbcat.createElicitationTaskParticipantAttributeOption(male);
+      assertNotNull("New option returned", option);
+      assertEquals("Task ID correct", male.getTaskId(), option.getTaskId());
+      assertEquals("Attribute correct", male.getAttribute(), option.getAttribute());
+      assertEquals("Value correct", male.getValue(), option.getValue());
+      assertEquals("Description correct", male.getDescription(), option.getDescription());
+
+      // read
+      options = labbcat.readElicitationTaskParticipantAttributeOptions(taskId, "gender");
+      assertEquals("There is one option " + Arrays.asList(options),
+                   1, options.length);
+      assertEquals("Task ID correct", male.getTaskId(), options[0].getTaskId());
+      assertEquals("Attribute correct", male.getAttribute(), options[0].getAttribute());
+      assertEquals("Value correct", male.getValue(), options[0].getValue());
+      assertEquals("Description correct",
+                   male.getDescription(), options[0].getDescription());
+
+      // update
+      male.setDescription("male");
+      option = labbcat.updateElicitationTaskParticipantAttributeOption(male);
+      assertNotNull("New option returned", option);
+      assertEquals("Task ID correct", male.getTaskId(), option.getTaskId());
+      assertEquals("Attribute correct", male.getAttribute(), option.getAttribute());
+      assertEquals("Value correct", male.getValue(), option.getValue());
+      assertEquals("Description correct", male.getDescription(), option.getDescription());
+
+      // delete
+      labbcat.deleteElicitationTaskParticipantAttributeOption(male);
+      options = labbcat.readElicitationTaskTranscriptAttributeOptions(taskId, "gender");
+      assertEquals("There are no longer any options " + Arrays.asList(options),
+                   0, options.length);
+
+      // transcript attributes
+
+      // start with none
+      options = labbcat.readElicitationTaskTranscriptAttributeOptions(taskId, "language");
+      assertEquals("There are no options " + Arrays.asList(options),
+                   0, options.length);
+
+      // create
+      ElicitationTaskAttributeOption en = new ElicitationTaskAttributeOption()
+        .setTaskId(taskId)
+        .setAttribute("language")
+        .setValue("en")
+        .setDescription("Inglés");
+      option = labbcat.createElicitationTaskTranscriptAttributeOption(en);
+      assertNotNull("New option returned", option);
+      assertEquals("Task ID correct", en.getTaskId(), option.getTaskId());
+      assertEquals("Attribute correct", en.getAttribute(), option.getAttribute());
+      assertEquals("Value correct", en.getValue(), option.getValue());
+      assertEquals("Description correct", en.getDescription(), option.getDescription());
+      
+      // read
+      options = labbcat.readElicitationTaskTranscriptAttributeOptions(taskId, "language");
+      assertEquals("There is one option " + Arrays.asList(options),
+                   1, options.length);
+      assertEquals("Task ID correct", en.getTaskId(), options[0].getTaskId());
+      assertEquals("Attribute correct", en.getAttribute(), options[0].getAttribute());
+      assertEquals("Value correct", en.getValue(), options[0].getValue());
+      assertEquals("Description correct",
+                   en.getDescription(), options[0].getDescription());
+
+      // update
+      en.setDescription("English");
+      option = labbcat.updateElicitationTaskTranscriptAttributeOption(en);
+      assertNotNull("New option returned", option);
+      assertEquals("Task ID correct", en.getTaskId(), option.getTaskId());
+      assertEquals("Attribute correct", en.getAttribute(), option.getAttribute());
+      assertEquals("Value correct", en.getValue(), option.getValue());
+      assertEquals("Description correct", en.getDescription(), option.getDescription());
+
+      // delete
+      labbcat.deleteElicitationTaskTranscriptAttributeOption(en);
+      options = labbcat.readElicitationTaskTranscriptAttributeOptions(taskId, "language");
+      assertEquals("There are no longer any options " + Arrays.asList(options),
+                   0, options.length);
+
+    } finally {
+      labbcat.setVerbose(false);
+      // update it so it has no steps (so we can delete it)
+      IO.Copy(noSteps, json);
+      try {
+        int emptyTaskId = labbcat.elicitatationTaskUpload(json);
+      } catch(Exception exception) {
+        System.out.println("Could not reupload " + taskId + ": "+exception);
+      }
+      // delete it
+      try {
+        labbcat.deleteElicitationTask(taskId);
+      } catch(Exception exception) {
+        System.out.println("Could not delete task " + taskId + ": "+exception);
+      }
+    }
+  }
+
   /**
    * Reads a CSV file into a map of lists, and then deletes the file.
    * @param csv Dictionary file.

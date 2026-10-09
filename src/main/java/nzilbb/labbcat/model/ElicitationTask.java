@@ -190,9 +190,12 @@ public class ElicitationTask {
     description = json.getString("description");
     corpusName = json.getString("corpus_name");
     transcriptType = json.getString("transcript_type");
-    preamble = json.getString("preamble");
-    if (!json.isNull("consent")) consent = json.getString("consent");
-    if (!json.isNull("endUrl")) endUrl = json.getString("endUrl");
+    if (json.containsKey("preamble") && !json.isNull("preamble"))
+      preamble = json.getString("preamble");
+    if (json.containsKey("consent") && !json.isNull("consent"))
+      consent = json.getString("consent");
+    if (json.containsKey("endUrl") && !json.isNull("endUrl"))
+      endUrl = json.getString("endUrl");
   } // end of constructor
 
   /**
