@@ -1710,8 +1710,8 @@ public class LabbcatAdmin extends LabbcatEdit implements GraphStoreAdministratio
    * @return The resource just updated.
    * @throws StoreException If an error prevents the operation.
    * @throws PermissionException If the operation is not permitted.
-   * @see #readElicitationTaskResources(String)
-   * @see #readElicitationTaskResources(String,Integer,Integer)
+   * @see #readElicitationTaskResources(int)
+   * @see #readElicitationTaskResources(int,Integer,Integer)
    */
   public ElicitationTaskResource updateElicitationTaskResource(ElicitationTaskResource resource)
     throws StoreException, PermissionException {
@@ -1738,7 +1738,7 @@ public class LabbcatAdmin extends LabbcatEdit implements GraphStoreAdministratio
    * @see #readElicitationTaskTranscriptAttributeOptions(int,String,Integer,Integer)
    * @see #updateElicitationTaskTranscriptAttributeOption(ElicitationTaskAttributeOption)
    * @see #deleteElicitationTaskTranscriptAttributeOption(ElicitationTaskAttributeOption)
-   * @see #deleteElicitationTaskTranscriptAttributeOption(String,String,String)
+   * @see #deleteElicitationTaskTranscriptAttributeOption(int,String,String)
    */
   public ElicitationTaskAttributeOption createElicitationTaskTranscriptAttributeOption(
     ElicitationTaskAttributeOption attributeOption)
@@ -1771,7 +1771,7 @@ public class LabbcatAdmin extends LabbcatEdit implements GraphStoreAdministratio
    * @see #readElicitationTaskTranscriptAttributeOptions(int,String,Integer,Integer)
    * @see #updateElicitationTaskTranscriptAttributeOption(ElicitationTaskAttributeOption)
    * @see #deleteElicitationTaskTranscriptAttributeOption(ElicitationTaskAttributeOption)
-   * @see #deleteElicitationTaskTranscriptAttributeOption(String,String,String)
+   * @see #deleteElicitationTaskTranscriptAttributeOption(int,String,String)
    */
   public ElicitationTaskAttributeOption[] readElicitationTaskTranscriptAttributeOptions(
     int taskId, String attribute)
@@ -1793,7 +1793,7 @@ public class LabbcatAdmin extends LabbcatEdit implements GraphStoreAdministratio
    * @see #readElicitationTaskTranscriptAttributeOptions(int,String)
    * @see #updateElicitationTaskTranscriptAttributeOption(ElicitationTaskAttributeOption)
    * @see #deleteElicitationTaskTranscriptAttributeOption(ElicitationTaskAttributeOption)
-   * @see #deleteElicitationTaskTranscriptAttributeOption(String,String,String)
+   * @see #deleteElicitationTaskTranscriptAttributeOption(int,String,String)
    */
   public ElicitationTaskAttributeOption[] readElicitationTaskTranscriptAttributeOptions(
     int taskId, String attribute, Integer pageNumber, Integer pageLength)
@@ -1832,7 +1832,7 @@ public class LabbcatAdmin extends LabbcatEdit implements GraphStoreAdministratio
    * @see #readElicitationTaskTranscriptAttributeOptions(int,String)
    * @see #readElicitationTaskTranscriptAttributeOptions(int,String,Integer,Integer)
    * @see #deleteElicitationTaskTranscriptAttributeOption(ElicitationTaskAttributeOption)
-   * @see #deleteElicitationTaskTranscriptAttributeOption(String,String,String)
+   * @see #deleteElicitationTaskTranscriptAttributeOption(int,String,String)
    */
   public ElicitationTaskAttributeOption updateElicitationTaskTranscriptAttributeOption(
     ElicitationTaskAttributeOption attributeOption)
@@ -1860,7 +1860,7 @@ public class LabbcatAdmin extends LabbcatEdit implements GraphStoreAdministratio
    * @see #readElicitationTaskTranscriptAttributeOptions(int,String)
    * @see #readElicitationTaskTranscriptAttributeOptions(int,String,Integer,Integer)
    * @see #updateElicitationTaskTranscriptAttributeOption(ElicitationTaskAttributeOption)
-   * @see #deleteElicitationTaskTranscriptAttributeOption(String,String,String)
+   * @see #deleteElicitationTaskTranscriptAttributeOption(int,String,String)
    */
   public void deleteElicitationTaskTranscriptAttributeOption(
     ElicitationTaskAttributeOption attributeOption)
@@ -1910,7 +1910,7 @@ public class LabbcatAdmin extends LabbcatEdit implements GraphStoreAdministratio
    * @see #readElicitationTaskParticipantAttributeOptions(int,String,Integer,Integer)
    * @see #updateElicitationTaskParticipantAttributeOption(ElicitationTaskAttributeOption)
    * @see #deleteElicitationTaskParticipantAttributeOption(ElicitationTaskAttributeOption)
-   * @see #deleteElicitationTaskParticipantAttributeOption(String,String,String)
+   * @see #deleteElicitationTaskParticipantAttributeOption(int,String,String)
    */
   public ElicitationTaskAttributeOption createElicitationTaskParticipantAttributeOption(
     ElicitationTaskAttributeOption attributeOption)
@@ -1943,7 +1943,7 @@ public class LabbcatAdmin extends LabbcatEdit implements GraphStoreAdministratio
    * @see #readElicitationTaskParticipantAttributeOptions(int,String,Integer,Integer)
    * @see #updateElicitationTaskParticipantAttributeOption(ElicitationTaskAttributeOption)
    * @see #deleteElicitationTaskParticipantAttributeOption(ElicitationTaskAttributeOption)
-   * @see #deleteElicitationTaskParticipantAttributeOption(String,String,String)
+   * @see #deleteElicitationTaskParticipantAttributeOption(int,String,String)
    */
   public ElicitationTaskAttributeOption[] readElicitationTaskParticipantAttributeOptions(
     int taskId, String attribute)
@@ -1965,7 +1965,7 @@ public class LabbcatAdmin extends LabbcatEdit implements GraphStoreAdministratio
    * @see #readElicitationTaskParticipantAttributeOptions(int,String)
    * @see #updateElicitationTaskParticipantAttributeOption(ElicitationTaskAttributeOption)
    * @see #deleteElicitationTaskParticipantAttributeOption(ElicitationTaskAttributeOption)
-   * @see #deleteElicitationTaskParticipantAttributeOption(String,String,String)
+   * @see #deleteElicitationTaskParticipantAttributeOption(int,String,String)
    */
   public ElicitationTaskAttributeOption[] readElicitationTaskParticipantAttributeOptions(
     int taskId, String attribute, Integer pageNumber, Integer pageLength)
@@ -2004,7 +2004,7 @@ public class LabbcatAdmin extends LabbcatEdit implements GraphStoreAdministratio
    * @see #readElicitationTaskParticipantAttributeOptions(int,String)
    * @see #readElicitationTaskParticipantAttributeOptions(int,String,Integer,Integer)
    * @see #deleteElicitationTaskParticipantAttributeOption(ElicitationTaskAttributeOption)
-   * @see #deleteElicitationTaskParticipantAttributeOption(String,String,String)
+   * @see #deleteElicitationTaskParticipantAttributeOption(int,String,String)
    */
   public ElicitationTaskAttributeOption updateElicitationTaskParticipantAttributeOption(
     ElicitationTaskAttributeOption attributeOption)
@@ -2032,7 +2032,7 @@ public class LabbcatAdmin extends LabbcatEdit implements GraphStoreAdministratio
    * @see #readElicitationTaskParticipantAttributeOptions(int,String)
    * @see #readElicitationTaskParticipantAttributeOptions(int,String,Integer,Integer)
    * @see #updateElicitationTaskParticipantAttributeOption(ElicitationTaskAttributeOption)
-   * @see #deleteElicitationTaskParticipantAttributeOption(String,String,String)
+   * @see #deleteElicitationTaskParticipantAttributeOption(int,String,String)
    */
   public void deleteElicitationTaskParticipantAttributeOption(
     ElicitationTaskAttributeOption attributeOption)
@@ -2085,7 +2085,7 @@ public class LabbcatAdmin extends LabbcatEdit implements GraphStoreAdministratio
    * @see #readElicitationTaskParticipantAttributeOptions(int,String)
    * @see #readElicitationTaskParticipantAttributeOptions(int,String,Integer,Integer)
    * @see #updateElicitationTaskParticipantAttributeOption(ElicitationTaskAttributeOption)
-   * @see #deleteElicitationTaskParticipantAttributeOption(String,String,String)
+   * @see #deleteElicitationTaskParticipantAttributeOption(int,String,String)
    * @see #deleteElicitationTaskParticipantAttributeOption(ElicitationTaskAttributeOption)
    * @throws StoreException If the lexicon could not be loaded.
    */

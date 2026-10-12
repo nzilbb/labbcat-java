@@ -27,7 +27,7 @@
   + updateElicitationTaskParticipantAttributeOption()
   + deleteElicitationTaskParticipantAttributeOption()
 
-Minimum LaBB-CAT version *20260812.1200*
+Minimum LaBB-CAT version *20261012.1814*
 
 # 1.4.0
 

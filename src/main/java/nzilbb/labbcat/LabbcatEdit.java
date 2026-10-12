@@ -917,7 +917,7 @@ public class LabbcatEdit extends LabbcatView implements GraphStore {
    * The second part of a fragment upload process started by a call to
    * {@link #fragmentUpload(File,boolean)}, which specifies values for the parameters
    * required to save the uploaded fragment to LaBB-CAT's database. 
-   * @param upload Response from {@link #fragmentUpload(File,Map,boolean)} with
+   * @param upload Response from {@link #fragmentUpload(File,boolean)} with
    * parameter values filled in as required.
    * @return The ID, transcript name, start and end time of the fragment, and URL
    * to the fragment in context. 
