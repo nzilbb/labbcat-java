@@ -2073,6 +2073,149 @@ public class LabbcatAdmin extends LabbcatEdit implements GraphStoreAdministratio
   } // end of updateElicitationTaskAttributeOption()
 
   /**
+   * Reads the elicitation task participant attribute validation script.
+   * @param taskId The ID of the elicitation task.
+   * @param attribute The attribute to list the current options for.
+   * @return A validation JavaScript, which may be empty, or null if the <var>taskId</var>
+   * doesn't identify a valid task, or <var>attribute</var> doesn't identify a participant
+   * attribute elicited during the task.
+   * @throws StoreException If an error prevents the operation.
+   * @throws PermissionException If the operation is not permitted.
+   * @see #updateElicitedParticipantAttributeValidation(int,String,String)
+   */
+  public String readElicitedParticipantAttributeValidation(
+    int taskId, String attribute)
+    throws StoreException, PermissionException {
+    try {
+      HttpRequestGet request = get(
+        "api/admin/elicit/validation/" + taskId + "/participant/" + attribute);
+      if (verbose) System.out.println(
+        "readElicitedParticipantAttributeValidation -> " + request);
+      HttpURLConnection connection = request.get();
+      if (connection.getResponseCode() == HttpURLConnection.HTTP_NOT_FOUND) {
+        return null;
+      }
+      if (connection.getResponseCode() != HttpURLConnection.HTTP_OK) {
+        throw new StoreException(
+          "Error " + connection.getResponseCode()
+          + " " + connection.getResponseMessage() + " - " + request);
+      } else {
+        return IO.InputStreamToString(connection.getInputStream());
+      } // response ok
+    } catch(IOException x) {
+      throw new StoreException("Could not get response.", x);
+    }
+  } // end of readElicitedParticipantAttributeValidation()
+  
+  /**
+   * Updates an elicitation task participant attribute validation script.
+   * @param taskId The ID of the elicitation task.
+   * @param attribute The attribute to list the current options for.
+   * @param script The validation JavaScript, which can be an empty string.
+   * @return The attributeOption just updated.
+   * @throws StoreException If an error prevents the operation.
+   * @throws PermissionException If the operation is not permitted.
+   * @see #readElicitedParticipantAttributeValidation(int,String)
+   */
+  public String updateElicitedParticipantAttributeValidation(
+    int taskId, String attribute, String script)
+    throws StoreException, PermissionException {
+    try{
+      HttpRequestPost request = put(
+        "api/admin/elicit/validation/" + taskId + "/participant/" + attribute)
+        .setHeader("Accept", "text/javascript");
+      if (verbose) System.out.println(
+        "updateElicitedParticipantAttributeValidation -> "
+        + request + " : " + script);
+      HttpURLConnection connection = request.post(script);
+      if (connection.getResponseCode() == HttpURLConnection.HTTP_NOT_FOUND) {
+        return null;
+      }
+      if (connection.getResponseCode() != HttpURLConnection.HTTP_OK) {
+        throw new StoreException(
+          "Error " + connection.getResponseCode()
+          + " " + connection.getResponseMessage() + " - " + request);
+      } else {
+        return script;
+      } // response ok
+    } catch(IOException x) {
+      throw new StoreException("Could not get response.", x);
+    }
+  } // end of updateElicitedParticipantAttributeValidation()
+  
+  /**
+   * Reads the elicitation task transcript attribute validation script.
+   * @param taskId The ID of the elicitation task.
+   * @param attribute The attribute to list the current options for.
+   * @return A validation JavaScript, which may be empty, or null if the <var>taskId</var>
+   * doesn't identify a valid task, or <var>attribute</var> doesn't identify a transcript
+   * attribute elicited during the task.
+   * @throws StoreException If an error prevents the operation.
+   * @throws PermissionException If the operation is not permitted.
+   * @see #updateElicitedTranscriptAttributeValidation(int,String,String)
+   */
+  public String readElicitedTranscriptAttributeValidation(
+    int taskId, String attribute)
+    throws StoreException, PermissionException {
+    try {
+      HttpRequestGet request = get(
+        "api/admin/elicit/validation/" + taskId + "/transcript/" + attribute);
+      if (verbose) System.out.println(
+        "readElicitedTranscriptAttributeValidation -> " + request);
+      HttpURLConnection connection = request.get();
+      if (connection.getResponseCode() == HttpURLConnection.HTTP_NOT_FOUND) {
+        return null;
+      }
+      if (connection.getResponseCode() != HttpURLConnection.HTTP_OK) {
+        throw new StoreException(
+          "Error " + connection.getResponseCode()
+          + " " + connection.getResponseMessage() + " - " + request);
+      } else {
+        return IO.InputStreamToString(connection.getInputStream());
+      } // response ok
+    } catch(IOException x) {
+      throw new StoreException("Could not get response.", x);
+    }
+  } // end of readElicitedTranscriptAttributeValidation()
+  
+  /**
+   * Updates an elicitation task transcript attribute validation script.
+   * @param taskId The ID of the elicitation task.
+   * @param attribute The attribute to list the current options for.
+   * @param script The validation JavaScript, which can be an empty string.
+   * @return The attributeOption just updated.
+   * @throws StoreException If an error prevents the operation.
+   * @throws PermissionException If the operation is not permitted.
+   * @see #readElicitedTranscriptAttributeValidation(int,String)
+   */
+  public String updateElicitedTranscriptAttributeValidation(
+    int taskId, String attribute, String script)
+    throws StoreException, PermissionException {
+    try{
+      HttpRequestPost request = put(
+        "api/admin/elicit/validation/" + taskId + "/transcript/" + attribute)
+        .setHeader("Accept", "text/javascript");
+      if (script == null) script = "";
+      if (verbose) System.out.println(
+        "updateElicitationTaskTranscriptAttributeValidation -> "
+        + request + " : " + script);
+      HttpURLConnection connection = request.post(script);
+      if (connection.getResponseCode() == HttpURLConnection.HTTP_NOT_FOUND) {
+        return null;
+      }
+      if (connection.getResponseCode() != HttpURLConnection.HTTP_OK) {
+        throw new StoreException(
+          "Error " + connection.getResponseCode()
+          + " " + connection.getResponseMessage() + " - " + request);
+      } else {
+        return script;
+      } // response ok
+    } catch(IOException x) {
+      throw new StoreException("Could not get response.", x);
+    }
+  } // end of updateElicitationTaskTranscriptAttributeValidationScript()
+  
+  /**
    * Upload a full task definition to be added/updated from a JSON file.
    * @param file The task definition file, the name of which must end
    *       in <q>.json</q>. The name of the file (without the .json

@@ -1,3 +1,14 @@
+# 1.6.0
+
+- New LabbcatAdmin functions for maintenance of validation scripts for 
+  participant/transcript attributes elicited during elicitation tasks:
+  + readElicitedParticipantAttributeValidation
+  + updateElicitedParticipantAttributeValidation
+  + readElicitedTranscriptAttributeValidation
+  + updateElicitedTranscriptAttributeValidation
+
+Minimum LaBB-CAT version *20261022.1945*
+
 # 1.5.0
 
 - New LabbcatEdit functions

@@ -1583,6 +1583,66 @@ public class TestLabbcatAdmin {
     }
   }
 
+  /** Elicitation task attribute validation scripts can be read and updated. */
+  @Test public void elicitationTaskAttributeValidationReadUpdate() throws Exception {
+    File someSteps = new File(getDir(), "nonempty-unit-test-task.json");
+    assertTrue("json file exists " + someSteps.getPath(), someSteps.exists());
+    File noSteps = new File(getDir(), "empty-unit-test-task.json");
+    assertTrue("json file exists " + noSteps.getPath(), noSteps.exists());
+    File json = new File(getDir(), "unit-test-task.json");
+    IO.Copy(someSteps, json);
+    
+    // upload the task
+    int taskId = labbcat.elicitatationTaskUpload(json);
+    try {
+
+      // participant attributes
+
+      // start with none
+      String emptyScript
+        = labbcat.readElicitedParticipantAttributeValidation(taskId, "gender");
+      assertEquals("There is no script", "", emptyScript);
+
+      // update
+      String script = "isValid();";
+      String updatedScript = labbcat
+        .updateElicitedParticipantAttributeValidation(taskId,"gender",script);
+      assertEquals("Returned script correct", script, updatedScript);
+
+      // transcript attributes
+
+      // start with none
+      emptyScript
+        = labbcat.readElicitedTranscriptAttributeValidation(taskId,"language");
+      assertEquals("There is no script", "", emptyScript);
+
+      // update
+      updatedScript = labbcat
+        .updateElicitedTranscriptAttributeValidation(taskId,"language",script);
+      assertEquals("Returned script correct", script, updatedScript);
+
+      // can use null
+      updatedScript = labbcat
+        .updateElicitedTranscriptAttributeValidation(taskId,"language",null);
+      assertEquals("Null becomes empty string", "", updatedScript);
+    } finally {
+      labbcat.setVerbose(false);
+      // update it so it has no steps (so we can delete it)
+      IO.Copy(noSteps, json);
+      try {
+        int emptyTaskId = labbcat.elicitatationTaskUpload(json);
+      } catch(Exception exception) {
+        System.out.println("Could not reupload " + taskId + ": "+exception);
+      }
+      // delete it
+      try {
+        labbcat.deleteElicitationTask(taskId);
+      } catch(Exception exception) {
+        System.out.println("Could not delete task " + taskId + ": "+exception);
+      }
+    }
+  }
+
   /**
    * Reads a CSV file into a map of lists, and then deletes the file.
    * @param csv Dictionary file.
