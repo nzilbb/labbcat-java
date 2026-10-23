@@ -1,5 +1,5 @@
 //
-// Copyright 2020-2022 New Zealand Institute of Language, Brain and Behaviour, 
+// Copyright 2020-2026 New Zealand Institute of Language, Brain and Behaviour, 
 // University of Canterbury
 // Written by Robert Fromont - robert.fromont@canterbury.ac.nz
 //
@@ -44,6 +44,7 @@ import nzilbb.ag.serialize.SerializationDescriptor;
 import nzilbb.labbcat.http.*;
 import nzilbb.labbcat.model.Category;
 import nzilbb.labbcat.model.Corpus;
+import nzilbb.labbcat.model.DashboardItem;
 import nzilbb.labbcat.model.ElicitationTask;
 import nzilbb.labbcat.model.ElicitationTaskAttributeOption;
 import nzilbb.labbcat.model.ElicitationTaskResource;
@@ -849,6 +850,153 @@ public class LabbcatAdmin extends LabbcatEdit implements GraphStoreAdministratio
       throw new StoreException("Could not get response.", x);
     }
   } // end of updateMediaTrack()
+   
+  /**
+   * Creates a new dashboard item.
+   * @param dashboardItem The dashboardItem details to save.
+   * @return The dashboardItem just created.
+   * @throws StoreException If an error prevents the operation.
+   * @throws PermissionException If the operation is not permitted.
+   * @see #readDashboardItems(String)
+   * @see #readDashboardItems(String,Integer,Integer)
+   * @see #updateDashboardItem(DashboardItem)
+   * @see #deleteDashboardItem(DashboardItem)
+   * @see #deleteDashboardItem(String,Integer)
+   */
+  public DashboardItem createDashboardItem(DashboardItem dashboardItem)
+    throws StoreException, PermissionException {
+    try {
+      HttpRequestPost request = post("api/admin/dashboard")
+        .setHeader("Accept", "application/json");
+      if (verbose) System.out.println("createDashboardItem -> " + request);
+      response = new Response(request.post(dashboardItem.toJson()), verbose);
+      response.checkForErrors(); // throws a StoreException on error
+      if (response.isModelNull()) return null;
+      return new DashboardItem((JsonObject)response.getModel());
+    } catch(IOException x) {
+      throw new StoreException("Could not get response.", x);
+    }
+  } // end of createDashboardItem()
+   
+  /**
+   * Reads a list of dashboardItem records.
+   * @param type The type of item to read - "link" or "sql".
+   * @return A list of dashboardItems.
+   * @throws StoreException If an error prevents the operation.
+   * @throws PermissionException If the operation is not permitted.
+   * @see #createDashboardItem(DashboardItem)
+   * @see #readDashboardItems(String,Integer,Integer)
+   * @see #updateDashboardItem(DashboardItem)
+   * @see #deleteDashboardItem(DashboardItem)
+   * @see #deleteDashboardItem(String,Integer)
+   */
+  public DashboardItem[] readDashboardItems(String type) throws StoreException, PermissionException {
+    return readDashboardItems(type, null, null);
+  }
+   
+  /**
+   * Reads a list of dashboard items.
+   * @param type The type of item to read - "link" or "sql".
+   * @param pageNumber The zero-based  page of records to return (if null, all records
+   * will be returned). 
+   * @param pageLength The length of pages (if null, the default page length is 20).
+   * @return A list of dashboardItems.
+   * @throws StoreException If an error prevents the operation.
+   * @throws PermissionException If the operation is not permitted.
+   * @see #createDashboardItem(DashboardItem)
+   * @see #readDashboardItems(String)
+   * @see #updateDashboardItem(DashboardItem)
+   * @see #deleteDashboardItem(DashboardItem)
+   * @see #deleteDashboardItem(String,Integer)
+   */
+  public DashboardItem[] readDashboardItems(String type, Integer pageNumber, Integer pageLength)
+    throws StoreException, PermissionException {
+    try {
+      HttpRequestGet request = get("api/admin/dashboard/"+type)
+        .setHeader("Accept", "application/json");
+      if (pageLength != null) request.setParameter("pageNumber", pageLength);
+      if (pageNumber != null) request.setParameter("pageLength", pageNumber);
+      if (verbose) System.out.println("readDashboardItems -> " + request);
+      response = new Response(request.get(), verbose);
+      response.checkForErrors(); // throws a StoreException on error
+      if (response.isModelNull()) return null;
+      JsonArray array = (JsonArray)response.getModel();
+      Vector<DashboardItem> dashboardItems = new Vector<DashboardItem>();
+      if (array != null) {
+        for (int i = 0; i < array.size(); i++) {
+          dashboardItems.add(new DashboardItem(array.getJsonObject(i)));
+        }
+      }
+      return dashboardItems.toArray(new DashboardItem[0]);
+    } catch(IOException x) {
+      throw new StoreException("Could not get response.", x);
+    }
+  } // end of readDashboardItems()
+   
+  /**
+   * Updates an existing dashboard item.
+   * @param dashboardItem The dashboardItem details to save.
+   * @return The dashboardItem just updated.
+   * @throws StoreException If an error prevents the operation.
+   * @throws PermissionException If the operation is not permitted.
+   * @see #createDashboardItem(DashboardItem)
+   * @see #readDashboardItems(String)
+   * @see #readDashboardItems(String,Integer,Integer)
+   * @see #deleteDashboardItem(DashboardItem)
+   * @see #deleteDashboardItem(String,Integer)
+   */
+  public DashboardItem updateDashboardItem(DashboardItem dashboardItem)
+    throws StoreException, PermissionException {
+    try{
+      HttpRequestPost request = put("api/admin/dashboard")
+        .setHeader("Accept", "application/json");
+      if (verbose) System.out.println("updateDashboardItem -> " + request);
+      response = new Response(request.post(dashboardItem.toJson()), verbose);
+      response.checkForErrors(); // throws a StoreException on error
+      if (response.isModelNull()) return null;
+      return new DashboardItem((JsonObject)response.getModel());
+    } catch(IOException x) {
+      throw new StoreException("Could not get response.", x);
+    }
+  } // end of updateDashboardItem()
+   
+  /**
+   * Deletes an existing dashboard item.
+   * @param dashboardItem The dashboardItem to delete.
+   * @throws StoreException If an error prevents the operation.
+   * @throws PermissionException If the operation is not permitted.
+   * @see #createDashboardItem(DashboardItem)
+   * @see #readDashboardItems(String)
+   * @see #readDashboardItems(String,Integer,Integer)
+   * @see #updateDashboardItem(DashboardItem)
+   * @see #deleteDashboardItem(String,Integer)
+   */
+  public void deleteDashboardItem(DashboardItem dashboardItem) throws StoreException, PermissionException {
+    deleteDashboardItem(dashboardItem.getType(), dashboardItem.getItemId());
+  }
+   
+  /**
+   * Deletes an existing dashboard item.
+   * @param type The type of the item - "link" or "sql"
+   * @param itemId The ID of the item ({@link DashboardItem#getItemId()})
+   * @throws StoreException If an error prevents the operation.
+   * @throws PermissionException If the operation is not permitted.
+   * @see #createDashboardItem(DashboardItem)
+   * @see #readDashboardItems()
+   * @see #readDashboardItems(Integer,Integer)
+   * @see #updateDashboardItem(DashboardItem)
+   * @see #deleteDashboardItem(DashboardItem)
+   */
+  public void deleteDashboardItem(String type, int itemId) throws StoreException, PermissionException {
+    try{
+      HttpRequestPost request = delete("api/admin/dashboard/" + type + "/" + itemId);
+      if (verbose) System.out.println("deleteDashboardItem -> " + request);
+      response = new Response(request.post(), verbose);
+      response.checkForErrors(); // throws a StoreException on error
+    } catch(IOException x) {
+      throw new StoreException("Could not get response.", x);
+    }
+  } // end of deleteDashboardItem()
    
   /**
    * Creates a new role record.

@@ -102,7 +102,92 @@ public class DashboardItem {
    * @param newIcon The item's icon.
    */
   public DashboardItem setIcon(String newIcon) { icon = newIcon; return this; }
+
+  /**
+   * The definition of the item, if available.
+   * @see #getDefinition()
+   * @see #setDefinition(String)
+   */
+  protected String definition;
+  /**
+   * Getter for {@link #definition}: The definition of the item, if available.
+   * @return The definition of the item, if available.
+   */
+  public String getDefinition() { return definition; }
+  /**
+   * Setter for {@link #definition}: The definition of the item, if available.
+   * @param newDefinition The definition of the item, if available.
+   */
+  public DashboardItem setDefinition(String newDefinition) { definition = newDefinition; return this; }
   
+  /**
+   * Wether the item is displayed on the main dashboard.
+   * @see #getDashboard()
+   * @see #setDashboard(Boolean)
+   */
+  protected Boolean dashboard;
+  /**
+   * Getter for {@link #dashboard}: Wether the item is displayed on the main dashboard.
+   * @return Wether the item is displayed on the main dashboard.
+   */
+  public Boolean getDashboard() { return dashboard; }
+  /**
+   * Setter for {@link #dashboard}: Wether the item is displayed on the main dashboard.
+   * @param newDashboard Wether the item is displayed on the main dashboard.
+   */
+  public DashboardItem setDashboard(Boolean newDashboard) { dashboard = newDashboard; return this; }
+
+  /**
+   * Wether the item is displayed on the 'express' dashboard.
+   * @see #getExpress()
+   * @see #setExpress(Boolean)
+   */
+  protected Boolean express;
+  /**
+   * Getter for {@link #express}: Wether the item is displayed on the 'express' dashboard.
+   * @return Wether the item is displayed on the 'express' dashboard.
+   */
+  public Boolean getExpress() { return express; }
+  /**
+   * Setter for {@link #express}: Wether the item is displayed on the 'express' dashboard.
+   * @param newExpress Wether the item is displayed on the 'express' dashboard.
+   */
+  public DashboardItem setExpress(Boolean newExpress) { express = newExpress; return this; }
+
+  /**
+   * Wether the item is displayed on the 'statistics' dashboard.
+   * @see #getStatistics()
+   * @see #setStatistics(Boolean)
+   */
+  protected Boolean statistics;
+  /**
+   * Getter for {@link #statistics}: Wether the item is displayed on the 'statistics' dashboard.
+   * @return Wether the item is displayed on the 'statistics' dashboard.
+   */
+  public Boolean getStatistics() { return statistics; }
+  /**
+   * Setter for {@link #statistics}: Wether the item is displayed on the 'statistics' dashboard.
+   * @param newStatistics Wether the item is displayed on the 'statistics' dashboard.
+   */
+  public DashboardItem setStatistics(Boolean newStatistics) { statistics = newStatistics; return this; }
+
+  /**
+   * Where the item fits in the order amongst other items of the same type.
+   * @see #getDisplayOrder()
+   * @see #setDisplayOrder(int)
+   */
+  protected int displayOrder = -1;
+  /**
+   * Getter for {@link #displayOrder}: Where the item fits in the order amongst other items of the same type.
+   * @return Where the item fits in the order amongst other items of the same type.
+   */
+  public int getDisplayOrder() { return displayOrder; }
+  /**
+   * Setter for {@link #displayOrder}: Where the item fits in the order amongst other items of the same type.
+   * @param newDisplayOrder Where the item fits in the order amongst other items of the same type.
+   */
+  public DashboardItem setDisplayOrder(int newDisplayOrder) { displayOrder = newDisplayOrder; return this; }
+
   // Methods:
   
   /**
@@ -120,6 +205,11 @@ public class DashboardItem {
     type = json.getString("type");
     label = json.getString("label");
     icon = json.getString("icon");
+    if (json.containsKey("definition")) definition = json.getString("definition");
+    if (json.containsKey("display_order")) displayOrder = json.getInt("display_order");
+    if (json.containsKey("dashboard")) dashboard = json.getInt("dashboard") == 1;
+    if (json.containsKey("express")) express = json.getInt("express") == 1;
+    if (json.containsKey("statistics")) statistics = json.getInt("statistics") == 1;
   } // end of constructor
 
   /**
@@ -132,6 +222,11 @@ public class DashboardItem {
     if (type != null) json = json.add("type", type);
     if (label != null) json = json.add("label", label);
     if (icon != null) json = json.add("icon", icon);
+    if (definition != null) json = json.add("definition", definition);
+    if (displayOrder >= 0) json = json.add("display_order", displayOrder);
+    if (dashboard != null) json = json.add("dashboard", dashboard?1:0);
+    if (express != null) json = json.add("express", express?1:0);
+    if (statistics != null) json = json.add("statistics", statistics?1:0);
     return json.build();
   } // end of toJSON()
 } // end of class DashboardItem

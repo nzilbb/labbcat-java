@@ -573,6 +573,111 @@ public class TestLabbcatAdmin {
     }
   }
 
+  @Test public void dashboardItemCRUD() throws Exception {
+    DashboardItem originalDashboardItem = new DashboardItem()
+      .setType("sql")
+      .setLabel("unit-test")
+      .setIcon("")
+      .setDefinition("SELECT COUNT(*) FROM transcript")
+      .setDashboard(true)
+      .setExpress(false)
+      .setStatistics(true)
+      .setDisplayOrder(99);
+    int itemId = -1;
+    try {
+      DashboardItem newDashboardItem = labbcat.createDashboardItem(originalDashboardItem);
+      assertNotNull("DashboardItem returned", newDashboardItem);
+      assertEquals("Type correct",
+                   originalDashboardItem.getType(), newDashboardItem.getType());
+      assertEquals("Label correct",
+                   originalDashboardItem.getLabel(), newDashboardItem.getLabel());
+      assertEquals("Icon correct",
+                   originalDashboardItem.getIcon(), newDashboardItem.getIcon());
+      assertEquals("Definition correct",
+                   originalDashboardItem.getDefinition(), newDashboardItem.getDefinition());
+      assertEquals("Dashboard correct",
+                   originalDashboardItem.getDashboard(), newDashboardItem.getDashboard());
+      assertEquals("Express correct",
+                   originalDashboardItem.getExpress(), newDashboardItem.getExpress());
+      assertEquals("Statistics correct",
+                   originalDashboardItem.getStatistics(), newDashboardItem.getStatistics());
+      assertEquals("Display order correct",
+                   originalDashboardItem.getDisplayOrder(), newDashboardItem.getDisplayOrder());
+      itemId = newDashboardItem.getItemId();
+         
+      DashboardItem[] dashboardItems = labbcat.readDashboardItems("sql");
+      // ensure the dashboardItem exists
+      assertTrue("There's at least one dashboardItem", dashboardItems.length >= 1);
+      boolean found = false;
+      for (DashboardItem c : dashboardItems) {
+        if (c.getItemId() == itemId) {
+          found = true;
+          break;
+        }
+      }
+      assertTrue("DashboardItem was added", found);
+
+      // update it
+      DashboardItem updatedDashboardItem = new DashboardItem()
+        .setItemId(itemId)
+        .setType("sql")
+        .setLabel("unit-test-changed")
+        .setIcon("search.svg")
+        .setDefinition("SELECT COUNT(*) FROM participant")
+        .setDashboard(false)
+        .setExpress(true)
+        .setStatistics(false)
+        .setDisplayOrder(98);
+         
+      DashboardItem changedDashboardItem = labbcat.updateDashboardItem(updatedDashboardItem);
+      assertNotNull("DashboardItem returned", changedDashboardItem);
+      assertEquals("Type correct",
+                   updatedDashboardItem.getType(), changedDashboardItem.getType());
+      assertEquals("Label correct",
+                   updatedDashboardItem.getLabel(), changedDashboardItem.getLabel());
+      assertEquals("Icon correct",
+                   updatedDashboardItem.getIcon(), changedDashboardItem.getIcon());
+      assertEquals("Definition correct",
+                   updatedDashboardItem.getDefinition(), changedDashboardItem.getDefinition());
+      assertEquals("Dashboard correct",
+                   updatedDashboardItem.getDashboard(), changedDashboardItem.getDashboard());
+      assertEquals("Express correct",
+                   originalDashboardItem.getExpress(), newDashboardItem.getExpress());
+      assertEquals("Statistics correct",
+                   originalDashboardItem.getStatistics(), newDashboardItem.getStatistics());
+      assertEquals("Display order correct",
+                   updatedDashboardItem.getDisplayOrder(), changedDashboardItem.getDisplayOrder());
+
+      // delete it
+      labbcat.deleteDashboardItem(changedDashboardItem.getType(), itemId);
+
+      DashboardItem[] dashboardItemsAfter = labbcat.readDashboardItems("sql");
+      // ensure the dashboardItem no longer exists
+      boolean foundAfter = false;
+      for (DashboardItem c : dashboardItemsAfter) {
+        if (c.getItemId() == itemId) {
+          foundAfter = true;
+          break;
+        }
+      }
+      assertFalse("DashboardItem is gone", foundAfter);
+
+      try {
+        // can't delete it again
+        labbcat.deleteDashboardItem(changedDashboardItem.getType(), itemId);
+        fail("Can't delete dashboardItem that doesn't exist");
+      } catch(Exception exception) {
+      }
+      
+    } finally {
+      labbcat.setVerbose(false);
+      // ensure it's not there
+      try {
+        labbcat.deleteDashboardItem("sql", itemId);
+      } catch(Exception exception) {}         
+    }
+  }
+
   @Test public void newRoleUpdateRoleAndDeleteRole() throws Exception {
     Role originalRole = new Role()
       .setRoleId("unit-test")

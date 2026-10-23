@@ -6,8 +6,13 @@
   + updateElicitedParticipantAttributeValidation
   + readElicitedTranscriptAttributeValidation
   + updateElicitedTranscriptAttributeValidation
+- New LabbcatAdmin functions for maintenance of dashboard items:
+  + createDashboardItem
+  + readDashboardItems
+  + updateDashboardItem
+  + deleteDashboardItem
 
-Minimum LaBB-CAT version *20261022.1945*
+Minimum LaBB-CAT version *20261023.1636*
 
 # 1.5.0
 
