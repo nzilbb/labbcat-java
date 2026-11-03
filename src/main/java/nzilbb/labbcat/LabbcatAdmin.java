@@ -1949,7 +1949,8 @@ public class LabbcatAdmin extends LabbcatEdit implements GraphStoreAdministratio
     throws StoreException, PermissionException {
     try {
       HttpRequestGet request = get(
-        "api/admin/elicit/options/transcript/" + taskId + "/" + attribute)
+        "api/admin/elicit/options/transcript/" + taskId + "/"
+        + URLEncoder.encode(attribute, "UTF-8"))
         .setHeader("Accept", "application/json");
       if (pageLength != null) request.setParameter("pageNumber", pageLength);
       if (pageNumber != null) request.setParameter("pageLength", pageNumber);
@@ -2121,7 +2122,8 @@ public class LabbcatAdmin extends LabbcatEdit implements GraphStoreAdministratio
     throws StoreException, PermissionException {
     try {
       HttpRequestGet request = get(
-        "api/admin/elicit/options/participant/" + taskId + "/" + attribute)
+        "api/admin/elicit/options/participant/" + taskId + "/"
+        + URLEncoder.encode(attribute, "UTF-8"))
         .setHeader("Accept", "application/json");
       if (pageLength != null) request.setParameter("pageNumber", pageLength);
       if (pageNumber != null) request.setParameter("pageLength", pageNumber);
@@ -2237,7 +2239,8 @@ public class LabbcatAdmin extends LabbcatEdit implements GraphStoreAdministratio
     throws StoreException, PermissionException {
     try {
       HttpRequestGet request = get(
-        "api/admin/elicit/validation/" + taskId + "/participant/" + attribute);
+        "api/admin/elicit/validation/" + taskId
+        + "/participant/" + URLEncoder.encode(attribute, "UTF-8"));
       if (verbose) System.out.println(
         "readElicitedParticipantAttributeValidation -> " + request);
       HttpURLConnection connection = request.get();
@@ -2308,7 +2311,8 @@ public class LabbcatAdmin extends LabbcatEdit implements GraphStoreAdministratio
     throws StoreException, PermissionException {
     try {
       HttpRequestGet request = get(
-        "api/admin/elicit/validation/" + taskId + "/transcript/" + attribute);
+        "api/admin/elicit/validation/" + taskId
+        + "/transcript/" + URLEncoder.encode(attribute, "UTF-8"));
       if (verbose) System.out.println(
         "readElicitedTranscriptAttributeValidation -> " + request);
       HttpURLConnection connection = request.get();
@@ -2342,7 +2346,8 @@ public class LabbcatAdmin extends LabbcatEdit implements GraphStoreAdministratio
     throws StoreException, PermissionException {
     try{
       HttpRequestPost request = put(
-        "api/admin/elicit/validation/" + taskId + "/transcript/" + attribute)
+        "api/admin/elicit/validation/" + taskId
+        + "/transcript/"+URLEncoder.encode(attribute, "UTF-8"))
         .setHeader("Accept", "text/javascript");
       if (script == null) script = "";
       if (verbose) System.out.println(
@@ -2410,7 +2415,7 @@ public class LabbcatAdmin extends LabbcatEdit implements GraphStoreAdministratio
   public Episode[] readEpisodes(String corpus)
     throws StoreException, PermissionException {
     try {
-      HttpRequestGet request = get("api/admin/episodes/" + corpus)
+      HttpRequestGet request = get("api/admin/episodes/"+URLEncoder.encode(corpus,"UTF-8"))
         .setHeader("Accept", "application/json");
       if (verbose) System.out.println("readEpisodes -> " + request);
       response = new Response(request.get(), verbose);
