@@ -48,6 +48,7 @@ import nzilbb.labbcat.model.DashboardItem;
 import nzilbb.labbcat.model.ElicitationTask;
 import nzilbb.labbcat.model.ElicitationTaskAttributeOption;
 import nzilbb.labbcat.model.ElicitationTaskResource;
+import nzilbb.labbcat.model.Episode;
 import nzilbb.labbcat.model.MediaTrack;
 import nzilbb.labbcat.model.Project;
 import nzilbb.labbcat.model.Role;
@@ -2398,6 +2399,59 @@ public class LabbcatAdmin extends LabbcatEdit implements GraphStoreAdministratio
     }
   } // end of elicitatationTaskUpload()
   
+  /**
+   * Reads a list of episodes in a given corpus.
+   * @param corpus The name of the corpus the episodes are in..
+   * @return A list of episodes.
+   * @throws StoreException If an error prevents the operation.
+   * @throws PermissionException If the operation is not permitted.
+   * @see #updateRolePermission(RolePermission)
+   */
+  public Episode[] readEpisodes(String corpus)
+    throws StoreException, PermissionException {
+    try {
+      HttpRequestGet request = get("api/admin/episodes/" + corpus)
+        .setHeader("Accept", "application/json");
+      if (verbose) System.out.println("readEpisodes -> " + request);
+      response = new Response(request.get(), verbose);
+      response.checkForErrors(); // throws a StoreException on error
+      if (response.isModelNull()) return null;
+      JsonArray array = (JsonArray)response.getModel();
+      Vector<Episode> episodes = new Vector<Episode>();
+      if (array != null) {
+        for (int i = 0; i < array.size(); i++) {
+          episodes.add(new Episode(array.getJsonObject(i)));
+        }
+      }
+      return episodes.toArray(new Episode[0]);
+    } catch(IOException x) {
+      throw new StoreException("Could not get response.", x);
+    }
+  } // end of readEpisodes()
+  
+  /**
+   * Updates an existing episode.
+   * @param episode The episode details to save.
+   * @return The episode just updated.
+   * @throws StoreException If an error prevents the operation.
+   * @throws PermissionException If the operation is not permitted.
+   * @see #readEpisodes(String)
+   */
+  public Episode updateEpisode(Episode episode)
+    throws StoreException, PermissionException {
+    try{
+      HttpRequestPost request = put("api/admin/episodes")
+        .setHeader("Accept", "application/json");
+      if (verbose) System.out.println("updateEpisode -> " + request);
+      response = new Response(request.post(episode.toJson()), verbose);
+      response.checkForErrors(); // throws a StoreException on error
+      if (response.isModelNull()) return null;
+      return new Episode((JsonObject)response.getModel());
+    } catch(IOException x) {
+      throw new StoreException("Could not get response.", x);
+    }
+  } // end of updateEpisode()
+   
   
   // TODO uploadSerialization
   // TODO installSerialization

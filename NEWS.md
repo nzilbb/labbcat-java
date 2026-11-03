@@ -11,8 +11,11 @@
   + readDashboardItems
   + updateDashboardItem
   + deleteDashboardItem
-
-Minimum LaBB-CAT version *20261023.1636*
+- New LabbcatAdmin functions for maintenance of episodes:
+  + readEpisodes
+  + updateEpisode
+    
+Minimum LaBB-CAT version *20261103.1017*
 
 # 1.5.0
 

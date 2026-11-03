@@ -34,6 +34,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.Vector;
 import java.util.stream.Collectors;
@@ -1748,6 +1749,59 @@ public class TestLabbcatAdmin {
     }
   }
 
+  /** Episodes can be read and updated. */
+  @Test public void episodeRU() throws Exception {
+    File transcript = new File(getDir(), "nzilbb.labbcat.test.txt");
+    assertTrue("Ensure transcript exists: " + transcript.getPath(), transcript.exists());
+    try {
+      // ensure transcript doesn't already exist
+      labbcat.deleteTranscript(transcript.getName());
+    } catch(ResponseException exception) {}
+    String episodeName = "unit-test";
+    String[] corpora = labbcat.getCorpusIds();
+    assertTrue("There are at least two corpora", corpora.length >= 2);
+    try {
+      
+      Upload upload = labbcat.transcriptUpload(transcript, false);
+      assertNotNull("Transcript upload ok", upload.getId());
+      upload.getParameters().get("labbcat_corpus").setValue(corpora[0]);
+      upload.getParameters().get("labbcat_episode").setValue(episodeName);
+      upload = labbcat.transcriptUploadParameters(upload);
+      assertNotNull("Transcript upload parameters ok ", upload.getId());
+      String threadId = upload.getTranscripts().get(transcript.getName());
+      if (threadId != null) {
+        // cancel layer generation, we don't care about it         
+        labbcat.cancelTask(threadId);
+        labbcat.releaseTask(threadId);
+      }
+
+      // get episodes in corpus
+      Episode[] episodes = labbcat.readEpisodes(corpora[0]);
+      Optional<Episode> episode = Arrays.stream(episodes)
+        .filter(e->e.getName().equals(episodeName))
+        .findAny();
+      assertTrue("Episode is in corpus", episode.isPresent());
+      assertEquals("Episode corpus is correct", corpora[0], episode.get().getCorpus());
+
+      // change name
+      String newEpisodeName = episodeName+"-changed";
+      episode.get().setName(newEpisodeName);
+      Episode changedName = labbcat.updateEpisode(episode.get());
+      assertEquals("Episode name is changed", newEpisodeName, changedName.getName());
+    
+      // change name back so tests are re-runnable
+      // (deleteTranscript doesn't remove episode directory, so it'll still be there next
+      //  time, preventing the first change)
+      episode.get().setName(episodeName);
+      labbcat.updateEpisode(episode.get());
+    
+    } finally {
+      try {
+        labbcat.deleteTranscript(transcript.getName());
+      } catch(ResponseException exception) {}
+    }
+  }
+  
   /**
    * Reads a CSV file into a map of lists, and then deletes the file.
    * @param csv Dictionary file.
