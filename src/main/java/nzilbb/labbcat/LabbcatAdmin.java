@@ -2370,6 +2370,33 @@ public class LabbcatAdmin extends LabbcatEdit implements GraphStoreAdministratio
   } // end of updateElicitationTaskTranscriptAttributeValidationScript()
   
   /**
+   * Updates an existing elicitation task record by setting the steps to the given
+   * definition.
+   * @param taskId The ID of the elicitation task.
+   * @param steps An array of possibly nested step objects.
+   * @throws StoreException If an error prevents the operation.
+   * @throws PermissionException If the operation is not permitted.
+   * @see #elicitatationTaskUpload(File)
+   * @see #createElicitationTask(ElicitationTask)
+   * @see #readElicitationTasks()
+   * @see #readElicitationTasks(Integer,Integer)
+   * @see #deleteElicitationTask(ElicitationTask)
+   * @see #deleteElicitationTask(int)
+   */
+  public void updateElicitationTaskSteps(int taskId, JsonArray steps)
+    throws StoreException, PermissionException {
+    try{
+      HttpRequestPost request = put("api/admin/elicit/steps/"+taskId)
+        .setHeader("Accept", "application/json");
+      if (verbose) System.out.println("updateElicitationTaskSteps -> " + request);
+      response = new Response(request.post(steps), verbose);
+      response.checkForErrors(); // throws a StoreException on error
+    } catch(IOException x) {
+      throw new StoreException("Could not get response.", x);
+    }
+  } // end of updateElicitationTaskSteps()
+  
+  /**
    * Upload a full task definition to be added/updated from a JSON file.
    * @param file The task definition file, the name of which must end
    *       in <q>.json</q>. The name of the file (without the .json
@@ -2378,6 +2405,7 @@ public class LabbcatAdmin extends LabbcatEdit implements GraphStoreAdministratio
    *       will be <u>replaced</u> with the task in the
    *       file. Otherwise, a new task is created.
    * @return The task_id of the task.
+   * @see #updateElicitationTaskSteps(int,JsonArray)
    * @see #createElicitationTaskParticipantAttributeOption(ElicitationTaskAttributeOption)
    * @see #readElicitationTaskParticipantAttributeOptions(int,String)
    * @see #readElicitationTaskParticipantAttributeOptions(int,String,Integer,Integer)

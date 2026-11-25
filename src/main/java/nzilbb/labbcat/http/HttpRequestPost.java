@@ -385,6 +385,19 @@ public class HttpRequestPost {
    
    /**
     * posts the requests to the server, with all the cookies and parameters that were added
+    * @param json JSON body t post.
+    * @return input stream with the server response
+    * @throws IOException If an IO error occurs.
+    */
+   public HttpURLConnection post(JsonArray json) throws IOException {
+      
+      write(json.toString());
+      os.close();
+      return connection;
+   }
+   
+   /**
+    * posts the requests to the server, with all the cookies and parameters that were added
     * @param body Body text to post.
     * @return input stream with the server response
     * @throws IOException If an IO error occurs.

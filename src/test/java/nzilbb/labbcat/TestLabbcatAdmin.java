@@ -27,8 +27,8 @@ import static org.junit.Assert.*;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.net.URL;
 import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -38,6 +38,11 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.Vector;
 import java.util.stream.Collectors;
+import javax.json.Json;
+import javax.json.JsonArray;
+import javax.json.JsonArrayBuilder;
+import javax.json.JsonObject;
+import javax.json.JsonObjectBuilder;
 import nzilbb.ag.Anchor;
 import nzilbb.ag.Annotation;
 import nzilbb.ag.Constants;
@@ -1512,7 +1517,7 @@ public class TestLabbcatAdmin {
     }
   }
 
-  /** Ensure elicitation task upload works. */
+  /** Ensure elicitation task upload and step specification works. */
   @Test public void elicitationTaskUpload() throws Exception {
     File someSteps = new File(getDir(), "nonempty-unit-test-task.json");
     assertTrue("json file exists " + someSteps.getPath(), someSteps.exists());
@@ -1523,7 +1528,7 @@ public class TestLabbcatAdmin {
     
     // upload the task
     int taskId = labbcat.elicitatationTaskUpload(json);
-    try {      
+    try {
       
       ElicitationTask[] tasks = labbcat.readElicitationTasks();
       // ensure the task exists
@@ -1546,7 +1551,42 @@ public class TestLabbcatAdmin {
                    "<p>Consent</p>", foundTask.getConsent());
       assertEquals("EndUrl correct",
                    "https://example.com/", foundTask.getEndUrl());
-
+        
+      // also test updateElicitationTaskSteps
+      JsonArray steps = Json.createArrayBuilder()
+        .add(Json.createObjectBuilder()
+             .add("step_id", 1000)
+             .add("title", "Unit test step 1")
+             .add("prompt", "test step")
+             .add("transcript", "")
+             .add("shuffle_words", 0)
+             .add("record", 0)
+             .add("max_seconds", 30)
+             .add("suppress_next", 0)
+             .add("next_delay_seconds", 0)
+             .add("suppress_rerecord", 1)
+             .add("image","")
+             .add("countdown_seconds", 0)
+             .add("step_count", 0)
+             .build())
+        .add(Json.createObjectBuilder()
+             .add("step_id", 1001)
+             .add("title", "Unit test step 2")
+             .add("prompt", "test step")
+             .add("transcript", "")
+             .add("shuffle_words", 0)
+             .add("record", 0)
+             .add("max_seconds", 30)
+             .add("suppress_next", 0)
+             .add("next_delay_seconds", 0)
+             .add("suppress_rerecord", 1)
+             .add("image","")
+             .add("countdown_seconds", 0)
+             .add("step_count", 0)
+             .build())
+        .build();
+      labbcat.updateElicitationTaskSteps(taskId, steps);
+       
       // update it so it has no steps (so we can delete it)
       IO.Copy(noSteps, json);
       assertTrue("Can rename empty task file "
@@ -1557,6 +1597,7 @@ public class TestLabbcatAdmin {
                    taskId, emptyTaskId);
 
     } finally {
+      labbcat.setVerbose(false);
       // delete it
       try {
         labbcat.deleteElicitationTask(taskId);

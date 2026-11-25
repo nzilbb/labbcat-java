@@ -6,6 +6,8 @@
   + updateElicitedParticipantAttributeValidation
   + readElicitedTranscriptAttributeValidation
   + updateElicitedTranscriptAttributeValidation
+- New LabbcatAdmin functions for saving elicitation task steps:
+  + updateElicitationTaskSteps
 - New LabbcatAdmin functions for maintenance of dashboard items:
   + createDashboardItem
   + readDashboardItems
